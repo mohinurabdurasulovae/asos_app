@@ -1,0 +1,1373 @@
+openapi: 3.1.0
+info:
+  title: Asos API
+  version: 1.0.0-draft
+  summary: Backend contract for the Asos Constitution app.
+  description: |
+    Single source of truth for the client (`core:network`) and the backend team.
+    Change this file FIRST (in its own PR) before changing DTOs or Retrofit interfaces.
+
+    * **Public endpoints** (no `security`): Constitution text, topics, dictionary, search,
+      cases list, community feed (read), lawyers, hotline. These work without logging in
+      and are used by several screens.
+    * **Authenticated endpoints** (`bearerAuth`): everything under `/me`, posting, voting,
+      answers, chats.
+
+    All text is Uzbek (Latin). Send `Accept-Language: uz-Latn`.
+    The `x-screens` field on each operation lists the screens that use it.
+servers:
+  - url: https://api.asos.uz/api/v1
+    description: 'Production (PLACEHOLDER: domain not decided)'
+  - url: https://staging.api.asos.uz/api/v1
+    description: 'Staging (PLACEHOLDER)'
+
+tags:
+  - name: Auth
+  - name: Constitution
+  - name: Search
+  - name: Dictionary
+  - name: Learning
+  - name: Cases
+  - name: Community
+  - name: LegalHelp
+  - name: User
+  - name: Home
+
+security: []
+
+paths:
+  # ------------------------------------------------------------------ Auth
+  /auth/otp/request:
+    post:
+      tags: [Auth]
+      operationId: requestOtp
+      summary: Send an SMS code to a +998 phone number
+      x-screens: [Kirish]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OtpRequest' }
+      responses:
+        '204': { description: Code sent }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/otp/verify:
+    post:
+      tags: [Auth]
+      operationId: verifyOtp
+      summary: Exchange phone + code for tokens
+      x-screens: [Kirish]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OtpVerify' }
+      responses:
+        '200': { $ref: '#/components/responses/Session' }
+        '401': { $ref: '#/components/responses/Error' }
+  /auth/oneid:
+    post:
+      tags: [Auth]
+      operationId: loginWithOneId
+      summary: Log in with a OneID authorization code
+      x-screens: [Kirish]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProviderLogin' }
+      responses:
+        '200': { $ref: '#/components/responses/Session' }
+  /auth/google:
+    post:
+      tags: [Auth]
+      operationId: loginWithGoogle
+      summary: Log in with a Google ID token
+      x-screens: [Kirish]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProviderLogin' }
+      responses:
+        '200': { $ref: '#/components/responses/Session' }
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshToken
+      summary: Get a new access token
+      x-screens: ['all (AuthInterceptor)']
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties: { refreshToken: { type: string } }
+      responses:
+        '200': { $ref: '#/components/responses/Session' }
+  /auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil]
+      responses:
+        '204': { description: Logged out }
+
+  # ------------------------------------------------------------------ Constitution (public)
+  /constitution:
+    get:
+      tags: [Constitution]
+      operationId: getConstitutionInfo
+      summary: Edition info (2023 edition, 6 sections, 27 chapters, 155 articles)
+      x-screens: [Konstitutsiya]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConstitutionInfo' }
+  /constitution/sections:
+    get:
+      tags: [Constitution]
+      operationId: getSections
+      summary: All sections (bo‘lim) with their chapters (bob)
+      x-screens: [Konstitutsiya]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Section' }
+  /constitution/chapters/{chapterId}/articles:
+    get:
+      tags: [Constitution]
+      operationId: getChapterArticles
+      x-screens: [Konstitutsiya]
+      parameters:
+        - { name: chapterId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ArticleSummary' }
+  /articles/{number}:
+    get:
+      tags: [Constitution]
+      operationId: getArticle
+      summary: Full article — official text, plain summary, examples, terms
+      x-screens: [Modda, Bosh sahifa, Chat, Kazus, Test, Muhokama]
+      parameters:
+        - $ref: '#/components/parameters/ArticleNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Article' }
+        '404': { $ref: '#/components/responses/Error' }
+  /articles/{number}/related:
+    get:
+      tags: [Constitution]
+      operationId: getRelatedArticles
+      x-screens: [Modda]
+      parameters:
+        - $ref: '#/components/parameters/ArticleNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ArticleSummary' }
+  /articles/daily:
+    get:
+      tags: [Constitution]
+      operationId: getArticleOfTheDay
+      x-screens: [Bosh sahifa]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleSummary' }
+  /topics:
+    get:
+      tags: [Constitution]
+      operationId: getTopics
+      summary: Topics (Shaxsiy huquqlar, Siyosiy huquqlar, Ijtimoiy huquqlar, Burchlar, ...)
+      x-screens: [Bosh sahifa, O‘rganish]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Topic' }
+  /topics/{topicId}/articles:
+    get:
+      tags: [Constitution]
+      operationId: getTopicArticles
+      x-screens: [Konstitutsiya]
+      parameters:
+        - { name: topicId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ArticleSummary' }
+
+  # ------------------------------------------------------------------ Search (public)
+  /search:
+    get:
+      tags: [Search]
+      operationId: search
+      x-screens: [Bosh sahifa, Konstitutsiya, Hamjamiyat, Lug‘at]
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string } }
+        - name: type
+          in: query
+          schema: { type: string, enum: [all, article, term, case, post], default: all }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SearchResult' }
+
+  # ------------------------------------------------------------------ Dictionary (public)
+  /terms:
+    get:
+      tags: [Dictionary]
+      operationId: getTerms
+      x-screens: [Lug‘at]
+      parameters:
+        - { name: letter, in: query, schema: { type: string } }
+        - { name: q, in: query, schema: { type: string } }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Term' }
+  /terms/daily:
+    get:
+      tags: [Dictionary]
+      operationId: getTermOfTheDay
+      x-screens: [Lug‘at]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Term' }
+  /terms/{termId}:
+    get:
+      tags: [Dictionary]
+      operationId: getTerm
+      x-screens: [Lug‘at, Modda]
+      parameters:
+        - { name: termId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Term' }
+
+  # ------------------------------------------------------------------ Learning
+  /quizzes/topics:
+    get:
+      tags: [Learning]
+      operationId: getQuizTopics
+      summary: Tests by topic (public; includes user progress when a token is sent)
+      x-screens: [O‘rganish]
+      parameters:
+        - name: difficulty
+          in: query
+          schema: { $ref: '#/components/schemas/Difficulty' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/QuizTopic' }
+  /quizzes/daily:
+    get:
+      tags: [Learning]
+      operationId: getDailyQuestion
+      x-screens: [Bosh sahifa]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Question' }
+  /quizzes/{quizId}:
+    get:
+      tags: [Learning]
+      operationId: getQuiz
+      x-screens: [Test]
+      parameters:
+        - { name: quizId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quiz' }
+  /quizzes/{quizId}/answers:
+    post:
+      tags: [Learning]
+      operationId: submitAnswer
+      security: [{ bearerAuth: [] }]
+      x-screens: [Test, Bosh sahifa]
+      parameters:
+        - { name: quizId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [questionId, optionId]
+              properties:
+                questionId: { type: string }
+                optionId: { type: string }
+                timeSpentSec: { type: integer }
+      responses:
+        '200':
+          description: Checked answer
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnswerResult' }
+  /learning/progress:
+    get:
+      tags: [Learning]
+      operationId: getLearningProgress
+      security: [{ bearerAuth: [] }]
+      x-screens: [O‘rganish, Profil]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LearningProgress' }
+
+  # ------------------------------------------------------------------ Cases
+  /cases:
+    get:
+      tags: [Cases]
+      operationId: getCases
+      x-screens: [Kazuslar]
+      parameters:
+        - { name: category, in: query, schema: { type: string } }
+        - name: difficulty
+          in: query
+          schema: { $ref: '#/components/schemas/Difficulty' }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CaseSummary' }
+  /cases/featured:
+    get:
+      tags: [Cases]
+      operationId: getFeaturedCase
+      summary: Haftaning kazusi
+      x-screens: [Kazuslar, Bosh sahifa]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaseSummary' }
+  /cases/{caseId}:
+    get:
+      tags: [Cases]
+      operationId: getCase
+      x-screens: [Kazus]
+      parameters:
+        - $ref: '#/components/parameters/CaseId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegalCase' }
+  /cases/{caseId}/solutions:
+    post:
+      tags: [Cases]
+      operationId: submitCaseSolution
+      security: [{ bearerAuth: [] }]
+      x-screens: [Kazus]
+      parameters:
+        - $ref: '#/components/parameters/CaseId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [articleNumbers]
+              properties:
+                articleNumbers: { type: array, items: { type: integer } }
+                text: { type: string }
+      responses:
+        '200':
+          description: Score and the lawyer's explanation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaseResult' }
+
+  # ------------------------------------------------------------------ Community
+  /communities:
+    get:
+      tags: [Community]
+      operationId: getCommunities
+      x-screens: [Hamjamiyat]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Community' }
+  /posts:
+    get:
+      tags: [Community]
+      operationId: getPosts
+      x-screens: [Hamjamiyat]
+      parameters:
+        - { name: community, in: query, schema: { type: string } }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [hot, new, top, answered], default: hot }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Post' }
+    post:
+      tags: [Community]
+      operationId: createPost
+      security: [{ bearerAuth: [] }]
+      x-screens: [Hamjamiyat]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [communityId, title]
+              properties:
+                communityId: { type: string }
+                title: { type: string }
+                body: { type: string }
+                anonymous: { type: boolean, default: false }
+                articleNumbers: { type: array, items: { type: integer } }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Post' }
+  /posts/highlights:
+    get:
+      tags: [Community]
+      operationId: getPostHighlights
+      x-screens: [Bosh sahifa]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Post' }
+  /posts/{postId}:
+    get:
+      tags: [Community]
+      operationId: getPost
+      x-screens: [Muhokama]
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostDetail' }
+  /posts/{postId}/replies:
+    get:
+      tags: [Community]
+      operationId: getReplies
+      x-screens: [Muhokama]
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Reply' }
+    post:
+      tags: [Community]
+      operationId: createReply
+      security: [{ bearerAuth: [] }]
+      x-screens: [Muhokama]
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                parentReplyId: { type: string }
+                anonymous: { type: boolean, default: false }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reply' }
+  /posts/{postId}/vote:
+    post:
+      tags: [Community]
+      operationId: votePost
+      security: [{ bearerAuth: [] }]
+      x-screens: [Hamjamiyat, Muhokama, Bosh sahifa]
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VoteRequest' }
+      responses:
+        '200':
+          description: New score
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VoteResult' }
+  /replies/{replyId}/vote:
+    post:
+      tags: [Community]
+      operationId: voteReply
+      security: [{ bearerAuth: [] }]
+      x-screens: [Muhokama]
+      parameters:
+        - { name: replyId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VoteRequest' }
+      responses:
+        '200':
+          description: New score
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VoteResult' }
+
+  # ------------------------------------------------------------------ Legal help
+  /assistant/messages:
+    post:
+      tags: [LegalHelp]
+      operationId: askAssistant
+      summary: Ask the Asos AI assistant (answers cite articles)
+      security: [{ bearerAuth: [] }]
+      x-screens: [Huquqiy yordam, Bosh sahifa]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+                conversationId: { type: string }
+      responses:
+        '200':
+          description: Assistant reply
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssistantMessage' }
+  /legal-help/hotline:
+    get:
+      tags: [LegalHelp]
+      operationId: getHotline
+      x-screens: [Huquqiy yordam]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hotline' }
+  /lawyers:
+    get:
+      tags: [LegalHelp]
+      operationId: getLawyers
+      x-screens: [Huquqiy yordam]
+      parameters:
+        - { name: specialization, in: query, schema: { type: string } }
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Lawyer' }
+  /lawyers/{lawyerId}:
+    get:
+      tags: [LegalHelp]
+      operationId: getLawyer
+      x-screens: [Huquqiy yordam, Chat]
+      parameters:
+        - $ref: '#/components/parameters/LawyerId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Lawyer' }
+  /lawyers/{lawyerId}/bookings:
+    post:
+      tags: [LegalHelp]
+      operationId: bookLawyer
+      summary: Vaqt band qilish
+      security: [{ bearerAuth: [] }]
+      x-screens: [Huquqiy yordam]
+      parameters:
+        - $ref: '#/components/parameters/LawyerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [startsAt, kind]
+              properties:
+                startsAt: { type: string, format: date-time }
+                kind: { type: string, enum: [chat, call, video] }
+      responses:
+        '201':
+          description: Booked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Booking' }
+  /chats:
+    get:
+      tags: [LegalHelp]
+      operationId: getChats
+      security: [{ bearerAuth: [] }]
+      x-screens: [Huquqiy yordam]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ChatThread' }
+    post:
+      tags: [LegalHelp]
+      operationId: startChat
+      security: [{ bearerAuth: [] }]
+      x-screens: [Huquqiy yordam, Muhokama]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lawyerId]
+              properties: { lawyerId: { type: string } }
+      responses:
+        '201':
+          description: Chat created or existing chat returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChatThread' }
+  /chats/{chatId}:
+    get:
+      tags: [LegalHelp]
+      operationId: getChat
+      security: [{ bearerAuth: [] }]
+      x-screens: [Chat]
+      parameters:
+        - $ref: '#/components/parameters/ChatId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChatThread' }
+  /chats/{chatId}/messages:
+    get:
+      tags: [LegalHelp]
+      operationId: getChatMessages
+      security: [{ bearerAuth: [] }]
+      x-screens: [Chat]
+      parameters:
+        - $ref: '#/components/parameters/ChatId'
+        - { name: before, in: query, schema: { type: string }, description: Message id cursor }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ChatMessage' }
+    post:
+      tags: [LegalHelp]
+      operationId: sendChatMessage
+      security: [{ bearerAuth: [] }]
+      x-screens: [Chat]
+      parameters:
+        - $ref: '#/components/parameters/ChatId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text: { type: string }
+                fileId: { type: string }
+                articleNumber: { type: integer }
+      responses:
+        '201':
+          description: Sent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChatMessage' }
+
+  # ------------------------------------------------------------------ User (/me)
+  /me:
+    get:
+      tags: [User]
+      operationId: getMe
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil, Bosh sahifa]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+    patch:
+      tags: [User]
+      operationId: updateMe
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                avatarUrl: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+  /me/stats:
+    get:
+      tags: [User]
+      operationId: getMyStats
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil, O‘rganish]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserStats' }
+  /me/activity:
+    get:
+      tags: [User]
+      operationId: getMyActivity
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil]
+      parameters:
+        - name: range
+          in: query
+          schema: { type: string, enum: [week, month], default: week }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ActivityDay' }
+  /me/achievements:
+    get:
+      tags: [User]
+      operationId: getMyAchievements
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil, O‘rganish]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Achievement' }
+  /me/continue:
+    get:
+      tags: [User]
+      operationId: getContinueItems
+      summary: Davom ettiring (last article / case / test)
+      security: [{ bearerAuth: [] }]
+      x-screens: [Bosh sahifa, O‘rganish]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ContinueItem' }
+  /me/progress/articles:
+    get:
+      tags: [User]
+      operationId: getReadingProgress
+      security: [{ bearerAuth: [] }]
+      x-screens: [Konstitutsiya, Profil]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReadingProgress' }
+  /me/progress/articles/{number}:
+    put:
+      tags: [User]
+      operationId: markArticleRead
+      security: [{ bearerAuth: [] }]
+      x-screens: [Modda]
+      parameters:
+        - $ref: '#/components/parameters/ArticleNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: '#/components/schemas/ReadingStatus' }
+      responses:
+        '204': { description: Saved }
+  /me/bookmarks:
+    get:
+      tags: [User]
+      operationId: getBookmarks
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil, Konstitutsiya, Hamjamiyat, Lug‘at]
+      parameters:
+        - name: type
+          in: query
+          schema: { $ref: '#/components/schemas/BookmarkType' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Bookmark' }
+  /me/bookmarks/{type}/{id}:
+    parameters:
+      - name: type
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/BookmarkType' }
+      - { name: id, in: path, required: true, schema: { type: string } }
+    put:
+      tags: [User]
+      operationId: addBookmark
+      security: [{ bearerAuth: [] }]
+      x-screens: [Bosh sahifa, Modda, Lug‘at, Kazus, Muhokama]
+      responses:
+        '204': { description: Saved }
+    delete:
+      tags: [User]
+      operationId: removeBookmark
+      security: [{ bearerAuth: [] }]
+      x-screens: [Bosh sahifa, Modda, Lug‘at, Kazus, Muhokama, Profil]
+      responses:
+        '204': { description: Removed }
+  /me/settings:
+    patch:
+      tags: [User]
+      operationId: updateSettings
+      security: [{ bearerAuth: [] }]
+      x-screens: [Profil]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UserSettings' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserSettings' }
+
+  # ------------------------------------------------------------------ Home (aggregate)
+  /home:
+    get:
+      tags: [Home]
+      operationId: getHomeFeed
+      summary: Everything the home screen needs in one call
+      description: Aggregates /articles/daily, /topics, /me/continue, /quizzes/daily and /posts/highlights. Works without a token (no continue items).
+      x-screens: [Bosh sahifa]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HomeFeed' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ArticleNumber: { name: number, in: path, required: true, schema: { type: integer, minimum: 1, maximum: 155 } }
+    CaseId: { name: caseId, in: path, required: true, schema: { type: string } }
+    PostId: { name: postId, in: path, required: true, schema: { type: string } }
+    LawyerId: { name: lawyerId, in: path, required: true, schema: { type: string } }
+    ChatId: { name: chatId, in: path, required: true, schema: { type: string } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+
+  responses:
+    Session:
+      description: Logged in
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Session' }
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string, description: 'Uzbek, user-readable' }
+    OtpRequest:
+      type: object
+      required: [phone]
+      properties: { phone: { type: string, example: '+998901234567' } }
+    OtpVerify:
+      type: object
+      required: [phone, code]
+      properties: { phone: { type: string }, code: { type: string } }
+    ProviderLogin:
+      type: object
+      required: [token]
+      properties: { token: { type: string } }
+    Session:
+      type: object
+      required: [accessToken, refreshToken, user]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        expiresIn: { type: integer }
+        user: { $ref: '#/components/schemas/User' }
+
+    ConstitutionInfo:
+      type: object
+      properties:
+        edition: { type: string, example: '2023' }
+        sections: { type: integer, example: 6 }
+        chapters: { type: integer, example: 27 }
+        articles: { type: integer, example: 155 }
+        sourceUrl: { type: string }
+    Section:
+      type: object
+      properties:
+        id: { type: string }
+        number: { type: integer }
+        title: { type: string }
+        chapters: { type: array, items: { $ref: '#/components/schemas/Chapter' } }
+    Chapter:
+      type: object
+      properties:
+        id: { type: string }
+        number: { type: integer }
+        title: { type: string }
+        articleFrom: { type: integer }
+        articleTo: { type: integer }
+    ReadingStatus: { type: string, enum: [not_started, in_progress, read] }
+    ArticleSummary:
+      type: object
+      required: [number, title]
+      properties:
+        number: { type: integer, example: 50 }
+        title: { type: string }
+        chapterId: { type: string }
+        preview: { type: string }
+        readingMinutes: { type: integer }
+        status: { $ref: '#/components/schemas/ReadingStatus' }
+    Article:
+      allOf:
+        - $ref: '#/components/schemas/ArticleSummary'
+        - type: object
+          properties:
+            parts: { type: array, items: { type: string }, description: Official text parts }
+            summary: { type: array, items: { type: string }, description: Sodda qilib aytganda }
+            examples: { type: array, items: { $ref: '#/components/schemas/ArticleExample' } }
+            terms: { type: array, items: { $ref: '#/components/schemas/TermRef' } }
+            discussionCount: { type: integer }
+            quizId: { type: string }
+    ArticleExample:
+      type: object
+      properties: { title: { type: string }, text: { type: string }, caseId: { type: string } }
+    Topic:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        icon: { type: string, description: 'AsosIcons name, e.g. ShieldCheck' }
+        articleCount: { type: integer }
+    TermRef:
+      type: object
+      properties: { id: { type: string }, word: { type: string } }
+    Term:
+      type: object
+      properties:
+        id: { type: string }
+        word: { type: string }
+        definition: { type: string }
+        letter: { type: string }
+        articleNumbers: { type: array, items: { type: integer } }
+        audioUrl: { type: string }
+        saved: { type: boolean }
+    SearchResult:
+      type: object
+      properties:
+        type: { type: string, enum: [article, term, case, post] }
+        id: { type: string }
+        title: { type: string }
+        snippet: { type: string }
+
+    Difficulty: { type: string, enum: [easy, medium, hard] }
+    QuizTopic:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        icon: { type: string }
+        questionCount: { type: integer }
+        answeredCount: { type: integer }
+        completed: { type: boolean }
+        difficulty: { $ref: '#/components/schemas/Difficulty' }
+    Quiz:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        timeLimitSec: { type: integer }
+        questions: { type: array, items: { $ref: '#/components/schemas/Question' } }
+    Question:
+      type: object
+      properties:
+        id: { type: string }
+        quizId: { type: string }
+        text: { type: string }
+        options: { type: array, items: { $ref: '#/components/schemas/AnswerOption' } }
+    AnswerOption:
+      type: object
+      properties: { id: { type: string }, text: { type: string } }
+    AnswerResult:
+      type: object
+      properties:
+        correct: { type: boolean }
+        correctOptionId: { type: string }
+        explanation: { type: string }
+        articleNumber: { type: integer }
+        points: { type: integer }
+    LearningProgress:
+      type: object
+      properties:
+        overallPercent: { type: integer, example: 38 }
+        streakDays: { type: integer }
+        points: { type: integer }
+        level: { type: integer }
+        levelTitle: { type: string, example: Bilimdon }
+    Achievement:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        icon: { type: string }
+        unlocked: { type: boolean }
+        progressPercent: { type: integer }
+
+    CaseSummary:
+      type: object
+      properties:
+        id: { type: string }
+        number: { type: integer, example: 14 }
+        title: { type: string }
+        summary: { type: string }
+        category: { type: string }
+        difficulty: { $ref: '#/components/schemas/Difficulty' }
+        minutes: { type: integer }
+        status: { type: string, enum: [new, in_progress, solved] }
+        progressPercent: { type: integer }
+    LegalCase:
+      allOf:
+        - $ref: '#/components/schemas/CaseSummary'
+        - type: object
+          properties:
+            person: { type: string, example: 'Temur, 16 yosh' }
+            story: { type: string }
+            question: { type: string }
+            articleChoices: { type: array, items: { $ref: '#/components/schemas/ArticleSummary' } }
+    CaseResult:
+      type: object
+      properties:
+        points: { type: integer }
+        allCorrect: { type: boolean }
+        correctArticleNumbers: { type: array, items: { type: integer } }
+        explanation: { $ref: '#/components/schemas/LawyerExplanation' }
+    LawyerExplanation:
+      type: object
+      properties:
+        lawyer: { $ref: '#/components/schemas/Author' }
+        text: { type: string }
+        practicalSteps: { type: array, items: { type: string } }
+        seeAlsoArticleNumbers: { type: array, items: { type: integer } }
+
+    Author:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        initials: { type: string }
+        anonymous: { type: boolean }
+        verifiedLawyer: { type: boolean }
+    Community:
+      type: object
+      properties: { id: { type: string }, title: { type: string }, icon: { type: string } }
+    Post:
+      type: object
+      properties:
+        id: { type: string }
+        community: { $ref: '#/components/schemas/Community' }
+        author: { $ref: '#/components/schemas/Author' }
+        title: { type: string }
+        preview: { type: string }
+        score: { type: integer }
+        myVote: { type: string, enum: [up, down, none] }
+        commentCount: { type: integer }
+        lawyerAnswered: { type: boolean }
+        createdAt: { type: string, format: date-time }
+    PostDetail:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          properties:
+            body: { type: string }
+            articleNumbers: { type: array, items: { type: integer } }
+            lawyerAnswer: { $ref: '#/components/schemas/Reply' }
+            saved: { type: boolean }
+    Reply:
+      type: object
+      properties:
+        id: { type: string }
+        author: { $ref: '#/components/schemas/Author' }
+        text: { type: string }
+        score: { type: integer }
+        myVote: { type: string, enum: [up, down, none] }
+        parentReplyId: { type: string }
+        replies: { type: array, items: { $ref: '#/components/schemas/Reply' } }
+        createdAt: { type: string, format: date-time }
+    VoteRequest:
+      type: object
+      required: [direction]
+      properties: { direction: { type: string, enum: [up, down, none] } }
+    VoteResult:
+      type: object
+      properties: { score: { type: integer }, myVote: { type: string, enum: [up, down, none] } }
+
+    Hotline:
+      type: object
+      properties:
+        phone: { type: string, example: '+998 (71) 000-00-00', description: 'PLACEHOLDER: replace with the real number' }
+        hours: { type: string }
+        free: { type: boolean }
+    Lawyer:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        initials: { type: string }
+        specialization: { type: string }
+        verified: { type: boolean }
+        rating: { type: number }
+        reviewCount: { type: integer }
+        online: { type: boolean }
+        priceFrom: { type: integer, description: UZS }
+    Booking:
+      type: object
+      properties:
+        id: { type: string }
+        lawyerId: { type: string }
+        startsAt: { type: string, format: date-time }
+        kind: { type: string, enum: [chat, call, video] }
+    AssistantMessage:
+      type: object
+      properties:
+        conversationId: { type: string }
+        text: { type: string }
+        articleNumbers: { type: array, items: { type: integer } }
+        suggestLawyer: { type: boolean }
+    ChatThread:
+      type: object
+      properties:
+        id: { type: string }
+        lawyer: { $ref: '#/components/schemas/Lawyer' }
+        lastMessage: { $ref: '#/components/schemas/ChatMessage' }
+        unreadCount: { type: integer }
+    ChatMessage:
+      type: object
+      properties:
+        id: { type: string }
+        fromMe: { type: boolean }
+        text: { type: string }
+        file: { $ref: '#/components/schemas/FileRef' }
+        articleNumber: { type: integer }
+        sentAt: { type: string, format: date-time }
+        read: { type: boolean }
+    FileRef:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string, example: Ogohlantirish_xati.docx }
+        sizeBytes: { type: integer }
+        url: { type: string }
+
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        initials: { type: string }
+        phone: { type: string }
+        avatarUrl: { type: string }
+        level: { type: integer }
+        levelTitle: { type: string }
+    UserStats:
+      type: object
+      properties:
+        points: { type: integer }
+        streakDays: { type: integer }
+        articlesRead: { type: integer }
+        testsCompleted: { type: integer }
+        casesSolved: { type: integer }
+    ActivityDay:
+      type: object
+      properties: { date: { type: string, format: date }, minutes: { type: integer } }
+    ContinueItem:
+      type: object
+      properties:
+        type: { type: string, enum: [article, case, quiz] }
+        id: { type: string }
+        title: { type: string }
+        progressPercent: { type: integer }
+    ReadingProgress:
+      type: object
+      properties:
+        percent: { type: integer, example: 62 }
+        lastArticleNumber: { type: integer }
+        articles:
+          type: array
+          items:
+            type: object
+            properties:
+              number: { type: integer }
+              status: { $ref: '#/components/schemas/ReadingStatus' }
+    BookmarkType: { type: string, enum: [article, term, post, case] }
+    Bookmark:
+      type: object
+      properties:
+        type: { $ref: '#/components/schemas/BookmarkType' }
+        id: { type: string }
+        title: { type: string }
+        savedAt: { type: string, format: date-time }
+    UserSettings:
+      type: object
+      properties:
+        dailyReminders: { type: boolean }
+        reminderTime: { type: string, example: '19:00' }
+        language: { type: string, enum: [uz-Latn, uz-Cyrl, ru], default: uz-Latn }
+    HomeFeed:
+      type: object
+      properties:
+        greetingName: { type: string }
+        articleOfTheDay: { $ref: '#/components/schemas/ArticleSummary' }
+        topics: { type: array, items: { $ref: '#/components/schemas/Topic' } }
+        continueItems: { type: array, items: { $ref: '#/components/schemas/ContinueItem' } }
+        dailyQuestion: { $ref: '#/components/schemas/Question' }
+        streakDays: { type: integer }
+        highlights: { type: array, items: { $ref: '#/components/schemas/Post' } }

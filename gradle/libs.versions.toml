@@ -1,0 +1,16 @@
+# Version catalog  ·  WP-00
+# PLACEHOLDER: pin versions here and only here. Planned libraries:
+#   Kotlin, AGP, KSP
+#   Compose BOM, Material 3, ui-text-google-fonts, Activity Compose, Lifecycle (viewmodel/runtime compose)
+#   Navigation Compose (type-safe routes), kotlinx-serialization-json
+#   Hilt (+ hilt-navigation-compose)
+#   Retrofit, OkHttp (+ logging), retrofit-kotlinx-serialization converter
+#   Room, DataStore, security-crypto
+#   Coil (avatars, images)
+#   Coroutines
+#   Tests: JUnit, Turbine, kotlinx-coroutines-test, Compose UI test
+[versions]
+
+[libraries]
+
+[plugins]
