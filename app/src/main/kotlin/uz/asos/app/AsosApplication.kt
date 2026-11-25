@@ -3,6 +3,11 @@
  * Module: :app   ·   Work package: WP-00
  *
  * @HiltAndroidApp Application class.
- *
- * PLACEHOLDER: not implemented yet.
  */
+package uz.asos.app
+
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
+class AsosApplication : Application()

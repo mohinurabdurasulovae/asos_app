@@ -75,6 +75,7 @@ All icons are in [`core/designsystem/.../icon/AsosIcons.kt`](../../core/designsy
 | `AsosIcons.Send` | Send message / reply (Yuborish) | OnBrand |
 | `AsosIcons.Search` | Search fields (Qidirish) | Muted |
 | `AsosIcons.Bookmark` | Save / saved (Saqlash, Saqlanganlar) | Navy |
+| `AsosIcons.BookmarkFilled` | Saved state (Saqlangan) on the reader | Active |
 | `AsosIcons.ListAll` | "Barchasi" community chip | Navy |
 | `AsosIcons.Upvote` | Vote up | Muted / Active when voted |
 | `AsosIcons.Downvote` | Vote down | Muted |

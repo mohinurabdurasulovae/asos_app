@@ -1,14 +1,16 @@
 # Asos API
 
-The contract is [`openapi.yaml`](openapi.yaml) (OpenAPI 3.1). The backend and the Android client (`core:network`) both follow it.
+The contract is [`openapi.yaml`](openapi.yaml) (OpenAPI 3.0.3, same as the live server: https://asos.api.berdiklichev.uz/docs). The backend and the Android client (`core:network`) both follow it.
+
+> **Note:** the endpoint lists below were written for the first draft of the contract. The live API uses `/v1/...` paths and some different names (e.g. `POST /v1/me/bookmarks` instead of `PUT /me/bookmarks/{type}/{id}`). `openapi.yaml` is the source of truth; the Konstitutsiya and Modda sections are already updated.
 
 ## Rules
 
 1. **Contract first.** Change `openapi.yaml` in its own PR before touching DTOs (`core/network/.../dto`) or Retrofit interfaces (`core/network/.../api`).
 2. **Public vs private.** Endpoints without 🔒 work without logging in: the Constitution text, topics, dictionary, search, cases, the community feed, lawyers and the hotline. 🔒 endpoints need `Authorization: Bearer <token>`. `AuthInterceptor` adds it.
 3. **Screens never call the API directly.** Screen → ViewModel → (use case) → Repository (`core:data`) → `*Api` (`core:network`). Swap in `FakeAsosApi` / `Fake*Repository` while the backend isn't ready.
-4. **Base URL:** `/api/v1`. Send `Accept-Language: uz-Latn`. Errors use the `Error` schema with an Uzbek `message` you can show to the user.
-5. **Paging:** `?page=1` (default page size 20). Chat messages use a `before` cursor.
+4. **Base URL:** `https://asos.api.berdiklichev.uz/` (Gradle property `asos.baseUrl`); paths start with `v1/`. Send `Accept-Language: uz-Latn` and `X-Asos-Device`. Errors are `{ ok: false, error, message }` with an Uzbek `message` you can show to the user as-is.
+5. **Paging:** `?page=1&perPage=20`; lists return `{ ok, items, meta }`. Chat messages use a `before` cursor. Rate limit: 120 requests / minute per IP (`429` + `Retry-After`).
 
 ## Endpoints shared by several screens
 
@@ -65,22 +67,18 @@ These are the endpoints used across screens. Build and test them first.
 
 ### Konstitutsiya  ·  `:feature:constitution`
 
-- `GET /constitution`
-- `GET /constitution/sections`
-- `GET /constitution/chapters/{chapterId}/articles`
-- `GET /topics/{topicId}/articles`
-- `GET /search`
-- `GET /me/progress/articles` 🔒
-- `GET /me/bookmarks` 🔒
+- `GET /v1/constitution`
+- `GET /v1/topics`
+- `GET /v1/chapters/{roman}`
+- `GET /v1/articles` (`topic`, `q`, `section`, `status=saved` 🔒)
+- `GET /v1/me/progress` 🔒
 
 ### Modda  ·  `:feature:constitution`
 
-- `GET /articles/{number}`
-- `GET /articles/{number}/related`
-- `GET /terms/{termId}`
-- `PUT /me/progress/articles/{number}` 🔒
-- `PUT /me/bookmarks/{type}/{id}` 🔒
-- `DELETE /me/bookmarks/{type}/{id}` 🔒
+- `GET /v1/articles/{key}`
+- `POST /v1/articles/{key}/progress` 🔒
+- `POST /v1/me/bookmarks` 🔒
+- `DELETE /v1/me/bookmarks/{kind}/{id}` 🔒
 
 ### Lug‘at  ·  `:feature:dictionary`
 

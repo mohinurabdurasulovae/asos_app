@@ -4,7 +4,15 @@
 
 Android app (Kotlin + Jetpack Compose, MVVM) that makes the Constitution of the Republic of Uzbekistan (2023 edition) easy to read, understand and use. UI language: Uzbek (Latin).
 
-> **Status: project skeleton.** Every file is a placeholder with a header comment that says what goes in it. Nothing is implemented yet. The one exception is the icon set (`AsosIcons.kt`), which is taken complete from the design.
+> **Status:** the Gradle setup, app shell, design system basics, data layer for the Constitution, and the **Konstitutsiya** and **Modda** screens are implemented and connected to the live API. Every other file is still a placeholder with a header comment that says what goes in it.
+
+## Run it
+
+1. Open the `asos_app` folder in Android Studio (Ladybug or newer) and let Gradle sync. It downloads Gradle 8.11.1, AGP 8.7.3 and Kotlin 2.1.0.
+2. Run the `app` configuration on an emulator or phone (Android 8.0+). The app opens on Konstitutsiya.
+3. Unit tests: `./gradlew :feature:constitution:testDebugUnitTest`.
+
+The backend URL is the Gradle property `asos.baseUrl` in `gradle.properties`. For a local server (`php -S 127.0.0.1:8080 index.php`), set `asos.baseUrl=http://10.0.2.2:8080/` in `~/.gradle/gradle.properties` (local HTTP also needs a network security config for cleartext).
 
 ## Start here
 

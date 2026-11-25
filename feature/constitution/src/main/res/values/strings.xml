@@ -2,4 +2,74 @@
 <!-- Strings for :feature:constitution. Prefix keys with 'constitution_'. -->
 <!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <!-- Konstitutsiya (browse) -->
+    <string name="constitution_title">Konstitutsiya</string>
+    <string name="constitution_saved_button">Saqlanganlar</string>
+    <string name="constitution_search_placeholder">Modda raqami yoki so‘z, masalan: ta’lim</string>
+    <string name="constitution_search_label">Moddalardan qidirish</string>
+    <string name="constitution_tab_topics">Mavzular</string>
+    <string name="constitution_tab_structure">Tuzilish</string>
+    <string name="constitution_tab_saved">Saqlangan</string>
+    <string name="constitution_continue_overline">Oxirgi o‘qilgan</string>
+    <string name="constitution_continue_action">Davom ettirish</string>
+    <string name="constitution_topic_all">Barchasi</string>
+    <string name="constitution_preamble_title">Muqaddima</string>
+    <string name="constitution_preamble_subtitle">“Biz, O‘zbekistonning yagona xalqi…”</string>
+    <string name="constitution_expand">Ochish</string>
+    <string name="constitution_collapse">Yopish</string>
+    <string name="constitution_chapter_articles_empty">Bu bobda modda topilmadi.</string>
+    <string name="constitution_retry">Qayta urinish</string>
+    <string name="constitution_search_empty_title">Hech narsa topilmadi</string>
+    <string name="constitution_search_empty_message">Boshqa so‘z yoki modda raqamini kiriting.</string>
+    <string name="constitution_topic_empty_title">Bu mavzuda modda yo‘q</string>
+    <string name="constitution_topics_empty_title">Mavzular hali qo‘shilmagan</string>
+    <string name="constitution_saved_empty_title">Saqlangan moddalar yo‘q</string>
+    <string name="constitution_saved_empty_message">Moddani o‘qiyotganda yuqoridagi belgini bosing, u shu yerda paydo bo‘ladi.</string>
+    <string name="constitution_saved_signin_title">Saqlash uchun tizimga kiring</string>
+    <string name="constitution_saved_signin_message">Kirganingizdan keyin saqlangan moddalar barcha qurilmalaringizda ko‘rinadi.</string>
+    <string name="constitution_signin_action">Kirish</string>
+    <string name="constitution_load_error_title">Konstitutsiyani yuklab bo‘lmadi</string>
+
+    <!-- Modda (article reader) -->
+    <string name="constitution_back">Orqaga</string>
+    <string name="constitution_text_size">Matn o‘lchami</string>
+    <string name="constitution_save">Saqlash</string>
+    <string name="constitution_saved">Saqlangan</string>
+    <string name="constitution_share">Ulashish</string>
+    <string name="constitution_share_chooser">Moddani ulashish</string>
+    <string name="constitution_section_breadcrumb">%1$s bo‘lim</string>
+    <string name="constitution_chapter_breadcrumb">%1$s bob</string>
+    <string name="constitution_preamble_breadcrumb">Konstitutsiya</string>
+    <string name="constitution_in_force_since">%1$s dan kuchda</string>
+    <string name="constitution_tab_official">Rasmiy matn</string>
+    <string name="constitution_tab_plain">Sodda tilda</string>
+    <string name="constitution_tab_examples">Misollar</string>
+    <string name="constitution_tab_related">Bog‘liq</string>
+    <string name="constitution_parts_nav_label">Modda bo‘limlari</string>
+    <string name="constitution_show_full_text">To‘liq matnni ochish</string>
+    <string name="constitution_hide_full_text">Qisqartirish</string>
+    <string name="constitution_official_source">Rasmiy matn · Konstitutsiya, 2023-yil tahriri</string>
+    <string name="constitution_no_official_text">Bu moddaning rasmiy matni hali kiritilmagan.</string>
+    <string name="constitution_plain_title">Sodda qilib aytganda</string>
+    <string name="constitution_plain_reviewed_by">Tekshirgan: %1$s</string>
+    <string name="constitution_plain_default_disclaimer">Izohni huquqshunos tekshirgan · rasmiy matn o‘rnini bosmaydi</string>
+    <string name="constitution_examples_title">Hayotiy misollar</string>
+    <string name="constitution_examples_cases_link">Kazuslar →</string>
+    <string name="constitution_example_situation">Vaziyat</string>
+    <string name="constitution_related_title">Bog‘liq moddalar</string>
+    <string name="constitution_terms_title">Lug‘atda</string>
+    <string name="constitution_discussion_count">%1$d ta muhokama</string>
+    <string name="constitution_discussion_empty">Birinchi bo‘lib savol bering</string>
+    <string name="constitution_prev_article">Oldingi modda: %1$d</string>
+    <string name="constitution_next_article">Keyingi modda: %1$d</string>
+    <string name="constitution_quiz_button">Bilimni sinash</string>
+    <string name="constitution_quiz_soon">Test tez orada</string>
+    <string name="constitution_text_size_title">Matn o‘lchami</string>
+    <string name="constitution_text_size_small">Kichik</string>
+    <string name="constitution_text_size_medium">O‘rtacha</string>
+    <string name="constitution_text_size_large">Katta</string>
+    <string name="constitution_text_size_xlarge">Juda katta</string>
+    <string name="constitution_text_size_sample">Har kim ta’lim olish huquqiga ega.</string>
+    <string name="constitution_points_earned">+%1$d ball · modda o‘qildi</string>
+    <string name="constitution_article_load_error_title">Moddani yuklab bo‘lmadi</string>
 </resources>

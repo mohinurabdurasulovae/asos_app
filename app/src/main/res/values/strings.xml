@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Asos</string>
+    <string name="app_coming_soon_title">Tez orada</string>
+    <string name="app_coming_soon_message">“%1$s” ekrani hali tayyor emas. U keyingi versiyalarda qo‘shiladi.</string>
+    <string name="app_coming_soon_back">Orqaga</string>
+    <string name="app_screen_login">Kirish</string>
+    <string name="app_screen_home">Bosh sahifa</string>
+    <string name="app_screen_dictionary">Konstitutsiyaviy lug‘at</string>
+    <string name="app_screen_learn">O‘rganish</string>
+    <string name="app_screen_quiz">Test</string>
+    <string name="app_screen_cases">Kazuslar</string>
+    <string name="app_screen_case">Kazus</string>
+    <string name="app_screen_community">Hamjamiyat</string>
+    <string name="app_screen_post">Muhokama</string>
+    <string name="app_screen_legal_help">Huquqiy yordam</string>
+    <string name="app_screen_chat">Chat</string>
+    <string name="app_screen_profile">Profil</string>
+    <string name="app_screen_search">Qidiruv</string>
+    <string name="app_screen_bookmarks">Saqlanganlar</string>
 </resources>

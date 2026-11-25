@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for :core:navigation. All user-facing text is Uzbek (Latin script). -->
+<resources>
+    <string name="navigation_tab_home">Bosh sahifa</string>
+    <string name="navigation_tab_constitution">Konstitutsiya</string>
+    <string name="navigation_tab_learn">O‘rganish</string>
+    <string name="navigation_tab_community">Hamjamiyat</string>
+    <string name="navigation_tab_profile">Profil</string>
+</resources>

@@ -1,4 +1,10 @@
 // :core:common  ·  WP-00
-// PLACEHOLDER: build configuration goes here.
-//
-// Pure Kotlin/JVM library. Coroutines only.
+// Pure Kotlin/JVM library: result type, dispatchers, Uzbek formatters.
+plugins {
+    alias(libs.plugins.asos.jvm.library)
+    alias(libs.plugins.asos.hilt)
+}
+
+dependencies {
+    api(libs.kotlinx.coroutines.core)
+}

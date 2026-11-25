@@ -1,24 +1,39 @@
 // Root settings  ·  WP-00
-// PLACEHOLDER. rootProject.name = "Asos"; includeBuild("build-logic")
-// Modules to include:
-//   :app
-//   :core:common
-//   :core:model
-//   :core:network
-//   :core:database
-//   :core:datastore
-//   :core:data
-//   :core:domain
-//   :core:navigation
-//   :core:designsystem
-//   :core:ui
-//   :core:testing
-//   :feature:auth
-//   :feature:home
-//   :feature:constitution
-//   :feature:dictionary
-//   :feature:learn
-//   :feature:cases
-//   :feature:community
-//   :feature:legalhelp
-//   :feature:profile
+pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "Asos"
+
+include(":app")
+
+include(":core:common")
+include(":core:model")
+include(":core:network")
+include(":core:datastore")
+include(":core:data")
+include(":core:navigation")
+include(":core:designsystem")
+include(":core:ui")
+include(":core:testing")
+
+include(":feature:constitution")
+
+// Still placeholders (their build.gradle.kts files are empty). Add each line when the
+// work package lands, together with the module's dependency in app/build.gradle.kts:
+//   :core:database   :core:domain
+//   :feature:auth    :feature:home       :feature:dictionary   :feature:learn
+//   :feature:cases   :feature:community  :feature:legalhelp    :feature:profile

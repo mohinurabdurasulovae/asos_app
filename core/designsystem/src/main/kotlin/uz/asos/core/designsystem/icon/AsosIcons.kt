@@ -315,6 +315,14 @@ object AsosIcons {
         )
     }
 
+    /** Saved state of Bookmark (Saqlangan), filled. Recommended tint: Active. */
+    val BookmarkFilled: ImageVector by lazy {
+        icon(
+            "BookmarkFilled", 24f,
+            Layer("M6 3h12v18l-6-4-6 4z", fill = Color(0xFF172B4D)),
+        )
+    }
+
     /** "Barchasi" community chip. Recommended tint: Navy. */
     val ListAll: ImageVector by lazy {
         icon(

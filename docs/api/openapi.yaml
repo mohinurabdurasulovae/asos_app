@@ -1,1373 +1,3522 @@
-openapi: 3.1.0
+openapi: 3.0.3
+
 info:
   title: Asos API
-  version: 1.0.0-draft
-  summary: Backend contract for the Asos Constitution app.
+  version: 1.0.0
   description: |
-    Single source of truth for the client (`core:network`) and the backend team.
-    Change this file FIRST (in its own PR) before changing DTOs or Retrofit interfaces.
+    «Asos» — O‘zbekiston Respublikasi Konstitutsiyasini o‘qish, tushunish va
+    hayotda qo‘llash uchun mobil ilovaning backend'i.
 
-    * **Public endpoints** (no `security`): Constitution text, topics, dictionary, search,
-      cases list, community feed (read), lawyers, hotline. These work without logging in
-      and are used by several screens.
-    * **Authenticated endpoints** (`bearerAuth`): everything under `/me`, posting, voting,
-      answers, chats.
+    ## Umumiy qoidalar
 
-    All text is Uzbek (Latin). Send `Accept-Language: uz-Latn`.
-    The `x-screens` field on each operation lists the screens that use it.
+    * Hamma javob JSON. Muvaffaqiyatli javobda `"ok": true`, xatoda `"ok": false`.
+    * Xato javobi: `{ "ok": false, "error": "<kod>", "message": "<o‘zbekcha matn>" }`.
+      `message` ilovada o‘zgartirmasdan ko‘rsatishga yaroqli.
+    * Vaqt — UTC, `YYYY-MM-DD HH:MM:SS` ko‘rinishida.
+    * Ro‘yxatlar bir xil shaklda: `{ ok, items, meta: { total, page, perPage, pages, hasMore } }`.
+    * Sahifalash: `?page=1&perPage=20`.
+    * Kirish — `Authorization: Bearer <accessToken>`.
+    * Bir IP uchun daqiqada 120 so‘rov; oshsa `429` va `Retry-After` sarlavhasi.
+    * Brauzer sahifalari (`/`, `/docs`, `/openapi.yaml`) kod bilan to‘silgan.
+      `/v1/…` endpointlari **to‘silmaydi** — mobil ilova kodni bilmaydi.
+    * Qurilma nomini `X-Asos-Device` sarlavhasida yuborsangiz, u faol
+      qurilmalar ro‘yxatida ko‘rinadi.
+
+    ## Kirish oqimi
+
+    1. `POST /v1/auth/request-code` — telefon raqamga SMS kodi yuboriladi.
+       Rivojlanish rejimida (`dev_mode: true`) javobda `devCode` ham qaytadi.
+    2. `POST /v1/auth/verify` — kod to‘g‘ri bo‘lsa, token va foydalanuvchi qaytadi.
+       Raqam birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi (`isNew: true`).
+    3. Keyingi so‘rovlarda `Authorization: Bearer <accessToken>`.
+
+    ## Ekran — endpoint
+
+    | Ekran | Endpoint |
+    |---|---|
+    | Bosh sahifa | `GET /v1/home` |
+    | Konstitutsiya | `GET /v1/constitution` |
+    | Modda | `GET /v1/articles/{raqam}` |
+    | Lug‘at | `GET /v1/terms` |
+    | O‘rganish | `GET /v1/learn` |
+    | Test savoli | `POST /v1/quizzes/{id}/attempts` → `POST /v1/attempts/{id}/answers` |
+    | Kazuslar | `GET /v1/cases` |
+    | Kazus | `GET /v1/cases/{raqam}` → `POST /v1/cases/{raqam}/check` |
+    | Hamjamiyat | `GET /v1/posts` |
+    | Muhokama | `GET /v1/posts/{id}` |
+    | Huquqiy yordam | `GET /v1/help` |
+    | Chat | `GET /v1/conversations/{id}` |
+    | Profil | `GET /v1/me/profile` |
+
+    ## Kontent
+
+    Konstitutsiyaning to‘liq rasmiy matni bazada: 6 bo‘lim, 27 bob, 155 modda
+    va 10 bandli muqaddima, bandlarga ajratilgan holda. Manba —
+    [lex.uz](https://lex.uz/uz/docs/-6445145), 2023-yil 30-aprel referendumida
+    qabul qilingan tahrir (amaldagi o‘zgartirishlar bilan). Matn o‘zgartirilmagan.
+
+    Rasmiy matnda moddalarning **sarlavhasi yo‘q**. 12 ta moddaga tahririt
+    sarlavha berilgan; qolganlarida `title` — moddaning raqami va
+    `titleAuto: true`. Ro‘yxatlarda `excerpt` (matnning birinchi satri) ishlating.
+
+    Sodda tilda izoh (`plain`), hayotiy misollar (`examples`), testlar va
+    kazuslar — **tahririy kontent**, rasmiy matn emas.
+
+  contact:
+    name: Asos API
+    url: https://asos.api.berdiklichev.uz/docs
+
 servers:
-  - url: https://api.asos.uz/api/v1
-    description: 'Production (PLACEHOLDER: domain not decided)'
-  - url: https://staging.api.asos.uz/api/v1
-    description: 'Staging (PLACEHOLDER)'
+  - url: https://asos.api.berdiklichev.uz
+    description: Ishlab turgan server
+  - url: http://127.0.0.1:8080
+    description: Lokal (php -S 127.0.0.1:8080 index.php)
 
 tags:
-  - name: Auth
-  - name: Constitution
-  - name: Search
-  - name: Dictionary
-  - name: Learning
-  - name: Cases
-  - name: Community
-  - name: LegalHelp
-  - name: User
-  - name: Home
+  - name: Meta
+    description: Xizmat holati va ilova sozlamalari
+  - name: Kirish
+    description: Telefon + SMS kodi, tokenlar, qurilmalar
+  - name: Profil
+    description: O‘zim, statistika, yutuqlar, saqlanganlar, bildirishnomalar
+  - name: Konstitutsiya
+    description: Bo‘lim, bob, modda, mavzu, qidiruv
+  - name: Lug‘at
+    description: Konstitutsiyaviy atamalar
+  - name: O‘rganish
+    description: Testlar, urinishlar, kunlik savol
+  - name: Kazuslar
+    description: Hayotiy vaziyat → modda → yechim
+  - name: Hamjamiyat
+    description: Jamoalar, muhokamalar, izohlar, ovozlar
+  - name: Yordam
+    description: Ishonch telefoni, advokatlar, chat, AI, band qilish
 
-security: []
+security:
+  - bearerAuth: []
 
 paths:
-  # ------------------------------------------------------------------ Auth
-  /auth/otp/request:
-    post:
-      tags: [Auth]
-      operationId: requestOtp
-      summary: Send an SMS code to a +998 phone number
-      x-screens: [Kirish]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/OtpRequest' }
+
+  # ------------------------------------------------------------------ Meta
+
+  /v1/health:
+    get:
+      tags: [Meta]
+      summary: Xizmat holati
+      description: Monitoring uchun. Bazaga ulanishni va seed holatini ko‘rsatadi.
+      security: []
       responses:
-        '204': { description: Code sent }
-        '429': { $ref: '#/components/responses/Error' }
-  /auth/otp/verify:
-    post:
-      tags: [Auth]
-      operationId: verifyOtp
-      summary: Exchange phone + code for tokens
-      x-screens: [Kirish]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/OtpVerify' }
+        '200':
+          description: Holat
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      php:      { type: string, example: '8.2.12' }
+                      driver:   { type: string, enum: [mysql, sqlite] }
+                      schema:   { type: integer, example: 1 }
+                      articles: { type: integer, example: 156 }
+                      seeded:   { type: string, nullable: true }
+                      time:     { type: string }
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /v1/config:
+    get:
+      tags: [Meta]
+      summary: Ilova sozlamalari
+      description: |
+        Ilova ishga tushganda bir marta oladi: tuzilish raqamlari, ball
+        qiymatlari, darajalar, lug‘at alifbosi va ogohlantirish matnlari.
+        `ETag` qo‘yiladi — o‘zgarmagan bo‘lsa `304` qaytadi.
+      security: []
       responses:
-        '200': { $ref: '#/components/responses/Session' }
-        '401': { $ref: '#/components/responses/Error' }
-  /auth/oneid:
+        '200':
+          description: Sozlamalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      version:      { type: string }
+                      constitution: { $ref: '#/components/schemas/ConstitutionStats' }
+                      letters:
+                        type: array
+                        items: { $ref: '#/components/schemas/Letter' }
+                      points:
+                        type: object
+                        properties:
+                          perArticle:  { type: integer, example: 10 }
+                          perQuestion: { type: integer, example: 20 }
+                          casePerfect: { type: integer, example: 40 }
+                          casePartial: { type: integer, example: 15 }
+                      levels:
+                        type: array
+                        items: { $ref: '#/components/schemas/Level' }
+                      difficulties: { type: array, items: { type: string } }
+                      postSorts:    { type: array, items: { type: string } }
+                      bookmarkKinds: { type: array, items: { type: string } }
+                      locales:      { type: array, items: { type: string } }
+                      textSizes:    { type: array, items: { type: string } }
+                      disclaimers:
+                        type: object
+                        properties:
+                          plain: { type: string }
+                          ai:    { type: string }
+                          post:  { type: string }
+                      minAppVersion: { type: string }
+        '304':
+          description: O‘zgarmagan (If-None-Match)
+
+  # ----------------------------------------------------------------- Kirish
+
+  /v1/auth/request-code:
     post:
-      tags: [Auth]
-      operationId: loginWithOneId
-      summary: Log in with a OneID authorization code
-      x-screens: [Kirish]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/ProviderLogin' }
-      responses:
-        '200': { $ref: '#/components/responses/Session' }
-  /auth/google:
-    post:
-      tags: [Auth]
-      operationId: loginWithGoogle
-      summary: Log in with a Google ID token
-      x-screens: [Kirish]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/ProviderLogin' }
-      responses:
-        '200': { $ref: '#/components/responses/Session' }
-  /auth/refresh:
-    post:
-      tags: [Auth]
-      operationId: refreshToken
-      summary: Get a new access token
-      x-screens: ['all (AuthInterceptor)']
+      tags: [Kirish]
+      summary: SMS kodi yuborish
+      description: |
+        Bitta raqamga ketma-ket kod yuborish orasida kamida 60 sekund tanaffus.
+        Kod 5 daqiqa amal qiladi.
+      security: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [refreshToken]
-              properties: { refreshToken: { type: string } }
-      responses:
-        '200': { $ref: '#/components/responses/Session' }
-  /auth/logout:
-    post:
-      tags: [Auth]
-      operationId: logout
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil]
-      responses:
-        '204': { description: Logged out }
-
-  # ------------------------------------------------------------------ Constitution (public)
-  /constitution:
-    get:
-      tags: [Constitution]
-      operationId: getConstitutionInfo
-      summary: Edition info (2023 edition, 6 sections, 27 chapters, 155 articles)
-      x-screens: [Konstitutsiya]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ConstitutionInfo' }
-  /constitution/sections:
-    get:
-      tags: [Constitution]
-      operationId: getSections
-      summary: All sections (bo‘lim) with their chapters (bob)
-      x-screens: [Konstitutsiya]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Section' }
-  /constitution/chapters/{chapterId}/articles:
-    get:
-      tags: [Constitution]
-      operationId: getChapterArticles
-      x-screens: [Konstitutsiya]
-      parameters:
-        - { name: chapterId, in: path, required: true, schema: { type: string } }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ArticleSummary' }
-  /articles/{number}:
-    get:
-      tags: [Constitution]
-      operationId: getArticle
-      summary: Full article — official text, plain summary, examples, terms
-      x-screens: [Modda, Bosh sahifa, Chat, Kazus, Test, Muhokama]
-      parameters:
-        - $ref: '#/components/parameters/ArticleNumber'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Article' }
-        '404': { $ref: '#/components/responses/Error' }
-  /articles/{number}/related:
-    get:
-      tags: [Constitution]
-      operationId: getRelatedArticles
-      x-screens: [Modda]
-      parameters:
-        - $ref: '#/components/parameters/ArticleNumber'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ArticleSummary' }
-  /articles/daily:
-    get:
-      tags: [Constitution]
-      operationId: getArticleOfTheDay
-      x-screens: [Bosh sahifa]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ArticleSummary' }
-  /topics:
-    get:
-      tags: [Constitution]
-      operationId: getTopics
-      summary: Topics (Shaxsiy huquqlar, Siyosiy huquqlar, Ijtimoiy huquqlar, Burchlar, ...)
-      x-screens: [Bosh sahifa, O‘rganish]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Topic' }
-  /topics/{topicId}/articles:
-    get:
-      tags: [Constitution]
-      operationId: getTopicArticles
-      x-screens: [Konstitutsiya]
-      parameters:
-        - { name: topicId, in: path, required: true, schema: { type: string } }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ArticleSummary' }
-
-  # ------------------------------------------------------------------ Search (public)
-  /search:
-    get:
-      tags: [Search]
-      operationId: search
-      x-screens: [Bosh sahifa, Konstitutsiya, Hamjamiyat, Lug‘at]
-      parameters:
-        - { name: q, in: query, required: true, schema: { type: string } }
-        - name: type
-          in: query
-          schema: { type: string, enum: [all, article, term, case, post], default: all }
-        - $ref: '#/components/parameters/Page'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/SearchResult' }
-
-  # ------------------------------------------------------------------ Dictionary (public)
-  /terms:
-    get:
-      tags: [Dictionary]
-      operationId: getTerms
-      x-screens: [Lug‘at]
-      parameters:
-        - { name: letter, in: query, schema: { type: string } }
-        - { name: q, in: query, schema: { type: string } }
-        - $ref: '#/components/parameters/Page'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Term' }
-  /terms/daily:
-    get:
-      tags: [Dictionary]
-      operationId: getTermOfTheDay
-      x-screens: [Lug‘at]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Term' }
-  /terms/{termId}:
-    get:
-      tags: [Dictionary]
-      operationId: getTerm
-      x-screens: [Lug‘at, Modda]
-      parameters:
-        - { name: termId, in: path, required: true, schema: { type: string } }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Term' }
-
-  # ------------------------------------------------------------------ Learning
-  /quizzes/topics:
-    get:
-      tags: [Learning]
-      operationId: getQuizTopics
-      summary: Tests by topic (public; includes user progress when a token is sent)
-      x-screens: [O‘rganish]
-      parameters:
-        - name: difficulty
-          in: query
-          schema: { $ref: '#/components/schemas/Difficulty' }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/QuizTopic' }
-  /quizzes/daily:
-    get:
-      tags: [Learning]
-      operationId: getDailyQuestion
-      x-screens: [Bosh sahifa]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Question' }
-  /quizzes/{quizId}:
-    get:
-      tags: [Learning]
-      operationId: getQuiz
-      x-screens: [Test]
-      parameters:
-        - { name: quizId, in: path, required: true, schema: { type: string } }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Quiz' }
-  /quizzes/{quizId}/answers:
-    post:
-      tags: [Learning]
-      operationId: submitAnswer
-      security: [{ bearerAuth: [] }]
-      x-screens: [Test, Bosh sahifa]
-      parameters:
-        - { name: quizId, in: path, required: true, schema: { type: string } }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [questionId, optionId]
+              required: [phone]
               properties:
-                questionId: { type: string }
-                optionId: { type: string }
-                timeSpentSec: { type: integer }
+                phone:
+                  type: string
+                  description: '+998901234567, 998901234567 yoki 901234567 — hammasi qabul qilinadi'
+                  example: '+998901234567'
       responses:
         '200':
-          description: Checked answer
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/AnswerResult' }
-  /learning/progress:
-    get:
-      tags: [Learning]
-      operationId: getLearningProgress
-      security: [{ bearerAuth: [] }]
-      x-screens: [O‘rganish, Profil]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/LearningProgress' }
-
-  # ------------------------------------------------------------------ Cases
-  /cases:
-    get:
-      tags: [Cases]
-      operationId: getCases
-      x-screens: [Kazuslar]
-      parameters:
-        - { name: category, in: query, schema: { type: string } }
-        - name: difficulty
-          in: query
-          schema: { $ref: '#/components/schemas/Difficulty' }
-        - $ref: '#/components/parameters/Page'
-      responses:
-        '200':
-          description: OK
+          description: Kod yuborildi
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/CaseSummary' }
-  /cases/featured:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      phone:     { type: string, example: '+998901234567' }
+                      expiresIn: { type: integer, example: 300 }
+                      resendIn:  { type: integer, example: 60 }
+                      devCode:
+                        type: string
+                        description: "Faqat `dev_mode: true` bo‘lganda. Serverda qaytmaydi."
+                        example: '123456'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: Tanaffus tugamagan
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      retryAfter: { type: integer, example: 42 }
+
+  /v1/auth/verify:
+    post:
+      tags: [Kirish]
+      summary: Kodni tasdiqlash va token olish
+      description: Raqam birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, code]
+              properties:
+                phone: { type: string, example: '+998901234567' }
+                code:  { type: string, example: '123456' }
+      responses:
+        '200':
+          description: Kirish muvaffaqiyatli
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      token: { $ref: '#/components/schemas/Token' }
+                      user:  { $ref: '#/components/schemas/Me' }
+                      isNew: { type: boolean, description: Akkaunt shu so‘rovda yaratildimi }
+        '401':
+          description: Kod xato
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      triesLeft: { type: integer, example: 3 }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '410':
+          description: Kod yuborilmagan yoki muddati tugagan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/Validation' }
+        '429':
+          description: Urinishlar tugadi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /v1/auth/oauth:
+    post:
+      tags: [Kirish]
+      summary: OneID yoki Google orqali kirish
+      description: |
+        Provayder tokenini tekshirish ilova yoki provayder tomonida bo‘ladi;
+        bu endpoint barqaror `subject` (provayderdagi id) kutadi.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider, subject]
+              properties:
+                provider: { type: string, enum: [oneid, google] }
+                subject:  { type: string, example: 'oneid-7781234' }
+                email:    { type: string, format: email }
+                name:     { type: string, example: 'Aziza Karimova' }
+      responses:
+        '200':
+          description: Kirish muvaffaqiyatli
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      token: { $ref: '#/components/schemas/Token' }
+                      user:  { $ref: '#/components/schemas/Me' }
+                      isNew: { type: boolean }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/auth/logout:
+    post:
+      tags: [Kirish]
+      summary: Shu qurilmadan chiqish
+      responses:
+        '200':
+          description: Token bekor qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { loggedOut: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/auth/logout-all:
+    post:
+      tags: [Kirish]
+      summary: Barcha qurilmalardan chiqish
+      responses:
+        '200':
+          description: Hamma token bekor qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { loggedOut: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/auth/sessions:
     get:
-      tags: [Cases]
-      operationId: getFeaturedCase
+      tags: [Kirish]
+      summary: Faol qurilmalar
+      description: «Maxfiylik va xavfsizlik» ekrani uchun.
+      responses:
+        '200':
+          description: Qurilmalar ro‘yxati
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Session' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/auth/sessions/{id}:
+    delete:
+      tags: [Kirish]
+      summary: Bitta qurilmani chiqarish
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Bekor qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { revoked: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/devices:
+    post:
+      tags: [Kirish]
+      summary: Push token qo‘shish yoki yangilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pushToken]
+              properties:
+                pushToken:  { type: string }
+                platform:   { type: string, enum: [android, ios, web], default: android }
+                appVersion: { type: string, example: 1.0.0 }
+      responses:
+        '200':
+          description: Saqlandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { registered: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/devices/{token}:
+    delete:
+      tags: [Kirish]
+      summary: Push tokenni olib tashlash
+      parameters:
+        - { name: token, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: O‘chirildi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { removed: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # ------------------------------------------------------------- Bosh sahifa
+
+  /v1/home:
+    get:
+      tags: [Meta]
+      summary: Bosh sahifa — butun ekran bitta so‘rovda
+      description: |
+        Tokensiz ham ishlaydi (mehmon ko‘rinishi). Token bilan qo‘shimcha
+        `user`, `continue`, `dailyGoal` va `unreadNotifications` qaytadi.
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Bosh sahifa ma’lumotlari
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      greeting:
+                        type: string
+                        description: Toshkent vaqtiga qarab salomlashish
+                        example: Xayrli kech
+                      articleOfDay: { $ref: '#/components/schemas/ArticleOfDay' }
+                      termOfDay:
+                        type: object
+                        nullable: true
+                        properties:
+                          term:     { type: string }
+                          slug:     { type: string }
+                          shortDef: { type: string }
+                      topics:
+                        type: array
+                        items: { $ref: '#/components/schemas/Topic' }
+                      caseOfWeek:    { $ref: '#/components/schemas/CaseBrief' }
+                      dailyQuestion: { $ref: '#/components/schemas/DailyQuestion' }
+                      help:
+                        type: object
+                        properties:
+                          hotline:       { $ref: '#/components/schemas/Hotline' }
+                          lawyersOnline: { type: integer }
+                          aiSuggestions: { type: array, items: { type: string } }
+                      community:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: '#/components/schemas/PostBrief' }
+                      user:     { $ref: '#/components/schemas/Me' }
+                      continue: { $ref: '#/components/schemas/ReadingOverview' }
+                      dailyGoal: { $ref: '#/components/schemas/DailyGoal' }
+                      unreadNotifications: { type: integer }
+
+  # ----------------------------------------------------------- Konstitutsiya
+
+  /v1/constitution:
+    get:
+      tags: [Konstitutsiya]
+      summary: Bo‘lim va boblar daraxti
+      description: Token berilsa, har bobda o‘qilgan modda soni va foizi qaytadi.
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Daraxt
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      stats: { $ref: '#/components/schemas/ConstitutionStats' }
+                      sections:
+                        type: array
+                        items: { $ref: '#/components/schemas/Section' }
+
+  /v1/constitution/stats:
+    get:
+      tags: [Konstitutsiya]
+      summary: Tuzilish raqamlari
+      security: []
+      responses:
+        '200':
+          description: 6 bo‘lim · 27 bob · 155 modda
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - $ref: '#/components/schemas/ConstitutionStats'
+        '304': { description: O‘zgarmagan }
+
+  /v1/topics:
+    get:
+      tags: [Konstitutsiya]
+      summary: Mavzular
+      security: []
+      responses:
+        '200':
+          description: Mavzular ro‘yxati
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Topic' }
+        '304': { description: O‘zgarmagan }
+
+  /v1/chapters/{roman}:
+    get:
+      tags: [Konstitutsiya]
+      summary: Bitta bob va uning moddalari
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - name: roman
+          in: path
+          required: true
+          description: Bobning rim raqami
+          schema: { type: string }
+          example: IX
+      responses:
+        '200':
+          description: Bob
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      chapter: { $ref: '#/components/schemas/Chapter' }
+                      section:
+                        type: object
+                        nullable: true
+                        properties:
+                          roman: { type: string }
+                          title: { type: string }
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ArticleBrief' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/articles:
+    get:
+      tags: [Konstitutsiya]
+      summary: Moddalar ro‘yxati
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: topic,   in: query, schema: { type: string }, description: Mavzu slug'i, example: talim }
+        - { name: chapter, in: query, schema: { type: string }, description: Bobning rim raqami }
+        - { name: section, in: query, schema: { type: string }, description: Bo‘limning rim raqami }
+        - { name: q,       in: query, schema: { type: string }, description: Modda raqami yoki so‘z }
+        - name: status
+          in: query
+          description: Faqat token bilan ishlaydi
+          schema: { type: string, enum: [read, unread, saved] }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Moddalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ArticleBrief' }
+
+  /v1/articles/of-the-day:
+    get:
+      tags: [Konstitutsiya]
+      summary: Kun moddasi
+      description: Kunga bog‘langan barqaror tanlov — bir kun ichida o‘zgarmaydi.
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Kun moddasi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      article: { $ref: '#/components/schemas/ArticleOfDay' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/articles/{key}:
+    get:
+      tags: [Konstitutsiya]
+      summary: Bitta modda — to‘liq
+      description: |
+        «Modda» ekranining hammasi: rasmiy matn (`parts`), sodda tilda
+        (`plain`), hayotiy misollar (`examples`), bog‘liq moddalar, lug‘atdagi
+        atamalar, muhokamalar soni, tegishli test va qo‘shni moddalar.
+
+        **Diqqat:** rasmiy matni hali kiritilmagan moddalarda `parts` bo‘sh
+        massiv bo‘ladi.
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/articleKey'
+      responses:
+        '200':
+          description: Modda
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      article: { $ref: '#/components/schemas/Article' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/articles/{key}/progress:
+    post:
+      tags: [Konstitutsiya]
+      summary: O‘qish holatini saqlash
+      description: |
+        `status: read` birinchi marta yuborilganda 10 ball beriladi, kunlik
+        faollik oshadi va yutuqlar tekshiriladi. Takroriy `read` ball bermaydi.
+      parameters:
+        - $ref: '#/components/parameters/articleKey'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:  { type: string, enum: [reading, read], default: read }
+                seconds: { type: integer, minimum: 0, maximum: 86400, description: Shu moddada o‘tgan vaqt }
+      responses:
+        '200':
+          description: Saqlandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      status:       { type: string }
+                      pointsEarned: { type: integer, example: 10 }
+                      points:       { type: integer, description: Yangi umumiy ball }
+                      streakDays:   { type: integer }
+                      achievements:
+                        type: array
+                        items: { $ref: '#/components/schemas/Achievement' }
+                      overview: { $ref: '#/components/schemas/ReadingOverview' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/articles/{key}/posts:
+    get:
+      tags: [Konstitutsiya]
+      summary: Moddaga tegishli muhokamalar
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/articleKey'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Muhokamalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PostBrief' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/search:
+    get:
+      tags: [Konstitutsiya]
+      summary: Birlashgan qidiruv
+      description: Moddalar, lug‘at atamalari va muhokamalar bo‘yicha.
+      security: []
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string, minLength: 2 }, example: ta’lim }
+        - { name: limit, in: query, schema: { type: integer, default: 8, minimum: 1, maximum: 30 } }
+      responses:
+        '200':
+          description: Natijalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      query: { type: string }
+                      articles:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            number: { type: integer }
+                            title:  { type: string }
+                            slug:   { type: string }
+                      terms:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            slug:     { type: string }
+                            term:     { type: string }
+                            shortDef: { type: string }
+                      posts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:           { type: integer }
+                            title:        { type: string }
+                            upvotes:      { type: integer }
+                            commentCount: { type: integer }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  # ----------------------------------------------------------------- Lug'at
+
+  /v1/terms:
+    get:
+      tags: [Lug‘at]
+      summary: Atamalar ro‘yxati
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: letter, in: query, schema: { type: string }, example: D }
+        - { name: q,      in: query, schema: { type: string } }
+        - { name: saved,  in: query, schema: { type: string, enum: ['1'] }, description: Faqat saqlanganlar (token kerak) }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Atamalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/TermBrief' }
+                      letters:
+                        type: array
+                        items: { $ref: '#/components/schemas/Letter' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/terms/letters:
+    get:
+      tags: [Lug‘at]
+      summary: Alifbo reykasi
+      description: O‘zbek lotin alifbosi (29 element, `O‘`, `G‘`, `Sh`, `Ch`, `Ng` bilan) va har harfdagi atama soni.
+      security: []
+      responses:
+        '200':
+          description: Harflar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Letter' }
+        '304': { description: O‘zgarmagan }
+
+  /v1/terms/of-the-day:
+    get:
+      tags: [Lug‘at]
+      summary: Kun atamasi
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Kun atamasi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      term: { $ref: '#/components/schemas/Term' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/terms/{slug}:
+    get:
+      tags: [Lug‘at]
+      summary: Bitta atama
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string }, example: daxlsizlik }
+      responses:
+        '200':
+          description: Atama
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      term: { $ref: '#/components/schemas/Term' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ----------------------------------------------------------------- Profil
+
+  /v1/me:
+    get:
+      tags: [Profil]
+      summary: O‘zim
+      responses:
+        '200':
+          description: Foydalanuvchi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      user: { $ref: '#/components/schemas/Me' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    patch:
+      tags: [Profil]
+      summary: Profilni o‘zgartirish
+      description: Faqat yuborilgan maydonlar o‘zgaradi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:        { type: string, minLength: 2, maxLength: 120 }
+                city:        { type: string, nullable: true }
+                username:
+                  type: string
+                  nullable: true
+                  description: 'Harf yoki raqamdan boshlanadi, 3–60 belgi. Boshidagi @ olib tashlanadi.'
+                dailyGoal:   { type: integer, minimum: 1, maximum: 20 }
+                locale:      { type: string, enum: [uz-Latn, uz-Cyrl, ru, en] }
+                textSize:    { type: string, enum: [small, medium, large, xlarge] }
+                notifyDaily: { type: boolean }
+      responses:
+        '200':
+          description: Yangilandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      user: { $ref: '#/components/schemas/Me' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: Taxallus band
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/Validation' }
+    delete:
+      tags: [Profil]
+      summary: Akkauntni o‘chirish
+      description: |
+        Shaxsiy ma’lumotlar o‘chadi, hamjamiyatdagi postlar va izohlar anonim
+        bo‘lib qoladi (muhokamalar buzilmasligi uchun). Hamma token bekor qilinadi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirm]
+              properties:
+                confirm: { type: string, enum: ['DELETE'] }
+      responses:
+        '200':
+          description: O‘chirildi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { deleted: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/me/profile:
+    get:
+      tags: [Profil]
+      summary: Profil ekrani — butun ekran bitta so‘rovda
+      responses:
+        '200':
+          description: Profil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      user: { $ref: '#/components/schemas/Me' }
+                      stats:
+                        type: object
+                        properties:
+                          points:       { type: integer, example: 1240 }
+                          quizzesDone:  { type: integer, example: 18 }
+                          casesSolved:  { type: integer, example: 7 }
+                          articlesRead: { type: integer, example: 59 }
+                          percent:      { type: integer, example: 38 }
+                          streakDays:   { type: integer, example: 7 }
+                      week: { $ref: '#/components/schemas/WeekActivity' }
+                      dailyGoal: { $ref: '#/components/schemas/DailyGoal' }
+                      achievements:
+                        type: object
+                        properties:
+                          earned: { type: integer, example: 3 }
+                          total:  { type: integer, example: 12 }
+                          items:
+                            type: array
+                            items: { $ref: '#/components/schemas/Achievement' }
+                      bookmarks:
+                        type: object
+                        description: Saqlanganlar soni turlar bo‘yicha
+                        properties:
+                          article: { type: integer, example: 8 }
+                          term:    { type: integer, example: 12 }
+                          post:    { type: integer, example: 5 }
+                          case:    { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/me/progress:
+    get:
+      tags: [Profil]
+      summary: O‘qish jarayoni
+      responses:
+        '200':
+          description: Umumiy natija va «davom ettiring»
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - $ref: '#/components/schemas/ReadingOverview'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/me/achievements:
+    get:
+      tags: [Profil]
+      summary: Yutuqlar
+      description: Olinganlari birinchi.
+      responses:
+        '200':
+          description: Yutuqlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Achievement' }
+                      earned: { type: integer }
+                      total:  { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/me/achievements/recount:
+    post:
+      tags: [Profil]
+      summary: Yutuqlarni qayta sanash
+      description: Migratsiya yoki seed'dan keyin foydali.
+      responses:
+        '200':
+          description: Qayta sanaldi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      newlyEarned:
+                        type: array
+                        items: { $ref: '#/components/schemas/Achievement' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/me/points:
+    get:
+      tags: [Profil]
+      summary: Ballar tarixi
+      description: "Har bir ball qayerdan kelgani — `reason`: article, quiz, case."
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Daftar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      balance: { type: integer }
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:        { type: integer }
+                            delta:     { type: integer }
+                            reason:    { type: string, enum: [article, quiz, case, streak] }
+                            note:      { type: string, nullable: true }
+                            createdAt: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/me/bookmarks:
+    get:
+      tags: [Profil]
+      summary: Saqlanganlar
+      parameters:
+        - { name: kind, in: query, schema: { type: string, enum: [article, term, post, case], default: article } }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Saqlangan yozuvlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      kind:   { type: string }
+                      counts: { type: object, additionalProperties: { type: integer } }
+                      items:  { type: array, items: { type: object } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Profil]
+      summary: Saqlash
+      description: |
+        `targetId` to‘g‘ridan-to‘g‘ri, yoki qulayroq yo‘l bilan:
+        `articleNumber`, `termSlug`, `caseNumber`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind]
+              properties:
+                kind:          { type: string, enum: [article, term, post, case] }
+                targetId:      { type: integer }
+                articleNumber: { type: integer, example: 50 }
+                termSlug:      { type: string, example: daxlsizlik }
+                caseNumber:    { type: integer, example: 14 }
+      responses:
+        '200':
+          description: Saqlandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      saved:    { type: boolean }
+                      kind:     { type: string }
+                      targetId: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/me/bookmarks/{kind}/{id}:
+    delete:
+      tags: [Profil]
+      summary: Saqlanganni olib tashlash
+      parameters:
+        - { name: kind, in: path, required: true, schema: { type: string, enum: [article, term, post, case] } }
+        - { name: id,   in: path, required: true, schema: { type: integer }, description: Yozuvning ichki id'si }
+      responses:
+        '200':
+          description: Olib tashlandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { saved: { type: boolean, example: false } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/me/notifications:
+    get:
+      tags: [Profil]
+      summary: Bildirishnomalar
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Bildirishnomalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      unread: { type: integer }
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Notification' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/me/notifications/read:
+    post:
+      tags: [Profil]
+      summary: O‘qildi deb belgilash
+      description: '`ids` berilmasa — hammasi o‘qilgan deb belgilanadi.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items: { type: integer }
+                  maxItems: 200
+      responses:
+        '200':
+          description: Belgilandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { unread: { type: integer } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/leaderboard:
+    get:
+      tags: [Profil]
+      summary: Reyting
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: period, in: query, schema: { type: string, enum: [week, all], default: week } }
+        - { name: limit,  in: query, schema: { type: integer, default: 20, minimum: 1, maximum: 100 } }
+      responses:
+        '200':
+          description: Reyting
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      period: { type: string }
+                      items:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/UserPublic'
+                            - type: object
+                              properties:
+                                rank:   { type: integer }
+                                points: { type: integer }
+                                isMe:   { type: boolean }
+
+  # -------------------------------------------------------------- O'rganish
+
+  /v1/learn:
+    get:
+      tags: [O‘rganish]
+      summary: O‘rganish ekrani — butun ekran bitta so‘rovda
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: O‘rganish
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      quizzes:
+                        type: array
+                        items: { $ref: '#/components/schemas/Quiz' }
+                      caseOfWeek:  { $ref: '#/components/schemas/CaseBrief' }
+                      casesSolved: { type: integer }
+                      casesNew:    { type: integer }
+                      overview:    { $ref: '#/components/schemas/ReadingOverview' }
+                      dailyGoal:   { $ref: '#/components/schemas/DailyGoal' }
+                      points:      { type: integer }
+                      streakDays:  { type: integer }
+                      achievements:
+                        type: array
+                        items: { $ref: '#/components/schemas/Achievement' }
+
+  /v1/quizzes:
+    get:
+      tags: [O‘rganish]
+      summary: Testlar
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: difficulty, in: query, schema: { type: string, enum: [boshlangich, orta, murakkab] } }
+        - { name: topic,      in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Testlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Quiz' }
+
+  /v1/quizzes/{id}:
+    get:
+      tags: [O‘rganish]
+      summary: Bitta test
+      description: Savol matnlarini bermaydi — ular urinish ochilganda qaytadi.
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, description: 'id yoki slug', example: shaxsiy-huquqlar }
+      responses:
+        '200':
+          description: Test
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      quiz: { $ref: '#/components/schemas/Quiz' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/quizzes/{id}/attempts:
+    post:
+      tags: [O‘rganish]
+      summary: Urinish boshlash
+      description: |
+        Tugallanmagan urinish bo‘lsa, yangisi ochilmaydi — o‘shasi qaytadi,
+        shuning uchun ilova «Davom etish» holatini qo‘lda kuzatmasa ham bo‘ladi.
+
+        To‘g‘ri javob variantlari javobda **ko‘rsatilmaydi**: `isCorrect` maydoni
+        faqat javob berilgan savollarda paydo bo‘ladi.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, description: 'id yoki slug' }
+      responses:
+        '200':
+          description: Urinish
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      attempt: { $ref: '#/components/schemas/Attempt' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Testda savol yo‘q
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /v1/attempts/{id}:
+    get:
+      tags: [O‘rganish]
+      summary: Urinish holati
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Urinish
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      attempt: { $ref: '#/components/schemas/Attempt' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/attempts/{id}/answers:
+    post:
+      tags: [O‘rganish]
+      summary: Savolga javob berish
+      description: |
+        To‘g‘ri javob, izoh va tegishli modda **shu javobda** qaytadi — ilova
+        ularni oldindan bilmaydi. Bitta savolga ikkinchi marta javob berish
+        `409` bilan rad qilinadi. Oxirgi savol javoblansa, `result` ham qaytadi.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [questionId]
+              properties:
+                questionId: { type: integer }
+                optionId:
+                  type: integer
+                  nullable: true
+                  description: 'null — javobsiz qoldirish (xato deb hisoblanadi)'
+                seconds: { type: integer, minimum: 0, maximum: 3600 }
+      responses:
+        '200':
+          description: Javob natijasi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      isCorrect:       { type: boolean }
+                      correctOptionId: { type: integer, nullable: true }
+                      pointsEarned:    { type: integer, example: 20 }
+                      points:          { type: integer, description: Yangi umumiy ball }
+                      explanation:     { type: string }
+                      article:         { $ref: '#/components/schemas/ArticleRef' }
+                      answered:        { type: integer }
+                      total:           { type: integer }
+                      result:
+                        allOf:
+                          - $ref: '#/components/schemas/AttemptResult'
+                        nullable: true
+                        description: Oxirgi savol javoblansa to‘ladi
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Allaqachon javob berilgan yoki urinish tugagan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/attempts/{id}/finish:
+    post:
+      tags: [O‘rganish]
+      summary: Urinishni tugatish
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Natija
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      result: { $ref: '#/components/schemas/AttemptResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/daily-question:
+    get:
+      tags: [O‘rganish]
+      summary: Kunlik savol
+      description: Bir kunga bitta, hamma foydalanuvchiga bir xil.
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Savol
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      question: { $ref: '#/components/schemas/DailyQuestion' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/daily-question/answer:
+    post:
+      tags: [O‘rganish]
+      summary: Kunlik savolga javob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [optionId]
+              properties:
+                optionId: { type: integer }
+                seconds:  { type: integer, minimum: 0, maximum: 3600 }
+      responses:
+        '200':
+          description: Javob natijasi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      isCorrect:       { type: boolean }
+                      correctOptionId: { type: integer, nullable: true }
+                      pointsEarned:    { type: integer }
+                      points:          { type: integer }
+                      streakDays:      { type: integer }
+                      explanation:     { type: string }
+                      article:         { $ref: '#/components/schemas/ArticleRef' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Bugun allaqachon javob berilgan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  # --------------------------------------------------------------- Kazuslar
+
+  /v1/case-categories:
+    get:
+      tags: [Kazuslar]
+      summary: Kazus kategoriyalari
+      security: []
+      responses:
+        '200':
+          description: Kategoriyalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CaseCategory' }
+        '304': { description: O‘zgarmagan }
+
+  /v1/cases:
+    get:
+      tags: [Kazuslar]
+      summary: Kazuslar ro‘yxati
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: category,   in: query, schema: { type: string }, example: talim }
+        - { name: difficulty, in: query, schema: { type: integer, enum: [1, 2, 3] } }
+        - { name: status,     in: query, schema: { type: string, enum: [new, in_progress, solved] }, description: Urinish holati (token kerak) }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
+      responses:
+        '200':
+          description: Kazuslar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CaseBrief' }
+                      categories:
+                        type: array
+                        items: { $ref: '#/components/schemas/CaseCategory' }
+
+  /v1/cases/of-the-week:
+    get:
+      tags: [Kazuslar]
       summary: Haftaning kazusi
-      x-screens: [Kazuslar, Bosh sahifa]
+      security:
+        - bearerAuth: []
+        - {}
       responses:
         '200':
-          description: OK
+          description: Kazus
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CaseSummary' }
-  /cases/{caseId}:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      case: { $ref: '#/components/schemas/CaseBrief' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/cases/{key}:
     get:
-      tags: [Cases]
-      operationId: getCase
-      x-screens: [Kazus]
+      tags: [Kazuslar]
+      summary: Bitta kazus
+      description: |
+        Modda variantlarida `isCorrect` **yo‘q** — u faqat `check` dan keyin
+        paydo bo‘ladi. Huquqshunos izohi (`commentary`) ham tekshirishdan
+        oldin `null` bo‘ladi.
+      security:
+        - bearerAuth: []
+        - {}
       parameters:
-        - $ref: '#/components/parameters/CaseId'
+        - $ref: '#/components/parameters/caseKey'
       responses:
         '200':
-          description: OK
+          description: Kazus
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/LegalCase' }
-  /cases/{caseId}/solutions:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      case: { $ref: '#/components/schemas/Case' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/cases/{key}/draft:
     post:
-      tags: [Cases]
-      operationId: submitCaseSolution
-      security: [{ bearerAuth: [] }]
-      x-screens: [Kazus]
+      tags: [Kazuslar]
+      summary: Oraliq saqlash
+      description: 1 va 2-bosqichdagi holatni saqlaydi, hech narsa bahlolanmaydi.
       parameters:
-        - $ref: '#/components/parameters/CaseId'
+        - $ref: '#/components/parameters/caseKey'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                step:     { type: integer, minimum: 1, maximum: 3 }
+                selected: { type: array, items: { type: integer }, description: Tanlangan modda raqamlari }
+                solution: { type: string, maxLength: 4000 }
+      responses:
+        '200':
+          description: Saqlandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      attemptId: { type: integer }
+                      step:      { type: integer }
+                      status:    { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Kazus allaqachon yechilgan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /v1/cases/{key}/check:
+    post:
+      tags: [Kazuslar]
+      summary: Javobni tekshirish
+      description: |
+        Baholaydi, ball beradi va huquqshunos izohini ochadi.
+        Hammasi to‘g‘ri — 40 ball; qisman — 15 ball; mutlaqo xato — 0.
+        Takroriy tekshirish ball bermaydi (`pointsEarned: 0`).
+      parameters:
+        - $ref: '#/components/parameters/caseKey'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [articleNumbers]
+              required: [selected]
               properties:
-                articleNumbers: { type: array, items: { type: integer } }
-                text: { type: string }
+                selected:
+                  type: array
+                  items: { type: integer }
+                  minItems: 1
+                  description: Tanlangan modda raqamlari
+                  example: [31]
+                solution: { type: string, maxLength: 4000 }
       responses:
         '200':
-          description: Score and the lawyer's explanation
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/CaseResult' }
-
-  # ------------------------------------------------------------------ Community
-  /communities:
-    get:
-      tags: [Community]
-      operationId: getCommunities
-      x-screens: [Hamjamiyat]
-      responses:
-        '200':
-          description: OK
+          description: Natija
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/Community' }
-  /posts:
-    get:
-      tags: [Community]
-      operationId: getPosts
-      x-screens: [Hamjamiyat]
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      attemptId:    { type: integer }
+                      score:        { type: integer, example: 40 }
+                      pointsEarned: { type: integer }
+                      points:       { type: integer }
+                      streakDays:   { type: integer }
+                      isPerfect:    { type: boolean }
+                      isPartial:    { type: boolean }
+                      title:        { type: string, example: 'Ajoyib! +40 ball' }
+                      subtitle:     { type: string }
+                      correct:      { type: array, items: { type: integer } }
+                      hit:          { type: array, items: { type: integer } }
+                      extra:        { type: array, items: { type: integer }, description: Keraksiz tanlanganlar }
+                      missed:       { type: array, items: { type: integer }, description: Tanlanmay qolganlar }
+                      marks:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            number:    { type: integer }
+                            picked:    { type: boolean }
+                            isCorrect: { type: boolean }
+                            mark:      { type: string, enum: [correct, wrong, missed, neutral] }
+                            note:      { type: string, nullable: true }
+                      commentary: { $ref: '#/components/schemas/CaseCommentary' }
+                      achievements:
+                        type: array
+                        items: { $ref: '#/components/schemas/Achievement' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/cases/{key}/reset:
+    post:
+      tags: [Kazuslar]
+      summary: Qaytadan yechish
       parameters:
-        - { name: community, in: query, schema: { type: string } }
+        - $ref: '#/components/parameters/caseKey'
+      responses:
+        '200':
+          description: Urinish o‘chirildi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { status: { type: string, example: new } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ------------------------------------------------------------- Hamjamiyat
+
+  /v1/communities:
+    get:
+      tags: [Hamjamiyat]
+      summary: Jamoalar
+      security:
+        - bearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: Jamoalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Community' }
+
+  /v1/communities/{slug}/join:
+    post:
+      tags: [Hamjamiyat]
+      summary: Jamoaga qo‘shilish
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string }, example: uy-joy }
+      responses:
+        '200':
+          description: Qo‘shildi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      isMember:    { type: boolean }
+                      memberCount: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Hamjamiyat]
+      summary: Jamoadan chiqish
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Chiqdi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      isMember:    { type: boolean }
+                      memberCount: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/posts:
+    get:
+      tags: [Hamjamiyat]
+      summary: Lenta
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - { name: community, in: query, schema: { type: string }, description: "Jamoa slug'i yoki `all`" }
         - name: sort
           in: query
-          schema: { type: string, enum: [hot, new, top, answered], default: hot }
-        - $ref: '#/components/parameters/Page'
+          schema: { type: string, enum: [popular, new, unanswered, subscriptions], default: popular }
+          description: '`subscriptions` token talab qiladi'
+        - { name: q,       in: query, schema: { type: string } }
+        - { name: article, in: query, schema: { type: integer }, description: Modda raqami }
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/perPage'
       responses:
         '200':
-          description: OK
+          description: Muhokamalar
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/Post' }
+                allOf:
+                  - $ref: '#/components/schemas/ListResponse'
+                  - type: object
+                    properties:
+                      sort: { type: string }
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PostBrief' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
     post:
-      tags: [Community]
-      operationId: createPost
-      security: [{ bearerAuth: [] }]
-      x-screens: [Hamjamiyat]
+      tags: [Hamjamiyat]
+      summary: Savol berish
+      description: Yangi post `awaiting_lawyer` holatida boshlanadi.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [communityId, title]
+              required: [title, body]
               properties:
-                communityId: { type: string }
-                title: { type: string }
-                body: { type: string }
-                anonymous: { type: boolean, default: false }
-                articleNumbers: { type: array, items: { type: integer } }
+                title:         { type: string, minLength: 10, maxLength: 255 }
+                body:          { type: string, minLength: 20, maxLength: 8000 }
+                community:     { type: string, example: uy-joy }
+                isAnonymous:   { type: boolean, default: false }
+                articleNumber: { type: integer, example: 31 }
+                tags:
+                  type: array
+                  items: { type: string, maxLength: 40 }
+                  maxItems: 5
       responses:
         '201':
-          description: Created
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Post' }
-  /posts/highlights:
-    get:
-      tags: [Community]
-      operationId: getPostHighlights
-      x-screens: [Bosh sahifa]
-      responses:
-        '200':
-          description: OK
+          description: Yaratildi
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/Post' }
-  /posts/{postId}:
-    get:
-      tags: [Community]
-      operationId: getPost
-      x-screens: [Muhokama]
-      parameters:
-        - $ref: '#/components/parameters/PostId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/PostDetail' }
-  /posts/{postId}/replies:
-    get:
-      tags: [Community]
-      operationId: getReplies
-      x-screens: [Muhokama]
-      parameters:
-        - $ref: '#/components/parameters/PostId'
-        - $ref: '#/components/parameters/Page'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Reply' }
-    post:
-      tags: [Community]
-      operationId: createReply
-      security: [{ bearerAuth: [] }]
-      x-screens: [Muhokama]
-      parameters:
-        - $ref: '#/components/parameters/PostId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [text]
-              properties:
-                text: { type: string }
-                parentReplyId: { type: string }
-                anonymous: { type: boolean, default: false }
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Reply' }
-  /posts/{postId}/vote:
-    post:
-      tags: [Community]
-      operationId: votePost
-      security: [{ bearerAuth: [] }]
-      x-screens: [Hamjamiyat, Muhokama, Bosh sahifa]
-      parameters:
-        - $ref: '#/components/parameters/PostId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/VoteRequest' }
-      responses:
-        '200':
-          description: New score
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/VoteResult' }
-  /replies/{replyId}/vote:
-    post:
-      tags: [Community]
-      operationId: voteReply
-      security: [{ bearerAuth: [] }]
-      x-screens: [Muhokama]
-      parameters:
-        - { name: replyId, in: path, required: true, schema: { type: string } }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/VoteRequest' }
-      responses:
-        '200':
-          description: New score
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/VoteResult' }
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      post: { $ref: '#/components/schemas/Post' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
 
-  # ------------------------------------------------------------------ Legal help
-  /assistant/messages:
-    post:
-      tags: [LegalHelp]
-      operationId: askAssistant
-      summary: Ask the Asos AI assistant (answers cite articles)
-      security: [{ bearerAuth: [] }]
-      x-screens: [Huquqiy yordam, Bosh sahifa]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [text]
-              properties:
-                text: { type: string }
-                conversationId: { type: string }
-      responses:
-        '200':
-          description: Assistant reply
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/AssistantMessage' }
-  /legal-help/hotline:
+  /v1/posts/{id}:
     get:
-      tags: [LegalHelp]
-      operationId: getHotline
-      x-screens: [Huquqiy yordam]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Hotline' }
-  /lawyers:
-    get:
-      tags: [LegalHelp]
-      operationId: getLawyers
-      x-screens: [Huquqiy yordam]
+      tags: [Hamjamiyat]
+      summary: Muhokama — post va izohlar daraxti
+      security:
+        - bearerAuth: []
+        - {}
       parameters:
-        - { name: specialization, in: query, schema: { type: string } }
-        - $ref: '#/components/parameters/Page'
+        - { name: id, in: path, required: true, schema: { type: integer } }
+        - { name: commentSort, in: query, schema: { type: string, enum: [best, new], default: best } }
       responses:
         '200':
-          description: OK
+          description: Muhokama
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/Lawyer' }
-  /lawyers/{lawyerId}:
-    get:
-      tags: [LegalHelp]
-      operationId: getLawyer
-      x-screens: [Huquqiy yordam, Chat]
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      post: { $ref: '#/components/schemas/Post' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Hamjamiyat]
+      summary: Postni o‘chirish
+      description: Faqat muallif yoki moderator.
       parameters:
-        - $ref: '#/components/parameters/LawyerId'
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Lawyer' }
-  /lawyers/{lawyerId}/bookings:
-    post:
-      tags: [LegalHelp]
-      operationId: bookLawyer
-      summary: Vaqt band qilish
-      security: [{ bearerAuth: [] }]
-      x-screens: [Huquqiy yordam]
-      parameters:
-        - $ref: '#/components/parameters/LawyerId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [startsAt, kind]
-              properties:
-                startsAt: { type: string, format: date-time }
-                kind: { type: string, enum: [chat, call, video] }
-      responses:
-        '201':
-          description: Booked
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/Booking' }
-  /chats:
-    get:
-      tags: [LegalHelp]
-      operationId: getChats
-      security: [{ bearerAuth: [] }]
-      x-screens: [Huquqiy yordam]
-      responses:
-        '200':
-          description: OK
+          description: O‘chirildi
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/ChatThread' }
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { deleted: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/posts/{id}/vote:
     post:
-      tags: [LegalHelp]
-      operationId: startChat
-      security: [{ bearerAuth: [] }]
-      x-screens: [Huquqiy yordam, Muhokama]
+      tags: [Hamjamiyat]
+      summary: Postga ovoz berish
+      description: 'Bir foydalanuvchi — bir ovoz. `value: 0` ovozni olib tashlaydi.'
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [lawyerId]
-              properties: { lawyerId: { type: string } }
-      responses:
-        '201':
-          description: Chat created or existing chat returned
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ChatThread' }
-  /chats/{chatId}:
-    get:
-      tags: [LegalHelp]
-      operationId: getChat
-      security: [{ bearerAuth: [] }]
-      x-screens: [Chat]
-      parameters:
-        - $ref: '#/components/parameters/ChatId'
+              required: [value]
+              properties:
+                value: { type: integer, enum: [-1, 0, 1] }
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ChatThread' }
-  /chats/{chatId}/messages:
-    get:
-      tags: [LegalHelp]
-      operationId: getChatMessages
-      security: [{ bearerAuth: [] }]
-      x-screens: [Chat]
-      parameters:
-        - $ref: '#/components/parameters/ChatId'
-        - { name: before, in: query, schema: { type: string }, description: Message id cursor }
-      responses:
-        '200':
-          description: OK
+          description: Ovoz hisoblandi
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/ChatMessage' }
-    post:
-      tags: [LegalHelp]
-      operationId: sendChatMessage
-      security: [{ bearerAuth: [] }]
-      x-screens: [Chat]
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      upvotes: { type: integer }
+                      myVote:  { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/posts/{id}/comments:
+    get:
+      tags: [Hamjamiyat]
+      summary: Izohlar
+      description: "Ikki qatlamli daraxt: ildiz izohlar va ularning javoblari."
+      security:
+        - bearerAuth: []
+        - {}
       parameters:
-        - $ref: '#/components/parameters/ChatId'
+        - { name: id, in: path, required: true, schema: { type: integer } }
+        - { name: commentSort, in: query, schema: { type: string, enum: [best, new], default: best } }
+      responses:
+        '200':
+          description: Izohlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Comment' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Hamjamiyat]
+      summary: Izoh yozish
+      description: |
+        Muallif advokat bo‘lsa, izoh `isLawyer: true` bo‘ladi va post
+        `answered` holatiga o‘tadi. `parentId` uchinchi qatlamga tushmaydi —
+        chuqur javob avtomatik ildizga ko‘tariladi.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [body]
               properties:
-                text: { type: string }
-                fileId: { type: string }
+                body:          { type: string, minLength: 2, maxLength: 4000 }
+                parentId:      { type: integer }
+                isAnonymous:   { type: boolean, default: false }
                 articleNumber: { type: integer }
       responses:
         '201':
-          description: Sent
+          description: Yaratildi
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ChatMessage' }
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      comment: { $ref: '#/components/schemas/Comment' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Muhokama yopilgan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/Validation' }
 
-  # ------------------------------------------------------------------ User (/me)
-  /me:
-    get:
-      tags: [User]
-      operationId: getMe
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil, Bosh sahifa]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/User' }
-    patch:
-      tags: [User]
-      operationId: updateMe
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name: { type: string }
-                avatarUrl: { type: string }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/User' }
-  /me/stats:
-    get:
-      tags: [User]
-      operationId: getMyStats
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil, O‘rganish]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/UserStats' }
-  /me/activity:
-    get:
-      tags: [User]
-      operationId: getMyActivity
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil]
-      parameters:
-        - name: range
-          in: query
-          schema: { type: string, enum: [week, month], default: week }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ActivityDay' }
-  /me/achievements:
-    get:
-      tags: [User]
-      operationId: getMyAchievements
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil, O‘rganish]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Achievement' }
-  /me/continue:
-    get:
-      tags: [User]
-      operationId: getContinueItems
-      summary: Davom ettiring (last article / case / test)
-      security: [{ bearerAuth: [] }]
-      x-screens: [Bosh sahifa, O‘rganish]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ContinueItem' }
-  /me/progress/articles:
-    get:
-      tags: [User]
-      operationId: getReadingProgress
-      security: [{ bearerAuth: [] }]
-      x-screens: [Konstitutsiya, Profil]
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ReadingProgress' }
-  /me/progress/articles/{number}:
-    put:
-      tags: [User]
-      operationId: markArticleRead
-      security: [{ bearerAuth: [] }]
-      x-screens: [Modda]
-      parameters:
-        - $ref: '#/components/parameters/ArticleNumber'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [status]
-              properties:
-                status: { $ref: '#/components/schemas/ReadingStatus' }
-      responses:
-        '204': { description: Saved }
-  /me/bookmarks:
-    get:
-      tags: [User]
-      operationId: getBookmarks
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil, Konstitutsiya, Hamjamiyat, Lug‘at]
-      parameters:
-        - name: type
-          in: query
-          schema: { $ref: '#/components/schemas/BookmarkType' }
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/Bookmark' }
-  /me/bookmarks/{type}/{id}:
-    parameters:
-      - name: type
-        in: path
-        required: true
-        schema: { $ref: '#/components/schemas/BookmarkType' }
-      - { name: id, in: path, required: true, schema: { type: string } }
-    put:
-      tags: [User]
-      operationId: addBookmark
-      security: [{ bearerAuth: [] }]
-      x-screens: [Bosh sahifa, Modda, Lug‘at, Kazus, Muhokama]
-      responses:
-        '204': { description: Saved }
+  /v1/comments/{id}:
     delete:
-      tags: [User]
-      operationId: removeBookmark
-      security: [{ bearerAuth: [] }]
-      x-screens: [Bosh sahifa, Modda, Lug‘at, Kazus, Muhokama, Profil]
+      tags: [Hamjamiyat]
+      summary: Izohni o‘chirish
+      description: Javoblar daraxti buzilmasligi uchun matn o‘rniga belgi qo‘yiladi.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
-        '204': { description: Removed }
-  /me/settings:
-    patch:
-      tags: [User]
-      operationId: updateSettings
-      security: [{ bearerAuth: [] }]
-      x-screens: [Profil]
+        '200':
+          description: O‘chirildi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { deleted: { type: boolean } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/comments/{id}/vote:
+    post:
+      tags: [Hamjamiyat]
+      summary: Izohga ovoz berish
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UserSettings' }
+            schema:
+              type: object
+              required: [value]
+              properties:
+                value: { type: integer, enum: [-1, 0, 1] }
       responses:
         '200':
-          description: OK
+          description: Ovoz hisoblandi
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UserSettings' }
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      upvotes: { type: integer }
+                      myVote:  { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
 
-  # ------------------------------------------------------------------ Home (aggregate)
-  /home:
-    get:
-      tags: [Home]
-      operationId: getHomeFeed
-      summary: Everything the home screen needs in one call
-      description: Aggregates /articles/daily, /topics, /me/continue, /quizzes/daily and /posts/highlights. Works without a token (no continue items).
-      x-screens: [Bosh sahifa]
+  /v1/comments/{id}/best:
+    post:
+      tags: [Hamjamiyat]
+      summary: Eng yaxshi javobni belgilash
+      description: Faqat savol muallifi. Oldingi belgi olib tashlanadi.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         '200':
-          description: OK
+          description: Belgilandi
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/HomeFeed' }
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      commentId: { type: integer }
+                      isBest:    { type: boolean }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/reports:
+    post:
+      tags: [Hamjamiyat]
+      summary: Shikoyat yuborish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, targetId, reason]
+              properties:
+                kind:     { type: string, enum: [post, comment] }
+                targetId: { type: integer }
+                reason:   { type: string, enum: [spam, insult, wrong_info, private_data, other] }
+                note:     { type: string, maxLength: 255 }
+      responses:
+        '201':
+          description: Qabul qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      reportId: { type: integer }
+                      status:   { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  # ----------------------------------------------------------------- Yordam
+
+  /v1/help:
+    get:
+      tags: [Yordam]
+      summary: Huquqiy yordam ekrani — butun ekran bitta so‘rovda
+      security: []
+      responses:
+        '200':
+          description: Yordam
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      quote:
+                        type: object
+                        nullable: true
+                        description: 29-modda — malakali yuridik yordam huquqi
+                        properties:
+                          number: { type: integer }
+                          title:  { type: string }
+                          slug:   { type: string }
+                          body:   { type: string }
+                      ai:
+                        type: object
+                        properties:
+                          title:       { type: string }
+                          subtitle:    { type: string }
+                          suggestions: { type: array, items: { type: string } }
+                          disclaimer:  { type: string }
+                      hotline: { $ref: '#/components/schemas/Hotline' }
+                      lawyers:
+                        type: array
+                        items: { $ref: '#/components/schemas/Lawyer' }
+                      lawyersOnline: { type: integer }
+                      specialties:   { type: array, items: { type: string } }
+
+  /v1/hotline:
+    get:
+      tags: [Yordam]
+      summary: Ishonch telefoni
+      security: []
+      responses:
+        '200':
+          description: Telefon va ish vaqti
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      hotline: { $ref: '#/components/schemas/Hotline' }
+
+  /v1/lawyers:
+    get:
+      tags: [Yordam]
+      summary: Advokatlar
+      description: Onlayn bo‘lganlar birinchi.
+      security: []
+      parameters:
+        - { name: online,    in: query, schema: { type: string, enum: ['1'] } }
+        - { name: specialty, in: query, schema: { type: string }, example: mehnat }
+      responses:
+        '200':
+          description: Advokatlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Lawyer' }
+
+  /v1/lawyers/{id}:
+    get:
+      tags: [Yordam]
+      summary: Bitta advokat
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Advokat
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      lawyer:
+                        allOf:
+                          - $ref: '#/components/schemas/Lawyer'
+                          - type: object
+                            properties:
+                              bio:         { type: string, nullable: true }
+                              licenseNo:   { type: string, nullable: true }
+                              answerCount: { type: integer, description: Hamjamiyatda bergan javoblari }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/lawyers/{id}/conversations:
+    post:
+      tags: [Yordam]
+      summary: Advokat bilan suhbat ochish
+      description: |
+        Bitta advokat bilan bitta suhbat bo‘ladi: mavjud bo‘lsa, o‘shasi
+        qaytadi. `message` berilsa, birinchi xabar ham shu yerda yuboriladi.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:    { type: string, maxLength: 190 }
+                message:    { type: string, maxLength: 4000 }
+                caseNumber: { type: integer, description: Suhbatni kazusga bog‘lash }
+      responses:
+        '201':
+          description: Suhbat
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      conversation: { $ref: '#/components/schemas/Conversation' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/conversations:
+    get:
+      tags: [Yordam]
+      summary: Suhbatlar
+      description: Advokat o‘z suhbatlarini ham ko‘radi.
+      responses:
+        '200':
+          description: Suhbatlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Conversation' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/conversations/{id}:
+    get:
+      tags: [Yordam]
+      summary: Suhbat va xabarlar
+      parameters:
+        - { name: id,    in: path,  required: true, schema: { type: integer } }
+        - { name: limit, in: query, schema: { type: integer, default: 50, minimum: 1, maximum: 100 } }
+      responses:
+        '200':
+          description: Suhbat
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      conversation: { $ref: '#/components/schemas/Conversation' }
+                      messages:
+                        type: array
+                        items: { $ref: '#/components/schemas/Message' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/conversations/{id}/messages:
+    get:
+      tags: [Yordam]
+      summary: Xabarlar
+      description: Eng yangisidan orqaga. `?before=<id>` bilan oldingi sahifani oladi.
+      parameters:
+        - { name: id,     in: path,  required: true, schema: { type: integer } }
+        - { name: before, in: query, schema: { type: integer }, description: Shu id'dan oldingi xabarlar }
+        - { name: limit,  in: query, schema: { type: integer, default: 50, minimum: 1, maximum: 100 } }
+      responses:
+        '200':
+          description: Xabarlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Message' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Yordam]
+      summary: Xabar yuborish
+      description: Matn yoki modda havolasi (yoki ikkisi birga) bo‘lishi kerak.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body: { type: string, maxLength: 4000 }
+                articleNumbers:
+                  type: array
+                  items: { type: integer }
+                  maxItems: 5
+                  description: Xabarga ilova qilinadigan modda raqamlari
+                  example: [31]
+      responses:
+        '201':
+          description: Yuborildi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      message: { $ref: '#/components/schemas/Message' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/conversations/{id}/read:
+    post:
+      tags: [Yordam]
+      summary: Xabarlarni o‘qildi deb belgilash
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Belgilandi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { unreadCount: { type: integer, example: 0 } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/ai/suggestions:
+    get:
+      tags: [Yordam]
+      summary: AI uchun tayyor so‘rovlar
+      security: []
+      responses:
+        '200':
+          description: Tavsiyalar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:      { type: array, items: { type: string } }
+                      disclaimer: { type: string }
+
+  /v1/ai/ask:
+    post:
+      tags: [Yordam]
+      summary: AI yordamchidan so‘rash
+      description: |
+        Vaziyatni matn bilan yuboradi; javobda tegishli moddalar va ularning
+        sodda tilidagi izohi qaytadi. Model kontekst sifatida **faqat bazadagi
+        moddalar matnini** ko‘radi, shuning uchun o‘ylab topilgan modda
+        raqami bo‘lmaydi.
+
+        `driver: stub` bo‘lsa tashqi xizmat ishlatilmaydi — javob bazadagi
+        moddalardan yig‘iladi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:     { type: string, minLength: 10, maxLength: 2000 }
+                threadId: { type: integer, description: Mavjud suhbatni davom ettirish }
+      responses:
+        '200':
+          description: Javob
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      threadId: { type: integer }
+                      answer:   { type: string }
+                      articles:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            number:  { type: integer }
+                            title:   { type: string }
+                            slug:    { type: string }
+                            bullets: { type: array, items: { type: string } }
+                      disclaimer: { type: string }
+                      driver:     { type: string, enum: [stub, anthropic] }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/ai/threads:
+    get:
+      tags: [Yordam]
+      summary: AI suhbatlari
+      responses:
+        '200':
+          description: Suhbatlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:        { type: integer }
+                            title:     { type: string }
+                            updatedAt: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/ai/threads/{id}:
+    get:
+      tags: [Yordam]
+      summary: AI suhbat tarixi
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Tarix
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      thread:
+                        type: object
+                        properties:
+                          id:        { type: integer }
+                          title:     { type: string }
+                          createdAt: { type: string }
+                          messages:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:        { type: integer }
+                                role:      { type: string, enum: [user, assistant] }
+                                body:      { type: string }
+                                articles:  { type: array, items: { type: integer } }
+                                createdAt: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/callback-requests:
+    post:
+      tags: [Yordam]
+      summary: «Menga qo‘ng‘iroq qiling»
+      description: Tokensiz ham ishlaydi. Token bo‘lsa, raqam profildan olinadi.
+      security:
+        - bearerAuth: []
+        - {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone: { type: string, example: '+998901234567' }
+                topic: { type: string, maxLength: 190, example: Ijara }
+      responses:
+        '201':
+          description: Qabul qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      requestId: { type: integer }
+                      phone:     { type: string }
+                      status:    { type: string }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/bookings:
+    get:
+      tags: [Yordam]
+      summary: Band qilingan vaqtlar
+      responses:
+        '200':
+          description: Band qilishlar
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Booking' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Yordam]
+      summary: Advokat vaqtini band qilish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lawyerId, slotAt]
+              properties:
+                lawyerId: { type: integer }
+                slotAt:   { type: string, example: '2026-11-21 15:00' }
+                note:     { type: string, maxLength: 255 }
+      responses:
+        '201':
+          description: Band qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties:
+                      bookingId: { type: integer }
+                      slotAt:    { type: string }
+                      status:    { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Bu vaqt band
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/Validation' }
+
+  /v1/bookings/{id}:
+    delete:
+      tags: [Yordam]
+      summary: Band qilishni bekor qilish
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: Bekor qilindi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Ok'
+                  - type: object
+                    properties: { status: { type: string, example: cancelled } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+# =====================================================================
 
 components:
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
+      description: '`POST /v1/auth/verify` bergan `token.accessToken`.'
 
   parameters:
-    ArticleNumber: { name: number, in: path, required: true, schema: { type: integer, minimum: 1, maximum: 155 } }
-    CaseId: { name: caseId, in: path, required: true, schema: { type: string } }
-    PostId: { name: postId, in: path, required: true, schema: { type: string } }
-    LawyerId: { name: lawyerId, in: path, required: true, schema: { type: string } }
-    ChatId: { name: chatId, in: path, required: true, schema: { type: string } }
-    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    page:
+      name: page
+      in: query
+      schema: { type: integer, default: 1, minimum: 1 }
+    perPage:
+      name: perPage
+      in: query
+      schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+    articleKey:
+      name: key
+      in: path
+      required: true
+      description: >
+        Modda raqami (`50`) yoki slug'i. Muqaddima uchun `muqaddima`.
+      schema: { type: string }
+      example: '50'
+    caseKey:
+      name: key
+      in: path
+      required: true
+      description: Kazus raqami (`14`) yoki slug'i
+      schema: { type: string }
+      example: '14'
 
   responses:
-    Session:
-      description: Logged in
+    Unauthorized:
+      description: Token yo‘q, yaroqsiz yoki muddati tugagan
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/Session' }
-    Error:
-      description: Error
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { ok: false, error: unauthorized, message: 'Avval tizimga kiring.' }
+    Forbidden:
+      description: Ruxsat yo‘q
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Topilmadi
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Validation:
+      description: Kirish ma’lumotlari xato
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  field:   { type: string, description: Xato maydon nomi }
+                  allowed: { type: array, items: { type: string } }
+          example:
+            ok: false
+            error: bad_phone
+            message: 'Telefon raqam +998 va 9 ta raqamdan iborat bo‘lishi kerak. Masalan: 90 123 45 67.'
+            field: phone
+    ServerError:
+      description: Server xatosi
       content:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
 
   schemas:
+
+    Ok:
+      type: object
+      properties:
+        ok: { type: boolean, enum: [true] }
+      required: [ok]
+
     Error:
       type: object
-      required: [code, message]
+      required: [ok, error, message]
       properties:
-        code: { type: string }
-        message: { type: string, description: 'Uzbek, user-readable' }
-    OtpRequest:
+        ok:      { type: boolean, enum: [false] }
+        error:   { type: string, description: Mashina o‘qiydigan kod }
+        message: { type: string, description: Ilovada ko‘rsatishga yaroqli o‘zbekcha matn }
+
+    ListMeta:
       type: object
-      required: [phone]
-      properties: { phone: { type: string, example: '+998901234567' } }
-    OtpVerify:
+      properties:
+        total:   { type: integer }
+        page:    { type: integer }
+        perPage: { type: integer }
+        pages:   { type: integer }
+        hasMore: { type: boolean }
+
+    ListResponse:
       type: object
-      required: [phone, code]
-      properties: { phone: { type: string }, code: { type: string } }
-    ProviderLogin:
+      properties:
+        ok:    { type: boolean, enum: [true] }
+        items: { type: array, items: { type: object } }
+        meta:  { $ref: '#/components/schemas/ListMeta' }
+
+    Token:
       type: object
-      required: [token]
-      properties: { token: { type: string } }
+      properties:
+        accessToken: { type: string, description: Bir marta beriladi; bazada faqat hash saqlanadi }
+        expiresAt:   { type: string }
+        tokenType:   { type: string, enum: [Bearer] }
+
     Session:
       type: object
-      required: [accessToken, refreshToken, user]
       properties:
-        accessToken: { type: string }
-        refreshToken: { type: string }
-        expiresIn: { type: integer }
-        user: { $ref: '#/components/schemas/User' }
+        id:         { type: integer }
+        device:     { type: string }
+        createdAt:  { type: string }
+        lastUsedAt: { type: string, nullable: true }
+        expiresAt:  { type: string }
+        isCurrent:  { type: boolean }
 
-    ConstitutionInfo:
+    Level:
       type: object
       properties:
-        edition: { type: string, example: '2023' }
-        sections: { type: integer, example: 6 }
-        chapters: { type: integer, example: 27 }
-        articles: { type: integer, example: 155 }
-        sourceUrl: { type: string }
-    Section:
+        level:     { type: integer }
+        title:     { type: string, example: Bilimdon }
+        minPoints: { type: integer }
+
+    UserPublic:
       type: object
       properties:
-        id: { type: string }
-        number: { type: integer }
-        title: { type: string }
-        chapters: { type: array, items: { $ref: '#/components/schemas/Chapter' } }
-    Chapter:
-      type: object
-      properties:
-        id: { type: string }
-        number: { type: integer }
-        title: { type: string }
-        articleFrom: { type: integer }
-        articleTo: { type: integer }
-    ReadingStatus: { type: string, enum: [not_started, in_progress, read] }
-    ArticleSummary:
-      type: object
-      required: [number, title]
-      properties:
-        number: { type: integer, example: 50 }
-        title: { type: string }
-        chapterId: { type: string }
-        preview: { type: string }
-        readingMinutes: { type: integer }
-        status: { $ref: '#/components/schemas/ReadingStatus' }
-    Article:
-      allOf:
-        - $ref: '#/components/schemas/ArticleSummary'
-        - type: object
+        id:        { type: integer }
+        name:      { type: string }
+        username:  { type: string, nullable: true }
+        initials:  { type: string, example: AK }
+        avatarUrl: { type: string, nullable: true }
+        city:      { type: string, nullable: true }
+        role:      { type: string, enum: [user, lawyer, moderator, admin] }
+        points:    { type: integer }
+        level:
+          type: object
           properties:
-            parts: { type: array, items: { type: string }, description: Official text parts }
-            summary: { type: array, items: { type: string }, description: Sodda qilib aytganda }
-            examples: { type: array, items: { $ref: '#/components/schemas/ArticleExample' } }
-            terms: { type: array, items: { $ref: '#/components/schemas/TermRef' } }
-            discussionCount: { type: integer }
-            quizId: { type: string }
-    ArticleExample:
-      type: object
-      properties: { title: { type: string }, text: { type: string }, caseId: { type: string } }
-    Topic:
-      type: object
-      properties:
-        id: { type: string }
-        title: { type: string }
-        icon: { type: string, description: 'AsosIcons name, e.g. ShieldCheck' }
-        articleCount: { type: integer }
-    TermRef:
-      type: object
-      properties: { id: { type: string }, word: { type: string } }
-    Term:
-      type: object
-      properties:
-        id: { type: string }
-        word: { type: string }
-        definition: { type: string }
-        letter: { type: string }
-        articleNumbers: { type: array, items: { type: integer } }
-        audioUrl: { type: string }
-        saved: { type: boolean }
-    SearchResult:
-      type: object
-      properties:
-        type: { type: string, enum: [article, term, case, post] }
-        id: { type: string }
-        title: { type: string }
-        snippet: { type: string }
-
-    Difficulty: { type: string, enum: [easy, medium, hard] }
-    QuizTopic:
-      type: object
-      properties:
-        id: { type: string }
-        title: { type: string }
-        icon: { type: string }
-        questionCount: { type: integer }
-        answeredCount: { type: integer }
-        completed: { type: boolean }
-        difficulty: { $ref: '#/components/schemas/Difficulty' }
-    Quiz:
-      type: object
-      properties:
-        id: { type: string }
-        title: { type: string }
-        timeLimitSec: { type: integer }
-        questions: { type: array, items: { $ref: '#/components/schemas/Question' } }
-    Question:
-      type: object
-      properties:
-        id: { type: string }
-        quizId: { type: string }
-        text: { type: string }
-        options: { type: array, items: { $ref: '#/components/schemas/AnswerOption' } }
-    AnswerOption:
-      type: object
-      properties: { id: { type: string }, text: { type: string } }
-    AnswerResult:
-      type: object
-      properties:
-        correct: { type: boolean }
-        correctOptionId: { type: string }
-        explanation: { type: string }
-        articleNumber: { type: integer }
-        points: { type: integer }
-    LearningProgress:
-      type: object
-      properties:
-        overallPercent: { type: integer, example: 38 }
+            number:    { type: integer }
+            title:     { type: string }
+            minPoints: { type: integer }
+            nextAt:    { type: integer, nullable: true, description: Keyingi darajaga kerak bo‘lgan ball }
         streakDays: { type: integer }
-        points: { type: integer }
-        level: { type: integer }
-        levelTitle: { type: string, example: Bilimdon }
-    Achievement:
-      type: object
-      properties:
-        id: { type: string }
-        title: { type: string }
-        icon: { type: string }
-        unlocked: { type: boolean }
-        progressPercent: { type: integer }
 
-    CaseSummary:
-      type: object
-      properties:
-        id: { type: string }
-        number: { type: integer, example: 14 }
-        title: { type: string }
-        summary: { type: string }
-        category: { type: string }
-        difficulty: { $ref: '#/components/schemas/Difficulty' }
-        minutes: { type: integer }
-        status: { type: string, enum: [new, in_progress, solved] }
-        progressPercent: { type: integer }
-    LegalCase:
+    Me:
       allOf:
-        - $ref: '#/components/schemas/CaseSummary'
+        - $ref: '#/components/schemas/UserPublic'
         - type: object
           properties:
-            person: { type: string, example: 'Temur, 16 yosh' }
-            story: { type: string }
-            question: { type: string }
-            articleChoices: { type: array, items: { $ref: '#/components/schemas/ArticleSummary' } }
-    CaseResult:
-      type: object
-      properties:
-        points: { type: integer }
-        allCorrect: { type: boolean }
-        correctArticleNumbers: { type: array, items: { type: integer } }
-        explanation: { $ref: '#/components/schemas/LawyerExplanation' }
-    LawyerExplanation:
-      type: object
-      properties:
-        lawyer: { $ref: '#/components/schemas/Author' }
-        text: { type: string }
-        practicalSteps: { type: array, items: { type: string } }
-        seeAlsoArticleNumbers: { type: array, items: { type: integer } }
+            phone:       { type: string, nullable: true }
+            email:       { type: string, nullable: true }
+            dailyGoal:   { type: integer }
+            locale:      { type: string }
+            textSize:    { type: string }
+            notifyDaily: { type: boolean }
+            createdAt:   { type: string }
 
     Author:
       type: object
+      description: Anonim bo‘lsa `id` va ism oshkor qilinmaydi.
       properties:
-        id: { type: string }
-        name: { type: string }
-        initials: { type: string }
-        anonymous: { type: boolean }
-        verifiedLawyer: { type: boolean }
-    Community:
-      type: object
-      properties: { id: { type: string }, title: { type: string }, icon: { type: string } }
-    Post:
-      type: object
-      properties:
-        id: { type: string }
-        community: { $ref: '#/components/schemas/Community' }
-        author: { $ref: '#/components/schemas/Author' }
-        title: { type: string }
-        preview: { type: string }
-        score: { type: integer }
-        myVote: { type: string, enum: [up, down, none] }
-        commentCount: { type: integer }
-        lawyerAnswered: { type: boolean }
-        createdAt: { type: string, format: date-time }
-    PostDetail:
-      allOf:
-        - $ref: '#/components/schemas/Post'
-        - type: object
-          properties:
-            body: { type: string }
-            articleNumbers: { type: array, items: { type: integer } }
-            lawyerAnswer: { $ref: '#/components/schemas/Reply' }
-            saved: { type: boolean }
-    Reply:
-      type: object
-      properties:
-        id: { type: string }
-        author: { $ref: '#/components/schemas/Author' }
-        text: { type: string }
-        score: { type: integer }
-        myVote: { type: string, enum: [up, down, none] }
-        parentReplyId: { type: string }
-        replies: { type: array, items: { $ref: '#/components/schemas/Reply' } }
-        createdAt: { type: string, format: date-time }
-    VoteRequest:
-      type: object
-      required: [direction]
-      properties: { direction: { type: string, enum: [up, down, none] } }
-    VoteResult:
-      type: object
-      properties: { score: { type: integer }, myVote: { type: string, enum: [up, down, none] } }
+        id:          { type: integer, nullable: true }
+        name:        { type: string, example: Anonim }
+        username:    { type: string, nullable: true }
+        initials:    { type: string }
+        avatarUrl:   { type: string, nullable: true }
+        isAnonymous: { type: boolean }
+        isLawyer:    { type: boolean }
+        lawyerId:    { type: integer, nullable: true }
+        isVerified:  { type: boolean }
 
-    Hotline:
+    ConstitutionStats:
       type: object
+      description: >
+        Bazadagi tuzilish. Hozirgi holat: 6 bo‘lim, 27 bob, 155 modda
+        (muqaddima alohida yozuv, bu songa kirmaydi).
       properties:
-        phone: { type: string, example: '+998 (71) 000-00-00', description: 'PLACEHOLDER: replace with the real number' }
-        hours: { type: string }
-        free: { type: boolean }
-    Lawyer:
-      type: object
-      properties:
-        id: { type: string }
-        name: { type: string }
-        initials: { type: string }
-        specialization: { type: string }
-        verified: { type: boolean }
-        rating: { type: number }
-        reviewCount: { type: integer }
-        online: { type: boolean }
-        priceFrom: { type: integer, description: UZS }
-    Booking:
-      type: object
-      properties:
-        id: { type: string }
-        lawyerId: { type: string }
-        startsAt: { type: string, format: date-time }
-        kind: { type: string, enum: [chat, call, video] }
-    AssistantMessage:
-      type: object
-      properties:
-        conversationId: { type: string }
-        text: { type: string }
-        articleNumbers: { type: array, items: { type: integer } }
-        suggestLawyer: { type: boolean }
-    ChatThread:
-      type: object
-      properties:
-        id: { type: string }
-        lawyer: { $ref: '#/components/schemas/Lawyer' }
-        lastMessage: { $ref: '#/components/schemas/ChatMessage' }
-        unreadCount: { type: integer }
-    ChatMessage:
-      type: object
-      properties:
-        id: { type: string }
-        fromMe: { type: boolean }
-        text: { type: string }
-        file: { $ref: '#/components/schemas/FileRef' }
-        articleNumber: { type: integer }
-        sentAt: { type: string, format: date-time }
-        read: { type: boolean }
-    FileRef:
-      type: object
-      properties:
-        id: { type: string }
-        name: { type: string, example: Ogohlantirish_xati.docx }
-        sizeBytes: { type: integer }
-        url: { type: string }
+        edition:  { type: string, example: '2023' }
+        sections: { type: integer, example: 6 }
+        chapters: { type: integer, example: 27 }
+        articles: { type: integer, example: 155 }
+        source:   { type: string }
 
-    User:
+    Chapter:
       type: object
       properties:
-        id: { type: string }
-        name: { type: string }
-        initials: { type: string }
-        phone: { type: string }
-        avatarUrl: { type: string }
-        level: { type: integer }
-        levelTitle: { type: string }
-    UserStats:
+        id:           { type: integer }
+        roman:        { type: string, example: IX }
+        title:        { type: string }
+        articleFrom:  { type: integer, example: 41 }
+        articleTo:    { type: integer, example: 53 }
+        articleCount: { type: integer, example: 13 }
+        readCount:    { type: integer, example: 8 }
+        percent:      { type: integer, example: 62 }
+        status:       { type: string, enum: [not_started, in_progress, done] }
+
+    Section:
       type: object
       properties:
-        points: { type: integer }
-        streakDays: { type: integer }
-        articlesRead: { type: integer }
-        testsCompleted: { type: integer }
-        casesSolved: { type: integer }
-    ActivityDay:
-      type: object
-      properties: { date: { type: string, format: date }, minutes: { type: integer } }
-    ContinueItem:
+        id:           { type: integer }
+        roman:        { type: string, example: II }
+        title:        { type: string }
+        articleFrom:  { type: integer }
+        articleTo:    { type: integer }
+        chapterCount:
+          type: integer
+          description: >
+            VI bo‘limda bob yo‘q (`0`) — 154 va 155-moddalar bevosita
+            bo‘limga tegishli.
+        articleCount:
+          type: integer
+          description: Bo‘limdagi moddalar soni; boblarga kirmaganlari ham sanaladi.
+        readCount:    { type: integer }
+        percent:      { type: integer }
+        chapters:
+          type: array
+          items: { $ref: '#/components/schemas/Chapter' }
+
+    Topic:
       type: object
       properties:
-        type: { type: string, enum: [article, case, quiz] }
-        id: { type: string }
-        title: { type: string }
-        progressPercent: { type: integer }
+        id:           { type: integer }
+        slug:         { type: string, example: talim }
+        title:        { type: string, example: Ta’lim }
+        icon:         { type: string }
+        tone:         { type: string, description: 'Dizayn tizimidagi rang nomi: brand, teal, orange, purple, pink, navy' }
+        articleCount: { type: integer }
+
+    ArticleRef:
+      type: object
+      nullable: true
+      properties:
+        number: { type: integer }
+        title:  { type: string }
+        slug:   { type: string }
+
     ReadingProgress:
       type: object
+      nullable: true
       properties:
-        percent: { type: integer, example: 62 }
-        lastArticleNumber: { type: integer }
-        articles:
+        status:     { type: string, enum: [reading, read] }
+        seconds:    { type: integer }
+        lastReadAt: { type: string }
+
+    ArticleBrief:
+      type: object
+      properties:
+        id:             { type: integer }
+        number:         { type: integer, example: 50 }
+        title:          { type: string, example: Ta’lim olish huquqi }
+        titleAuto:
+          type: boolean
+          description: >
+            true — moddaning tahririy sarlavhasi yo‘q va `title` shunchaki
+            «130-modda». Rasmiy matnda sarlavhalar umuman yo‘q; 155 moddadan
+            12 tasiga tahririy sarlavha berilgan. true bo‘lsa, ro‘yxatda
+            sarlavha o‘rniga `excerpt` ni ko‘rsating.
+          example: false
+        slug:           { type: string }
+        chapterId:      { type: integer, nullable: true }
+        chapterRoman:   { type: string, nullable: true }
+        chapterTitle:   { type: string, nullable: true }
+        readingMinutes: { type: integer }
+        isPreamble:     { type: boolean }
+        excerpt:
+          type: string
+          nullable: true
+          description: Rasmiy matnning boshi (160 belgigacha) — ro‘yxatlarda ko‘rsatish uchun.
+          example: Har kim ta’lim olish huquqiga ega. Davlat uzluksiz ta’lim tizimi…
+        progress:       { $ref: '#/components/schemas/ReadingProgress' }
+
+    ArticlePart:
+      type: object
+      properties:
+        partNo:    { type: integer }
+        body:      { type: string, description: Rasmiy matn — serif shriftda ko‘rsatiladi }
+        highlight:
+          type: array
+          items: { type: string }
+          description: Matn ichida belgilanadigan iboralar
+        isExtra:   { type: boolean }
+
+    Article:
+      type: object
+      properties:
+        id:             { type: integer }
+        number:         { type: integer }
+        title:          { type: string }
+        titleAuto:
+          type: boolean
+          description: true — tahririy sarlavha yo‘q, `title` moddaning raqami.
+        slug:           { type: string }
+        readingMinutes: { type: integer }
+        effectiveFrom:  { type: string, nullable: true, example: '2023-05-01' }
+        isPreamble:     { type: boolean }
+        section:
+          type: object
+          nullable: true
+          properties:
+            roman: { type: string }
+            title: { type: string }
+        chapter:
+          type: object
+          nullable: true
+          properties:
+            id:    { type: integer }
+            roman: { type: string }
+            title: { type: string }
+        topics:
+          type: array
+          items:
+            type: object
+            properties:
+              slug:  { type: string }
+              title: { type: string }
+              tone:  { type: string }
+        parts:
+          type: array
+          minItems: 1
+          description: >
+            Moddaning rasmiy matni, bandlarga ajratilgan. Barcha 155 moddada
+            to‘ldirilgan. Muqaddimada 10 band.
+          items: { $ref: '#/components/schemas/ArticlePart' }
+        plain:
+          type: object
+          nullable: true
+          description: «Sodda qilib aytganda» bo‘limi
+          properties:
+            bullets:    { type: array, items: { type: string } }
+            reviewedBy: { type: string, nullable: true }
+            reviewedAt: { type: string, nullable: true }
+            disclaimer: { type: string }
+        examples:
+          type: array
+          items:
+            type: object
+            properties:
+              id:          { type: integer }
+              situation:   { type: string }
+              verdict:     { type: string }
+              verdictKind: { type: string, enum: [ok, bad] }
+        related:
           type: array
           items:
             type: object
             properties:
               number: { type: integer }
-              status: { $ref: '#/components/schemas/ReadingStatus' }
-    BookmarkType: { type: string, enum: [article, term, post, case] }
-    Bookmark:
+              title:  { type: string }
+              slug:   { type: string }
+              note:   { type: string, nullable: true }
+        terms:
+          type: array
+          items: { $ref: '#/components/schemas/TermBrief' }
+        discussion:
+          type: object
+          properties:
+            count:     { type: integer }
+            lastId:    { type: integer, nullable: true }
+            lastTitle: { type: string, nullable: true }
+        quiz:
+          type: object
+          nullable: true
+          properties:
+            id:    { type: integer }
+            slug:  { type: string }
+            title: { type: string }
+        prev:     { type: integer, nullable: true }
+        next:     { type: integer, nullable: true }
+        progress: { $ref: '#/components/schemas/ReadingProgress' }
+        isSaved:  { type: boolean }
+        source:   { type: string }
+
+    ArticleOfDay:
+      type: object
+      nullable: true
+      properties:
+        number: { type: integer }
+        title:  { type: string }
+        slug:   { type: string }
+        quote:  { type: string }
+        partNo: { type: integer }
+        chapter:
+          type: object
+          nullable: true
+          properties:
+            roman: { type: string }
+            title: { type: string }
+
+    Letter:
       type: object
       properties:
-        type: { $ref: '#/components/schemas/BookmarkType' }
-        id: { type: string }
-        title: { type: string }
-        savedAt: { type: string, format: date-time }
-    UserSettings:
+        letter: { type: string, example: O‘ }
+        count:  { type: integer }
+
+    TermBrief:
       type: object
       properties:
-        dailyReminders: { type: boolean }
-        reminderTime: { type: string, example: '19:00' }
-        language: { type: string, enum: [uz-Latn, uz-Cyrl, ru], default: uz-Latn }
-    HomeFeed:
+        id:       { type: integer }
+        term:     { type: string, example: Daxlsizlik }
+        slug:     { type: string }
+        letter:   { type: string }
+        shortDef: { type: string }
+        articles: { type: array, items: { type: integer }, description: Modda raqamlari }
+        isSaved:  { type: boolean }
+
+    Term:
       type: object
       properties:
-        greetingName: { type: string }
-        articleOfTheDay: { $ref: '#/components/schemas/ArticleSummary' }
-        topics: { type: array, items: { $ref: '#/components/schemas/Topic' } }
-        continueItems: { type: array, items: { $ref: '#/components/schemas/ContinueItem' } }
-        dailyQuestion: { $ref: '#/components/schemas/Question' }
-        streakDays: { type: integer }
-        highlights: { type: array, items: { $ref: '#/components/schemas/Post' } }
+        id:           { type: integer }
+        term:         { type: string }
+        slug:         { type: string }
+        letter:       { type: string }
+        partOfSpeech: { type: string, nullable: true, example: ot }
+        etymology:    { type: string, nullable: true, example: 'arabcha “daxl” — tegish' }
+        definition:   { type: string }
+        inLife:       { type: string, nullable: true, description: «Hayotda» bo‘limi }
+        shortDef:     { type: string }
+        articles:
+          type: array
+          items: { $ref: '#/components/schemas/ArticleRef' }
+        isSaved:      { type: boolean }
+
+    ReadingOverview:
+      type: object
+      properties:
+        articlesTotal: { type: integer, example: 155 }
+        articlesRead:  { type: integer, example: 59 }
+        percent:       { type: integer, example: 38 }
+        continue:
+          type: object
+          nullable: true
+          description: «Davom ettiring» kartasi
+          properties:
+            lastArticle:
+              type: object
+              properties:
+                number:         { type: integer }
+                title:          { type: string }
+                slug:           { type: string }
+                status:         { type: string }
+                readingMinutes: { type: integer }
+                minutesLeft:    { type: integer }
+            chapter:
+              type: object
+              nullable: true
+              properties:
+                id:           { type: integer }
+                roman:        { type: string }
+                title:        { type: string }
+                articleCount: { type: integer }
+                readCount:    { type: integer }
+                percent:      { type: integer }
+            nextArticle:
+              type: object
+              nullable: true
+              properties:
+                number: { type: integer }
+                title:  { type: string }
+
+    DailyGoal:
+      type: object
+      properties:
+        goal:      { type: integer, example: 3 }
+        done:      { type: integer, example: 2 }
+        rawDone:   { type: integer }
+        completed: { type: boolean }
+
+    WeekActivity:
+      type: object
+      description: Profildagi Du–Ya ustunchalari
+      properties:
+        days:
+          type: array
+          items:
+            type: object
+            properties:
+              label:    { type: string, example: Du }
+              date:     { type: string }
+              minutes:  { type: integer }
+              lessons:  { type: integer }
+              isToday:  { type: boolean }
+              isFuture: { type: boolean }
+        totalMinutes: { type: integer, example: 42 }
+        activeDays:   { type: integer, example: 6 }
+
+    Achievement:
+      type: object
+      properties:
+        id:        { type: integer }
+        slug:      { type: string }
+        title:     { type: string, example: 7 kunlik seriya }
+        hint:      { type: string }
+        icon:      { type: string }
+        tone:      { type: string }
+        metric:    { type: string, enum: [articles_read, quizzes_done, cases_solved, streak_days, points, terms_saved, posts_written] }
+        threshold: { type: integer }
+        progress:  { type: integer }
+        earned:    { type: boolean }
+        earnedAt:  { type: string, nullable: true }
+
+    Notification:
+      type: object
+      properties:
+        id:        { type: integer }
+        kind:      { type: string, enum: [comment, lawyer_answer, achievement, message, daily] }
+        title:     { type: string }
+        body:      { type: string }
+        link:      { type: string, nullable: true }
+        isRead:    { type: boolean }
+        createdAt: { type: string }
+
+    Quiz:
+      type: object
+      properties:
+        id:            { type: integer }
+        slug:          { type: string }
+        title:         { type: string }
+        difficulty:    { type: string, enum: [boshlangich, orta, murakkab] }
+        icon:          { type: string }
+        tone:          { type: string }
+        estMinutes:    { type: integer }
+        questionCount: { type: integer }
+        isGenerated:
+          type: boolean
+          description: >
+            true — test Konstitutsiya matnidan avtomatik yasalgan
+            (tools/make-quizzes.php). To'g'ri javob rasmiy matndan
+            tekshirilgan, lekin savollar tahririy ko'rikdan o'tmagan.
+            false — qo'lda yozilgan test.
+          example: false
+        topic:
+          type: object
+          nullable: true
+          properties:
+            slug:  { type: string }
+            title: { type: string }
+        myBest:
+          type: object
+          nullable: true
+          description: Foydalanuvchining eng yaxshi natijasi
+          properties:
+            correct:       { type: integer }
+            total:         { type: integer }
+            percent:       { type: integer }
+            attempts:      { type: integer }
+            isPerfect:     { type: boolean }
+            openAttemptId: { type: integer, description: Tugallanmagan urinish — «Davom etish» }
+
+    QuizOption:
+      type: object
+      properties:
+        id:    { type: integer }
+        label: { type: string, example: B }
+        body:  { type: string, example: 48 soat }
+        isCorrect:
+          type: boolean
+          description: 'Faqat javob berilgandan keyin qaytadi. Javobsiz savolda bu maydon yo‘q.'
+
+    AttemptQuestion:
+      type: object
+      properties:
+        id:          { type: integer }
+        index:       { type: integer }
+        body:        { type: string }
+        points:      { type: integer }
+        seconds:     { type: integer, description: Tavsiya etilgan vaqt }
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/QuizOption' }
+        answered:    { type: boolean }
+        myOptionId:  { type: integer, nullable: true }
+        isCorrect:   { type: boolean, nullable: true }
+        explanation: { type: string, nullable: true }
+        article:     { $ref: '#/components/schemas/ArticleRef' }
+
+    Attempt:
+      type: object
+      properties:
+        id:    { type: integer }
+        quiz:
+          type: object
+          properties:
+            id:         { type: integer }
+            slug:       { type: string }
+            title:      { type: string }
+            difficulty: { type: string }
+        total:        { type: integer }
+        answered:     { type: integer }
+        correctCount: { type: integer }
+        points:       { type: integer }
+        startedAt:    { type: string }
+        finishedAt:   { type: string, nullable: true }
+        isFinished:   { type: boolean }
+        marks:
+          type: array
+          description: Yuqoridagi chiziq uchun — har savolga bitta belgi
+          items: { type: string, enum: [correct, wrong, current, pending] }
+        nextQuestionId: { type: integer, nullable: true }
+        questions:
+          type: array
+          items: { $ref: '#/components/schemas/AttemptQuestion' }
+
+    AttemptResult:
+      type: object
+      properties:
+        attemptId:    { type: integer }
+        total:        { type: integer }
+        correctCount: { type: integer }
+        percent:      { type: integer }
+        points:       { type: integer }
+        isPerfect:    { type: boolean }
+        finishedAt:   { type: string }
+        achievements:
+          type: array
+          items: { $ref: '#/components/schemas/Achievement' }
+
+    DailyQuestion:
+      type: object
+      nullable: true
+      properties:
+        day:        { type: string }
+        questionId: { type: integer }
+        quizId:     { type: integer }
+        body:       { type: string }
+        points:     { type: integer }
+        difficulty: { type: string }
+        topic:      { type: string, nullable: true }
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/QuizOption' }
+        answered:    { type: boolean }
+        myOptionId:  { type: integer, nullable: true }
+        isCorrect:   { type: boolean, nullable: true }
+        explanation: { type: string, nullable: true }
+        article:     { $ref: '#/components/schemas/ArticleRef' }
+
+    CaseCategory:
+      type: object
+      properties:
+        id:        { type: integer }
+        slug:      { type: string }
+        title:     { type: string }
+        tone:      { type: string }
+        caseCount: { type: integer }
+
+    CaseBrief:
+      type: object
+      nullable: true
+      properties:
+        id:         { type: integer }
+        number:     { type: integer, example: 14 }
+        slug:       { type: string }
+        title:      { type: string, example: Direktor va telefon }
+        teaser:     { type: string }
+        difficulty: { type: integer, enum: [1, 2, 3], description: '1 — oson, 3 — murakkab' }
+        estMinutes: { type: integer }
+        ofTheWeek:  { type: boolean }
+        category:
+          type: object
+          nullable: true
+          properties:
+            slug:  { type: string }
+            title: { type: string }
+            tone:  { type: string }
+        myStatus:  { type: string, enum: [new, in_progress, solved] }
+        myScore:   { type: integer, nullable: true }
+        myStep:    { type: integer, nullable: true }
+        myPercent: { type: integer, nullable: true }
+
+    CaseChoice:
+      type: object
+      properties:
+        number: { type: integer }
+        title:  { type: string }
+        slug:   { type: string }
+        isCorrect:
+          type: boolean
+          description: 'Faqat `check` dan keyin qaytadi.'
+        note:
+          type: string
+          nullable: true
+          description: 'Faqat `check` dan keyin qaytadi.'
+
+    CaseCommentary:
+      type: object
+      nullable: true
+      description: Huquqshunos izohi. Tekshirishdan oldin `null`.
+      properties:
+        body:  { type: string }
+        steps: { type: array, items: { type: string }, description: Amaliy qadamlar }
+        seeAlso:
+          type: array
+          items:
+            type: object
+            properties:
+              number: { type: integer }
+              title:  { type: string, nullable: true }
+              slug:   { type: string, nullable: true }
+              note:   { type: string }
+        lawyer:
+          type: object
+          nullable: true
+          properties:
+            id:         { type: integer }
+            name:       { type: string }
+            initials:   { type: string }
+            isVerified: { type: boolean }
+        disclaimer: { type: string }
+
+    Case:
+      type: object
+      properties:
+        id:         { type: integer }
+        number:     { type: integer }
+        slug:       { type: string }
+        title:      { type: string }
+        difficulty: { type: integer }
+        estMinutes: { type: integer }
+        situation:  { type: string }
+        question:   { type: string }
+        persona:
+          type: object
+          nullable: true
+          properties:
+            name:     { type: string, example: 'Temur, 16 yosh' }
+            note:     { type: string, nullable: true }
+            initials: { type: string }
+        category:
+          type: object
+          nullable: true
+          properties:
+            slug:  { type: string }
+            title: { type: string }
+            tone:  { type: string }
+        ofTheWeek: { type: boolean }
+        choices:
+          type: array
+          items: { $ref: '#/components/schemas/CaseChoice' }
+        commentary: { $ref: '#/components/schemas/CaseCommentary' }
+        myAttempt:
+          type: object
+          nullable: true
+          properties:
+            id:         { type: integer }
+            step:       { type: integer }
+            selected:   { type: array, items: { type: integer } }
+            solution:   { type: string, nullable: true }
+            score:      { type: integer }
+            status:     { type: string }
+            revealedAt: { type: string, nullable: true }
+
+    Community:
+      type: object
+      properties:
+        id:          { type: integer }
+        slug:        { type: string }
+        title:       { type: string }
+        description: { type: string }
+        tone:        { type: string }
+        memberCount: { type: integer }
+        postCount:   { type: integer }
+        isMember:    { type: boolean }
+
+    PostBrief:
+      type: object
+      properties:
+        id:           { type: integer }
+        title:        { type: string }
+        excerpt:      { type: string }
+        tags:         { type: array, items: { type: string } }
+        upvotes:      { type: integer }
+        commentCount: { type: integer }
+        status:       { type: string, enum: [open, awaiting_lawyer, answered] }
+        createdAt:    { type: string }
+        author:       { $ref: '#/components/schemas/Author' }
+        community:
+          type: object
+          nullable: true
+          properties:
+            slug:  { type: string }
+            title: { type: string }
+            tone:  { type: string }
+        article: { $ref: '#/components/schemas/ArticleRef' }
+        bestAnswer:
+          type: object
+          nullable: true
+          properties:
+            id:         { type: integer }
+            excerpt:    { type: string }
+            isLawyer:   { type: boolean }
+            authorName: { type: string }
+        myVote:  { type: integer, enum: [-1, 0, 1] }
+        isSaved: { type: boolean }
+
+    Post:
+      allOf:
+        - $ref: '#/components/schemas/PostBrief'
+        - type: object
+          properties:
+            body:       { type: string }
+            isMine:     { type: boolean }
+            disclaimer: { type: string }
+            comments:
+              type: array
+              items: { $ref: '#/components/schemas/Comment' }
+
+    Comment:
+      type: object
+      properties:
+        id:         { type: integer }
+        parentId:   { type: integer, nullable: true }
+        body:       { type: string }
+        isDeleted:  { type: boolean }
+        upvotes:    { type: integer }
+        isBest:     { type: boolean }
+        isLawyer:   { type: boolean }
+        lawyer:
+          type: object
+          nullable: true
+          properties:
+            specialties: { type: array, items: { type: string } }
+            years:       { type: integer }
+        replyCount: { type: integer }
+        createdAt:  { type: string }
+        author:     { $ref: '#/components/schemas/Author' }
+        article:    { $ref: '#/components/schemas/ArticleRef' }
+        isMine:     { type: boolean }
+        replies:
+          type: array
+          description: Ikkinchi qatlam. Chuqurroq javob avtomatik ildizga ko‘tariladi.
+          items: { $ref: '#/components/schemas/Comment' }
+
+    Hotline:
+      type: object
+      properties:
+        phone:    { type: string }
+        hours:    { type: string, example: '09:00–21:00' }
+        isFree:   { type: boolean }
+        everyDay: { type: boolean }
+        isOpen:   { type: boolean, description: Toshkent vaqti bo‘yicha hozir ishlayaptimi }
+        note:     { type: string }
+
+    Lawyer:
+      type: object
+      properties:
+        id:           { type: integer }
+        name:         { type: string }
+        initials:     { type: string, example: SR }
+        specialties:  { type: array, items: { type: string } }
+        years:        { type: integer }
+        rating:       { type: number, format: float, example: 4.9 }
+        reviewsCount: { type: integer }
+        isVerified:   { type: boolean }
+        isOnline:     { type: boolean }
+        nextFreeAt:   { type: string, nullable: true }
+
+    Conversation:
+      type: object
+      properties:
+        id:            { type: integer }
+        subject:       { type: string, nullable: true }
+        createdAt:     { type: string }
+        lastMessageAt: { type: string, nullable: true }
+        unreadCount:   { type: integer }
+        lawyer:        { $ref: '#/components/schemas/Lawyer' }
+        lastMessage:
+          type: object
+          nullable: true
+          properties:
+            excerpt: { type: string }
+            isMine:  { type: boolean }
+            at:      { type: string }
+
+    Message:
+      type: object
+      properties:
+        id:        { type: integer }
+        body:      { type: string }
+        isMine:    { type: boolean }
+        createdAt: { type: string }
+        readAt:    { type: string, nullable: true }
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              id:   { type: integer }
+              kind: { type: string, enum: [article, file] }
+              article: { $ref: '#/components/schemas/ArticleRef' }
+              fileName: { type: string, nullable: true }
+              mime:     { type: string, nullable: true }
+              bytes:    { type: integer }
+              url:      { type: string, nullable: true }
+
+    Booking:
+      type: object
+      properties:
+        id:     { type: integer }
+        slotAt: { type: string }
+        status: { type: string, enum: [pending, confirmed, cancelled] }
+        note:   { type: string, nullable: true }
+        lawyer: { $ref: '#/components/schemas/Lawyer' }
