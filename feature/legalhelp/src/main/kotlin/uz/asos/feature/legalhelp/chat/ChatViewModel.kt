@@ -5,10 +5,13 @@
  *
  * Holds StateFlow<ChatUiState> and handles ChatAction. No Android UI types.
  *
- * API used (through the repository, see docs/api/openapi.yaml):
- *  - GET  /chats/{chatId}
- *  - GET  /chats/{chatId}/messages
- *  - POST /chats/{chatId}/messages
+ * The API has no push or websocket for chats, so while the screen is visible (OnResume →
+ * OnPause) the conversation is re-read every [POLL_MS] to show the lawyer's replies.
+ *
+ * API used (through LegalHelpRepository, see docs/api/openapi.yaml):
+ *  - GET  /v1/conversations/{id}           conversation + messages (token)
+ *  - POST /v1/conversations/{id}/messages  send (token)
+ *  - POST /v1/conversations/{id}/read      mark the lawyer's messages read (token)
  */
 package uz.asos.feature.legalhelp.chat
 
@@ -22,46 +25,61 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import uz.asos.core.common.result.AsosErrorCode
 import uz.asos.core.common.result.AsosResult
-import uz.asos.feature.legalhelp.data.temp.ChatMessage
-import uz.asos.feature.legalhelp.data.temp.Lawyer
-import uz.asos.feature.legalhelp.data.temp.TempLegalHelpRepository
+import uz.asos.core.common.text.UzbekFormatters
+import uz.asos.core.data.repository.LegalHelpRepository
+import uz.asos.core.model.legalhelp.ChatMessage
+import uz.asos.core.model.legalhelp.ConversationDetail
+import uz.asos.core.model.legalhelp.Lawyer
+import uz.asos.core.model.legalhelp.MessageAttachment
+import uz.asos.feature.legalhelp.ui.AvatarTone
+import uz.asos.feature.legalhelp.ui.LegalHelpFormat
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    // TODO(WP-02): switch to uz.asos.core.data.repository.LegalHelpRepository.
-    private val repository: TempLegalHelpRepository,
+    private val repository: LegalHelpRepository,
 ) : ViewModel() {
 
     /**
-     * ChatRoute(chatId) stores its argument under "chatId". Read directly (instead of
-     * toRoute()) so the ViewModel stays testable on the plain JVM.
+     * ChatRoute(chatId) stores its argument under "chatId": the conversation id from
+     * POST /v1/lawyers/{id}/conversations. Read directly (instead of toRoute()) so the
+     * ViewModel stays testable on the plain JVM.
      */
-    private val chatId: Int = checkNotNull(savedStateHandle.get<Int>(CHAT_ID_ARG)) {
+    private val conversationId: Int = checkNotNull(savedStateHandle.get<Int>(CHAT_ID_ARG)) {
         "ChatViewModel needs the \"$CHAT_ID_ARG\" navigation argument"
     }
 
-    private val _uiState = MutableStateFlow(ChatUiState())
+    private val _uiState = MutableStateFlow(ChatUiState(today = LegalHelpFormat.today().toString()))
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 
     private var loadJob: Job? = null
-    private var replyJob: Job? = null
+    private var pollJob: Job? = null
+    private var lastMarkedReadId: Int? = null
 
     init {
-        load()
+        load(showSkeleton = true)
     }
 
     fun onAction(action: ChatAction) {
         when (action) {
             is ChatAction.OnInputChange -> _uiState.update { it.copy(input = action.text) }
-            ChatAction.OnSend -> send(_uiState.value.input, clearInput = true)
-            is ChatAction.OnQuickReply -> send(action.text, clearInput = false)
-            ChatAction.OnRetry -> load()
+            ChatAction.OnSend -> send(_uiState.value.input, fromInput = true)
+            is ChatAction.OnQuickReply -> send(action.text, fromInput = false)
+            ChatAction.OnRetry -> load(showSkeleton = true)
+            ChatAction.OnResume -> startPolling()
+            ChatAction.OnPause -> {
+                pollJob?.cancel()
+                pollJob = null
+            }
+            ChatAction.OnSendErrorShown -> _uiState.update { it.copy(sendError = null) }
             // Navigation and system actions are handled by ChatRoute.
             ChatAction.OnBackClick,
+            ChatAction.OnSignInClick,
             is ChatAction.OnArticleClick,
             is ChatAction.OnFileClick,
             ChatAction.OnCallClick,
@@ -72,79 +90,122 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun load() {
+    // ------------------------------------------------------------------ loading
+
+    private fun load(showSkeleton: Boolean) {
         loadJob?.cancel()
-        loadJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = repository.getChat(chatId)) {
-                is AsosResult.Success -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        lawyer = result.data.lawyer.toChatUi(),
-                        messages = result.data.messages.map { message -> message.toUi() },
-                    )
+        loadJob = viewModelScope.launch { refresh(showSkeleton) }
+    }
+
+    private suspend fun refresh(showSkeleton: Boolean) {
+        if (showSkeleton) _uiState.update { it.copy(isLoading = true, errorMessage = null, needsSignIn = false) }
+        when (val result = repository.getConversation(conversationId)) {
+            is AsosResult.Success -> {
+                apply(result.data)
+                markReadIfNeeded(result.data)
+            }
+            is AsosResult.Error -> _uiState.update {
+                when {
+                    result.code == AsosErrorCode.UNAUTHORIZED -> it.copy(isLoading = false, needsSignIn = true)
+                    // A failed background refresh keeps the chat on screen.
+                    !showSkeleton && it.lawyer != null -> it
+                    else -> it.copy(isLoading = false, errorMessage = result.message)
                 }
-                is AsosResult.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
             }
         }
     }
 
-    private fun send(text: String, clearInput: Boolean) {
+    private fun apply(detail: ConversationDetail) {
+        val loaded = detail.messages.map { it.toUi() }
+        _uiState.update { state ->
+            // Keep messages sent while this request was in flight.
+            val loadedIds = loaded.mapTo(HashSet()) { it.id }
+            val pending = state.messages.filter { it.fromMe && it.id !in loadedIds && it.id > (loaded.lastOrNull()?.id ?: 0) }
+            state.copy(
+                isLoading = false,
+                errorMessage = null,
+                needsSignIn = false,
+                lawyer = detail.conversation.lawyer?.toChatUi() ?: state.lawyer,
+                messages = loaded + pending,
+                today = LegalHelpFormat.today().toString(),
+            )
+        }
+    }
+
+    private suspend fun markReadIfNeeded(detail: ConversationDetail) {
+        val lastTheirs = detail.messages.lastOrNull { !it.isMine } ?: return
+        if (lastTheirs.readAt != null || lastMarkedReadId == lastTheirs.id) return
+        if (repository.markRead(conversationId) is AsosResult.Success) lastMarkedReadId = lastTheirs.id
+    }
+
+    private fun startPolling() {
+        if (pollJob?.isActive == true) return
+        pollJob = viewModelScope.launch {
+            while (isActive) {
+                delay(POLL_MS)
+                if (_uiState.value.lawyer != null && loadJob?.isActive != true) refresh(showSkeleton = false)
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ sending
+
+    private fun send(text: String, fromInput: Boolean) {
         val trimmed = text.trim()
-        if (trimmed.isEmpty() || _uiState.value.isSending || _uiState.value.lawyer == null) return
+        val state = _uiState.value
+        if (trimmed.isEmpty() || state.isSending || state.lawyer == null) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSending = true, input = if (clearInput) "" else it.input) }
-            when (val result = repository.sendMessage(chatId, trimmed)) {
-                is AsosResult.Success -> {
-                    _uiState.update { it.copy(isSending = false, messages = it.messages + result.data.toUi()) }
-                    awaitReply(trimmed)
+            _uiState.update { it.copy(isSending = true, sendError = null, input = if (fromInput) "" else it.input) }
+            when (val result = repository.sendMessage(conversationId, trimmed)) {
+                is AsosResult.Success -> _uiState.update {
+                    val message = result.data.toUi()
+                    it.copy(isSending = false, messages = it.messages.filter { m -> m.id != message.id } + message)
                 }
-                // Put the text back so the user doesn't lose it.
                 is AsosResult.Error -> _uiState.update {
-                    it.copy(isSending = false, input = if (clearInput) trimmed else it.input)
+                    it.copy(
+                        isSending = false,
+                        // Put the text back so the user doesn't lose it.
+                        input = if (fromInput && it.input.isEmpty()) trimmed else it.input,
+                        sendError = result.message,
+                        needsSignIn = result.code == AsosErrorCode.UNAUTHORIZED,
+                    )
                 }
             }
         }
     }
 
-    /** Mock: shows "… yozmoqda" for a moment, then the lawyer's canned answer. */
-    private fun awaitReply(text: String) {
-        replyJob?.cancel()
-        replyJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLawyerTyping = true) }
-            delay(TYPING_MS)
-            val reply = repository.awaitLawyerReply(chatId, text)
-            _uiState.update { state ->
-                state.copy(
-                    isLawyerTyping = false,
-                    messages = if (reply is AsosResult.Success) state.messages + reply.data.toUi() else state.messages,
-                )
-            }
-        }
-    }
-
-    companion object {
-        internal const val CHAT_ID_ARG = "chatId"
-        internal const val TYPING_MS = 1_500L
+    internal companion object {
+        const val CHAT_ID_ARG = "chatId"
+        const val POLL_MS = 8_000L
     }
 }
 
+// ---------------------------------------------------------------------- mapping to UI models
+
 private fun Lawyer.toChatUi() = ChatLawyerUi(
-    name = fullName,
-    firstName = fullName.substringBefore(' '),
+    name = UzbekFormatters.display(name),
     initials = initials,
     isOnline = isOnline,
     isVerified = isVerified,
-    avatarTone = avatarTone,
+    avatarTone = AvatarTone.forId(id),
 )
 
-private fun ChatMessage.toUi() = ChatMessageUi(
-    id = id,
-    fromMe = fromMe,
-    text = text,
-    time = time,
-    isRead = isRead,
-    file = file?.let { ChatFileUi(name = it.fileName, meta = it.meta) },
-    article = article?.let { ChatArticleUi(number = it.articleNumber, title = it.title) },
-)
+internal fun ChatMessage.toUi(): ChatMessageUi {
+    val date = LegalHelpFormat.date(createdAt)
+    return ChatMessageUi(
+        id = id,
+        fromMe = isMine,
+        text = UzbekFormatters.display(body),
+        time = LegalHelpFormat.time(createdAt),
+        day = date?.toString().orEmpty(),
+        dayLabel = date?.let { LegalHelpFormat.fullDate(it) }.orEmpty(),
+        isRead = readAt != null,
+        files = attachments.filterIsInstance<MessageAttachment.File>().map {
+            ChatFileUi(name = it.fileName, meta = LegalHelpFormat.fileMeta(it.bytes, it.fileName, it.mime), url = it.url)
+        },
+        articles = attachments.filterIsInstance<MessageAttachment.ArticleLink>().map {
+            ChatArticleUi(number = it.number, title = UzbekFormatters.display(it.title))
+        },
+    )
+}

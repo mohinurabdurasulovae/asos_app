@@ -38,11 +38,11 @@ private val TheirBubbleShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.
 @Composable
 internal fun MessageBubble(
     message: ChatMessageUi,
-    onFileClick: (String) -> Unit,
+    onFileClick: (ChatFileUi) -> Unit,
     onArticleClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val hasCards = message.file != null || message.article != null
+    val hasCards = message.files.isNotEmpty() || message.articles.isNotEmpty()
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = if (message.fromMe) Alignment.End else Alignment.Start,
@@ -70,10 +70,12 @@ internal fun MessageBubble(
                     color = if (message.fromMe) AsosColors.Surface else AsosColors.Navy,
                 )
             }
-            message.file?.let { file -> FileAttachmentMessage(file = file, onClick = { onFileClick(file.name) }) }
-            message.article?.let { article -> ArticleLinkMessage(article = article, onClick = { onArticleClick(article.number) }) }
+            message.files.forEach { file -> FileAttachmentMessage(file = file, onClick = { onFileClick(file) }) }
+            message.articles.forEach { article ->
+                ArticleLinkMessage(article = article, onClick = { onArticleClick(article.number) })
+            }
         }
-        val meta = if (message.fromMe && message.isRead) {
+        val meta = if (message.fromMe && message.isRead && message.time.isNotEmpty()) {
             "${message.time} · ${stringResource(R.string.legalhelp_chat_read)}"
         } else {
             message.time
@@ -92,19 +94,24 @@ private fun MessageBubblePreview() {
     AsosTheme {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             MessageBubble(
-                message = ChatMessageUi(1, fromMe = true, text = "Yo‘q, oddiy yozma shartnoma.", time = "14:06", isRead = true),
+                message = ChatMessageUi(
+                    id = 3, fromMe = true, text = "Yo‘q, oddiy yozma shartnoma.", time = "14:06",
+                    day = "2026-11-21", dayLabel = "21.11.2026", isRead = true,
+                ),
                 onFileClick = {},
                 onArticleClick = {},
             )
             MessageBubble(
                 message = ChatMessageUi(
-                    id = 2,
+                    id = 4,
                     fromMe = false,
                     text = "Tushunarli. Birinchi qadam — uy egasiga yozma ogohlantirish.",
                     time = "14:08",
+                    day = "2026-11-21",
+                    dayLabel = "21.11.2026",
                     isRead = false,
-                    file = ChatFileUi("Ogohlantirish_xati.docx", "24 KB · Word"),
-                    article = ChatArticleUi(31, "Shaxsiy hayot va uy-joy daxlsizligi"),
+                    files = listOf(ChatFileUi("Ogohlantirish_xati.docx", "24 KB · Word", url = null)),
+                    articles = listOf(ChatArticleUi(31, "Shaxsiy hayot va uy-joy daxlsizligi")),
                 ),
                 onFileClick = {},
                 onArticleClick = {},

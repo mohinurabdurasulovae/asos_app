@@ -14,11 +14,17 @@ sealed interface ChatAction {
     /** Quick reply chip: sends its text right away. */
     data class OnQuickReply(val text: String) : ChatAction
     data object OnRetry : ChatAction
+    /** Screen visible: start refreshing for the lawyer's replies. */
+    data object OnResume : ChatAction
+    /** Screen hidden: stop refreshing. */
+    data object OnPause : ChatAction
+    data object OnSendErrorShown : ChatAction
 
     // Handled in ChatRoute
     data object OnBackClick : ChatAction
+    data object OnSignInClick : ChatAction
     data class OnArticleClick(val articleNumber: Int) : ChatAction
-    data class OnFileClick(val fileName: String) : ChatAction
+    data class OnFileClick(val file: ChatFileUi) : ChatAction
     data object OnCallClick : ChatAction
     data object OnVideoCallClick : ChatAction
     data object OnAttachClick : ChatAction

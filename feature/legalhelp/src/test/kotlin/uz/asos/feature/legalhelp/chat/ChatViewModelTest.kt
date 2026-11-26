@@ -3,118 +3,145 @@
  * Module: :feature:legalhelp   ·   Work package: WP-10
  * Screen: Advokat bilan chat (design artboard: Chat.dc.html)
  *
- * Unit tests for ChatViewModel on the in-memory repository (no network).
- * TODO(WP-02): switch to core:testing FakeLegalHelpRepository when it exists.
+ * Unit tests for ChatViewModel using fakes from core:testing (no network).
  */
 package uz.asos.feature.legalhelp.chat
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import uz.asos.core.common.result.AsosResult
+import uz.asos.core.model.legalhelp.ChatMessage
 import uz.asos.core.testing.MainDispatcherRule
-import uz.asos.feature.legalhelp.data.temp.InMemoryLegalHelpRepository
+import uz.asos.core.testing.data.LegalHelpSampleData
+import uz.asos.core.testing.repository.FakeLegalHelpRepository
 
 class ChatViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private fun createViewModel(chatId: Int = InMemoryLegalHelpRepository.SARDOR_ID) = ChatViewModel(
-        savedStateHandle = SavedStateHandle(mapOf(ChatViewModel.CHAT_ID_ARG to chatId)),
-        repository = InMemoryLegalHelpRepository(latencyMs = 0),
+    private val repository = FakeLegalHelpRepository()
+
+    private fun createViewModel(conversationId: Int = 42) = ChatViewModel(
+        savedStateHandle = SavedStateHandle(mapOf(ChatViewModel.CHAT_ID_ARG to conversationId)),
+        repository = repository,
     )
 
+    private val ChatViewModel.state get() = uiState.value
+
     @Test
-    fun `loads the lawyer and the seeded conversation`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = createViewModel()
-        advanceUntilIdle()
-        val state = viewModel.uiState.value
+    fun `loads the lawyer and the conversation oldest first`() {
+        val state = createViewModel().state
 
         assertFalse(state.isLoading)
         assertEquals("Sardor Rahimov", state.lawyer?.name)
-        assertEquals("Sardor", state.lawyer?.firstName)
-        assertEquals(4, state.messages.size)
+        assertEquals(listOf(1, 2, 3, 4), state.messages.map { it.id })
+        assertEquals("14:02", state.messages.first().time)
+        assertTrue(state.messages.first().isRead)
 
         val last = state.messages.last()
-        assertEquals("Ogohlantirish_xati.docx", last.file?.name)
-        assertEquals(31, last.article?.number)
+        assertEquals("Ogohlantirish_xati.docx", last.files.single().name)
+        assertEquals("24 KB · Word", last.files.single().meta)
+        assertEquals(31, last.articles.single().number)
     }
 
     @Test
-    fun `sending clears the input, shows typing, then adds the reply`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `unread lawyer message is marked read once`() {
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        assertEquals(listOf(42), repository.readConversationIds)
 
+        viewModel.onAction(ChatAction.OnRetry)
+        assertEquals(listOf(42), repository.readConversationIds)
+    }
+
+    @Test
+    fun `sending clears the input and adds my message`() {
+        val viewModel = createViewModel()
         viewModel.onAction(ChatAction.OnInputChange("Keyingi qadam qanday?"))
         viewModel.onAction(ChatAction.OnSend)
-        runCurrent()
 
-        var state = viewModel.uiState.value
-        assertEquals("", state.input)
-        assertEquals(5, state.messages.size)
-        assertTrue(state.messages.last().fromMe)
-        assertTrue(state.isLawyerTyping)
-
-        advanceTimeBy(ChatViewModel.TYPING_MS + 1)
-        runCurrent()
-
-        state = viewModel.uiState.value
-        assertFalse(state.isLawyerTyping)
-        assertEquals(6, state.messages.size)
-        assertFalse(state.messages.last().fromMe)
+        assertEquals(listOf(42 to "Keyingi qadam qanday?"), repository.sentMessages)
+        assertEquals("", viewModel.state.input)
+        assertEquals(5, viewModel.state.messages.size)
+        assertTrue(viewModel.state.messages.last().fromMe)
     }
 
     @Test
-    fun `quick reply is sent without touching the typed text`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `quick reply is sent without touching the typed text`() {
         val viewModel = createViewModel()
-        advanceUntilIdle()
-
         viewModel.onAction(ChatAction.OnInputChange("draft"))
         viewModel.onAction(ChatAction.OnQuickReply("Rahmat!"))
-        advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertEquals("draft", state.input)
-        assertEquals("Rahmat!", state.messages[4].text)
-        assertEquals(6, state.messages.size)
+        assertEquals("draft", viewModel.state.input)
+        assertEquals("Rahmat!", viewModel.state.messages.last().text)
     }
 
     @Test
-    fun `blank message is not sent`() = runTest(mainDispatcherRule.testDispatcher) {
+    fun `failed send puts the text back and reports the error`() {
+        repository.sendResult = AsosResult.Error("Serverda xatolik yuz berdi.")
         val viewModel = createViewModel()
-        advanceUntilIdle()
+        viewModel.onAction(ChatAction.OnInputChange("Salom"))
+        viewModel.onAction(ChatAction.OnSend)
 
+        assertEquals("Salom", viewModel.state.input)
+        assertEquals("Serverda xatolik yuz berdi.", viewModel.state.sendError)
+        assertEquals(4, viewModel.state.messages.size)
+
+        viewModel.onAction(ChatAction.OnSendErrorShown)
+        assertNull(viewModel.state.sendError)
+    }
+
+    @Test
+    fun `blank message is not sent`() {
+        val viewModel = createViewModel()
         viewModel.onAction(ChatAction.OnInputChange("   "))
         viewModel.onAction(ChatAction.OnSend)
-        advanceUntilIdle()
 
-        assertEquals(4, viewModel.uiState.value.messages.size)
+        assertTrue(repository.sentMessages.isEmpty())
     }
 
     @Test
-    fun `other lawyers start with an empty chat`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = createViewModel(chatId = 2)
-        advanceUntilIdle()
+    fun `signed out shows the sign-in prompt`() {
+        repository.conversationResult = FakeLegalHelpRepository.SIGNED_OUT
+        val state = createViewModel().state
 
-        assertNotNull(viewModel.uiState.value.lawyer)
-        assertTrue(viewModel.uiState.value.messages.isEmpty())
+        assertTrue(state.needsSignIn)
+        assertNull(state.errorMessage)
     }
 
     @Test
-    fun `unknown chat shows an error`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = createViewModel(chatId = 999)
-        advanceUntilIdle()
+    fun `while visible the chat refreshes and shows the lawyer's reply`() = runTest(mainDispatcherRule.testDispatcher) {
+        val viewModel = createViewModel()
+        viewModel.onAction(ChatAction.OnResume)
 
-        assertNull(viewModel.uiState.value.lawyer)
-        assertEquals("Suhbat topilmadi", viewModel.uiState.value.errorMessage)
+        val reply = ChatMessage(
+            id = 5,
+            body = "Ogohlantirish xatini imzolab topshiring.",
+            isMine = false,
+            createdAt = "2026-11-21 14:20:00",
+            readAt = null,
+            attachments = emptyList(),
+        )
+        val detail = LegalHelpSampleData.conversationDetail
+        repository.conversationResult = AsosResult.Success(detail.copy(messages = detail.messages + reply))
+
+        advanceTimeBy(ChatViewModel.POLL_MS + 1)
+        runCurrent()
+        assertEquals(5, viewModel.state.messages.last().id)
+
+        // Hidden: no more refreshes.
+        viewModel.onAction(ChatAction.OnPause)
+        repository.conversationResult = AsosResult.Error("x")
+        advanceTimeBy(ChatViewModel.POLL_MS * 3)
+        runCurrent()
+        assertEquals(5, viewModel.state.messages.size)
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Strings for :feature:legalhelp. Prefix keys with 'legalhelp_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
+<!-- All user-facing text is Uzbek (Latin script). Texts that the API sends (AI card, hints,
+     error messages) are shown as they come; these are fallbacks and UI labels. -->
 <resources>
     <!-- Huquqiy yordam -->
     <string name="legalhelp_title">Huquqiy yordam</string>
@@ -8,6 +9,9 @@
     <string name="legalhelp_quote">“Har kimga malakali yuridik yordam olish huquqi kafolatlanadi.”</string>
     <string name="legalhelp_load_error_title">Ma’lumotni yuklab bo‘lmadi</string>
     <string name="legalhelp_coming_soon">Tez kunda</string>
+    <string name="legalhelp_sign_in">Kirish</string>
+    <string name="legalhelp_sign_in_required">Buning uchun tizimga kiring</string>
+    <string name="legalhelp_cancel">Bekor qilish</string>
 
     <!-- AI yordamchi -->
     <string name="legalhelp_ai_title">Asos AI yordamchi</string>
@@ -15,39 +19,46 @@
     <string name="legalhelp_ai_placeholder">Vaziyatingizni yozing, masalan: ish beruvchi ikki oydan beri maoshni kechiktirmoqda…</string>
     <string name="legalhelp_ai_voice">Ovozli kiritish</string>
     <string name="legalhelp_ai_send">Yuborish</string>
-    <string name="legalhelp_ai_chip_salary">Ish haqi kechikdi</string>
-    <string name="legalhelp_ai_chip_rent">Ijara muammosi</string>
-    <string name="legalhelp_ai_chip_student">Talaba huquqlari</string>
     <string name="legalhelp_ai_disclaimer">AI umumiy huquqiy ma’lumot beradi va advokat maslahati o‘rnini bosmaydi.</string>
     <string name="legalhelp_ai_thinking">Moddalar qidirilmoqda…</string>
-    <string name="legalhelp_ai_answer_label">Tegishli modda</string>
+    <string name="legalhelp_ai_too_short">Vaziyatni batafsilroq yozing (kamida %1$d belgi).</string>
+    <string name="legalhelp_ai_sign_in">AI yordamchiga savol berish uchun tizimga kiring.</string>
     <string name="legalhelp_article_label">%1$d-modda</string>
 
     <!-- Ishonch telefoni -->
     <string name="legalhelp_hotline_title">Ishonch telefoni</string>
-    <string name="legalhelp_hotline_hours">Har kuni %1$s–%2$s</string>
+    <string name="legalhelp_hotline_every_day">Har kuni %1$s</string>
     <string name="legalhelp_hotline_free">bepul</string>
     <string name="legalhelp_hotline_open">Ochiq</string>
     <string name="legalhelp_hotline_closed">Yopiq</string>
     <string name="legalhelp_hotline_call">Qo‘ng‘iroq qilish</string>
     <string name="legalhelp_hotline_callback">Menga qo‘ng‘iroq</string>
     <string name="legalhelp_hotline_callback_done">So‘rov yuborildi. Tez orada qo‘ng‘iroq qilamiz.</string>
+    <string name="legalhelp_dialer_missing">Telefonda qo‘ng‘iroq ilovasi topilmadi</string>
+    <string name="legalhelp_callback_title">Sizga qo‘ng‘iroq qilamiz</string>
+    <string name="legalhelp_callback_message">Raqamingizni qoldiring, ishonch telefoni xodimi qo‘ng‘iroq qiladi.</string>
+    <string name="legalhelp_callback_phone">Telefon raqam</string>
+    <string name="legalhelp_callback_invalid">Raqamni to‘liq kiriting, masalan +998 90 123 45 67</string>
+    <string name="legalhelp_callback_send">Yuborish</string>
 
     <!-- Advokatlar -->
     <string name="legalhelp_lawyers_title">Advokatlar</string>
     <string name="legalhelp_lawyers_online">%1$d nafari onlayn</string>
     <string name="legalhelp_lawyers_empty">Bu yo‘nalishda advokat topilmadi</string>
     <string name="legalhelp_filter_all">Barchasi</string>
-    <string name="legalhelp_filter_housing">Uy-joy</string>
-    <string name="legalhelp_filter_family">Oila</string>
-    <string name="legalhelp_filter_labor">Mehnat</string>
-    <string name="legalhelp_filter_education">Ta’lim</string>
     <string name="legalhelp_lawyer_experience">%1$s · %2$d yil</string>
+    <string name="legalhelp_lawyer_years">%1$d yil tajriba</string>
     <string name="legalhelp_lawyer_rating">%1$s · %2$d ta baho</string>
-    <string name="legalhelp_lawyer_free_from">Bugun %1$s dan bo‘sh</string>
+    <string name="legalhelp_lawyer_free_today">Bugun %1$s dan bo‘sh</string>
+    <string name="legalhelp_lawyer_free_on">%1$s, %2$s dan bo‘sh</string>
     <string name="legalhelp_lawyer_write">Yozish</string>
     <string name="legalhelp_lawyer_book">Vaqt band qilish</string>
-    <string name="legalhelp_lawyer_book_done">Vaqt band qilish tez kunda ishga tushadi</string>
+    <string name="legalhelp_book_title">Vaqt band qilish</string>
+    <string name="legalhelp_book_message_today">%1$s bilan bugun %2$s ga uchrashuv band qilinsinmi?</string>
+    <string name="legalhelp_book_message_on">%1$s bilan %2$s, %3$s ga uchrashuv band qilinsinmi?</string>
+    <string name="legalhelp_book_confirm">Band qilish</string>
+    <string name="legalhelp_book_done">Band qilindi. Advokat tasdiqlashini kuting.</string>
+    <string name="legalhelp_book_no_slot">Hozircha bo‘sh vaqt yo‘q. Advokatga yozib ko‘ring.</string>
     <string name="legalhelp_call">Qo‘ng‘iroq</string>
     <string name="legalhelp_video_call">Video qo‘ng‘iroq</string>
     <string name="legalhelp_online">Onlayn</string>
@@ -57,16 +68,18 @@
     <string name="legalhelp_chat_status_offline">Oflayn · advokat</string>
     <string name="legalhelp_chat_today">Bugun</string>
     <string name="legalhelp_chat_read">O‘qildi</string>
-    <string name="legalhelp_chat_typing">%1$s yozmoqda…</string>
     <string name="legalhelp_chat_placeholder">Xabar yozing...</string>
     <string name="legalhelp_chat_attach">Fayl biriktirish</string>
     <string name="legalhelp_chat_voice">Ovozli xabar</string>
     <string name="legalhelp_chat_send">Yuborish</string>
     <string name="legalhelp_chat_open_file">Faylni ochish</string>
     <string name="legalhelp_chat_open_article">Moddani ochish</string>
+    <string name="legalhelp_chat_file_unavailable">Faylni ochib bo‘lmadi</string>
     <string name="legalhelp_chat_empty_title">Hali xabar yo‘q</string>
     <string name="legalhelp_chat_empty_message">Vaziyatingizni yozing, advokat javob beradi.</string>
     <string name="legalhelp_chat_load_error_title">Suhbatni yuklab bo‘lmadi</string>
+    <string name="legalhelp_chat_sign_in_title">Suhbat uchun tizimga kiring</string>
+    <string name="legalhelp_chat_sign_in_message">Advokat bilan yozishmalar faqat sizga ko‘rinadi.</string>
     <string name="legalhelp_quick_thanks">Rahmat!</string>
     <string name="legalhelp_quick_next_step">Keyingi qadam qanday?</string>
     <string name="legalhelp_quick_can_call">Qo‘ng‘iroq qilsam bo‘ladimi?</string>

@@ -3,14 +3,17 @@
  * Module: :feature:legalhelp   ·   Work package: WP-10
  * Screen: Advokat bilan chat (design artboard: Chat.dc.html)
  *
- * ChatRoute connects the ViewModel and handles navigation and snackbars;
+ * ChatRoute connects the ViewModel and handles navigation, file opening and snackbars;
  * ChatScreen(uiState, onAction) is stateless and previewable.
  *
- * Layout: ChatTopBar · "Bugun" pill + MessageBubbles + TypingIndicator ·
+ * Layout: ChatTopBar · day headers ("Bugun") + MessageBubbles ·
  *         QuickReplyChips · ChatComposer (above the keyboard).
  */
 package uz.asos.feature.legalhelp.chat
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +25,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -38,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import uz.asos.core.designsystem.icon.AsosIcons
@@ -55,13 +58,13 @@ import uz.asos.feature.legalhelp.chat.components.ChatComposer
 import uz.asos.feature.legalhelp.chat.components.ChatTopBar
 import uz.asos.feature.legalhelp.chat.components.MessageBubble
 import uz.asos.feature.legalhelp.chat.components.QuickReplyChips
-import uz.asos.feature.legalhelp.chat.components.TypingIndicator
-import uz.asos.feature.legalhelp.data.temp.AvatarTone
+import uz.asos.feature.legalhelp.ui.AvatarTone
 
 @Composable
 internal fun ChatRoute(
     onBack: () -> Unit,
     onOpenArticle: (number: Int) -> Unit,
+    onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChatViewModel = hiltViewModel(),
 ) {
@@ -69,10 +72,24 @@ internal fun ChatRoute(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val comingSoon: () -> Unit = {
+
+    fun show(message: String) {
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar(context.getString(R.string.legalhelp_coming_soon))
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    // Refresh for the lawyer's replies only while the chat is on screen.
+    LifecycleResumeEffect(viewModel) {
+        viewModel.onAction(ChatAction.OnResume)
+        onPauseOrDispose { viewModel.onAction(ChatAction.OnPause) }
+    }
+
+    LaunchedEffect(uiState.sendError) {
+        uiState.sendError?.let { message ->
+            show(message)
+            viewModel.onAction(ChatAction.OnSendErrorShown)
         }
     }
 
@@ -82,13 +99,26 @@ internal fun ChatRoute(
         onAction = { action ->
             when (action) {
                 ChatAction.OnBackClick -> onBack()
+                ChatAction.OnSignInClick -> onSignIn()
                 is ChatAction.OnArticleClick -> onOpenArticle(action.articleNumber)
-                is ChatAction.OnFileClick,
+                is ChatAction.OnFileClick -> {
+                    val url = action.file.url
+                    if (url.isNullOrBlank()) {
+                        show(context.getString(R.string.legalhelp_chat_file_unavailable))
+                    } else {
+                        try {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        } catch (@Suppress("UNUSED_PARAMETER") e: ActivityNotFoundException) {
+                            show(context.getString(R.string.legalhelp_chat_file_unavailable))
+                        }
+                    }
+                }
+                // No calls, uploads or voice messages in the API yet.
                 ChatAction.OnCallClick,
                 ChatAction.OnVideoCallClick,
                 ChatAction.OnAttachClick,
                 ChatAction.OnVoiceClick,
-                -> comingSoon()
+                -> show(context.getString(R.string.legalhelp_coming_soon))
                 else -> viewModel.onAction(action)
             }
         },
@@ -108,6 +138,7 @@ internal fun ChatScreen(
         stringResource(R.string.legalhelp_quick_next_step),
         stringResource(R.string.legalhelp_quick_can_call),
     )
+    val showComposer = uiState.lawyer != null && !uiState.needsSignIn
 
     Box(
         modifier = modifier
@@ -128,6 +159,14 @@ internal fun ChatScreen(
                     .fillMaxWidth(),
             ) {
                 when {
+                    uiState.needsSignIn -> EmptyState(
+                        title = stringResource(R.string.legalhelp_chat_sign_in_title),
+                        message = stringResource(R.string.legalhelp_chat_sign_in_message),
+                        icon = AsosIcons.Lock,
+                        actionLabel = stringResource(R.string.legalhelp_sign_in),
+                        onAction = { onAction(ChatAction.OnSignInClick) },
+                    )
+
                     uiState.isLoading && uiState.messages.isEmpty() -> LoadingState()
 
                     uiState.errorMessage != null && uiState.lawyer == null -> ErrorState(
@@ -136,7 +175,7 @@ internal fun ChatScreen(
                         onRetry = { onAction(ChatAction.OnRetry) },
                     )
 
-                    uiState.messages.isEmpty() && !uiState.isLawyerTyping -> EmptyState(
+                    uiState.messages.isEmpty() -> EmptyState(
                         title = stringResource(R.string.legalhelp_chat_empty_title),
                         message = stringResource(R.string.legalhelp_chat_empty_message),
                         icon = AsosIcons.Comment,
@@ -146,7 +185,7 @@ internal fun ChatScreen(
                 }
             }
 
-            if (uiState.lawyer != null) {
+            if (showComposer) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -177,7 +216,7 @@ internal fun ChatScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(bottom = 140.dp),
+                .padding(bottom = if (showComposer) 140.dp else 0.dp),
         )
     }
 }
@@ -188,10 +227,25 @@ private fun MessageList(
     onAction: (ChatAction) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    // Keep the newest message (or the typing indicator) in view.
-    val lastIndex = uiState.messages.size + if (uiState.isLawyerTyping) 1 else 0
-    LaunchedEffect(lastIndex) {
-        listState.animateScrollToItem(lastIndex)
+    val todayLabel = stringResource(R.string.legalhelp_chat_today)
+
+    // One header per day, then that day's messages.
+    val rows = remember(uiState.messages, uiState.today) {
+        buildList {
+            var lastDay: String? = null
+            uiState.messages.forEach { message ->
+                if (message.day != lastDay) {
+                    lastDay = message.day
+                    add(ChatRow.Day(key = "day-${message.day}", isToday = message.day == uiState.today, label = message.dayLabel))
+                }
+                add(ChatRow.Message(message))
+            }
+        }
+    }
+
+    // Keep the newest message in view.
+    LaunchedEffect(rows.size) {
+        if (rows.isNotEmpty()) listState.animateScrollToItem(rows.lastIndex)
     }
 
     LazyColumn(
@@ -200,30 +254,39 @@ private fun MessageList(
         contentPadding = PaddingValues(horizontal = AsosSpacing.l, vertical = AsosSpacing.l),
         verticalArrangement = Arrangement.spacedBy(AsosSpacing.m),
     ) {
-        item(key = "day") {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = stringResource(R.string.legalhelp_chat_today),
-                    style = AsosTextStyles.Tag,
-                    color = AsosColors.Text2,
-                    modifier = Modifier
-                        .background(AsosColors.SegmentTrack, AsosShapes.Pill)
-                        .padding(horizontal = AsosSpacing.m, vertical = AsosSpacing.xxs),
-                )
+        rows.forEach { row ->
+            when (row) {
+                is ChatRow.Day -> item(key = row.key) {
+                    DayHeader(label = if (row.isToday || row.label.isEmpty()) todayLabel else row.label)
+                }
+                is ChatRow.Message -> item(key = row.message.id) {
+                    MessageBubble(
+                        message = row.message,
+                        onFileClick = { onAction(ChatAction.OnFileClick(it)) },
+                        onArticleClick = { onAction(ChatAction.OnArticleClick(it)) },
+                    )
+                }
             }
         }
-        items(uiState.messages, key = { it.id }) { message ->
-            MessageBubble(
-                message = message,
-                onFileClick = { onAction(ChatAction.OnFileClick(it)) },
-                onArticleClick = { onAction(ChatAction.OnArticleClick(it)) },
-            )
-        }
-        if (uiState.isLawyerTyping && uiState.lawyer != null) {
-            item(key = "typing") {
-                TypingIndicator(name = uiState.lawyer.firstName)
-            }
-        }
+    }
+}
+
+private sealed interface ChatRow {
+    data class Day(val key: String, val isToday: Boolean, val label: String) : ChatRow
+    data class Message(val message: ChatMessageUi) : ChatRow
+}
+
+@Composable
+private fun DayHeader(label: String) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Text(
+            text = label,
+            style = AsosTextStyles.Tag,
+            color = AsosColors.Text2,
+            modifier = Modifier
+                .background(AsosColors.SegmentTrack, AsosShapes.Pill)
+                .padding(horizontal = AsosSpacing.m, vertical = AsosSpacing.xxs),
+        )
     }
 }
 
@@ -231,31 +294,34 @@ private fun MessageList(
 
 private val PreviewLawyer = ChatLawyerUi(
     name = "Sardor Rahimov",
-    firstName = "Sardor",
     initials = "SR",
     isOnline = true,
     isVerified = true,
     avatarTone = AvatarTone.NAVY,
 )
 
+private fun previewMessage(id: Int, mine: Boolean, text: String, time: String) = ChatMessageUi(
+    id = id, fromMe = mine, text = text, time = time, day = "2026-11-21", dayLabel = "21.11.2026", isRead = mine,
+)
+
 internal val PreviewChatState = ChatUiState(
     isLoading = false,
+    today = "2026-11-21",
     lawyer = PreviewLawyer,
     messages = listOf(
-        ChatMessageUi(1, true, "Assalomu alaykum. Uy egasi men yo‘qligimda kvartiraga kirib turibdi.", "14:02", true),
-        ChatMessageUi(2, false, "Va alaykum assalom, Aziza. Ijara shartnomangiz notarial tasdiqlanganmi?", "14:05", false),
-        ChatMessageUi(3, true, "Yo‘q, oddiy yozma shartnoma.", "14:06", true),
-        ChatMessageUi(
-            id = 4,
-            fromMe = false,
-            text = "Tushunarli. Birinchi qadam — uy egasiga yozma ogohlantirish. Namunani va tayanadigan moddani yubordim:",
-            time = "14:08",
-            isRead = false,
-            file = ChatFileUi("Ogohlantirish_xati.docx", "24 KB · Word"),
-            article = ChatArticleUi(31, "Shaxsiy hayot va uy-joy daxlsizligi"),
+        previewMessage(1, true, "Assalomu alaykum. Uy egasi men yo‘qligimda kvartiraga kirib turibdi.", "14:02"),
+        previewMessage(2, false, "Va alaykum assalom, Aziza. Ijara shartnomangiz notarial tasdiqlanganmi?", "14:05"),
+        previewMessage(3, true, "Yo‘q, oddiy yozma shartnoma.", "14:06"),
+        previewMessage(
+            4,
+            false,
+            "Tushunarli. Birinchi qadam — uy egasiga yozma ogohlantirish. Namunani va tayanadigan moddani yubordim:",
+            "14:08",
+        ).copy(
+            files = listOf(ChatFileUi("Ogohlantirish_xati.docx", "24 KB · Word", url = null)),
+            articles = listOf(ChatArticleUi(31, "Shaxsiy hayot va uy-joy daxlsizligi")),
         ),
     ),
-    isLawyerTyping = true,
 )
 
 @AsosPreviews
@@ -272,8 +338,14 @@ private fun ChatScreenEmptyPreview() {
 
 @AsosPreviews
 @Composable
+private fun ChatScreenSignInPreview() {
+    AsosTheme { ChatScreen(uiState = ChatUiState(isLoading = false, needsSignIn = true), onAction = {}) }
+}
+
+@AsosPreviews
+@Composable
 private fun ChatScreenErrorPreview() {
     AsosTheme {
-        ChatScreen(uiState = ChatUiState(isLoading = false, errorMessage = "Suhbat topilmadi"), onAction = {})
+        ChatScreen(uiState = ChatUiState(isLoading = false, errorMessage = "Ma’lumot topilmadi."), onAction = {})
     }
 }

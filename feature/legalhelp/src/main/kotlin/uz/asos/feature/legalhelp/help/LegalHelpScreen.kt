@@ -19,6 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,14 +32,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,9 +57,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import uz.asos.core.designsystem.component.ArticleNumberBadge
@@ -78,8 +90,9 @@ private const val QUOTE_ARTICLE = 29
 @Composable
 internal fun LegalHelpRoute(
     onBack: () -> Unit,
-    onOpenChat: (chatId: Int) -> Unit,
+    onOpenChat: (conversationId: Int) -> Unit,
     onOpenArticle: (number: Int) -> Unit,
+    onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LegalHelpViewModel = hiltViewModel(),
 ) {
@@ -87,11 +100,38 @@ internal fun LegalHelpRoute(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val showSnackbar: (Int) -> Unit = { res ->
+    val currentOnSignIn by rememberUpdatedState(onSignIn)
+    val currentOnOpenChat by rememberUpdatedState(onOpenChat)
+
+    fun show(message: String, actionLabel: String? = null, onAction: (() -> Unit)? = null) {
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar(context.getString(res))
+            val result = snackbarHostState.showSnackbar(message = message, actionLabel = actionLabel)
+            if (result == SnackbarResult.ActionPerformed) onAction?.invoke()
         }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is LegalHelpEvent.OpenChat -> currentOnOpenChat(event.conversationId)
+                LegalHelpEvent.NeedsSignIn -> show(
+                    message = context.getString(R.string.legalhelp_sign_in_required),
+                    actionLabel = context.getString(R.string.legalhelp_sign_in),
+                    onAction = { currentOnSignIn() },
+                )
+                LegalHelpEvent.CallbackSent -> show(context.getString(R.string.legalhelp_hotline_callback_done))
+                LegalHelpEvent.BookingDone -> show(context.getString(R.string.legalhelp_book_done))
+                LegalHelpEvent.NoFreeSlot -> show(context.getString(R.string.legalhelp_book_no_slot))
+                is LegalHelpEvent.ShowError -> show(event.message)
+            }
+        }
+    }
+
+    // Coming back from a chat: refresh online status quietly.
+    LifecycleResumeEffect(Unit) {
+        viewModel.onAction(LegalHelpAction.OnResume)
+        onPauseOrDispose { }
     }
 
     LegalHelpScreen(
@@ -100,23 +140,21 @@ internal fun LegalHelpRoute(
         onAction = { action ->
             when (action) {
                 LegalHelpAction.OnBackClick -> onBack()
+                LegalHelpAction.OnSignInClick -> onSignIn()
                 is LegalHelpAction.OnArticleClick -> onOpenArticle(action.articleNumber)
-                // TODO(WP-02): POST /chats returns the chatId. Until then chatId = lawyerId.
-                is LegalHelpAction.OnWriteToLawyer -> onOpenChat(action.lawyerId)
                 is LegalHelpAction.OnHotlineCall -> {
                     val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${action.dialNumber}"))
                     try {
                         context.startActivity(intent)
                     } catch (@Suppress("UNUSED_PARAMETER") e: ActivityNotFoundException) {
-                        showSnackbar(R.string.legalhelp_coming_soon)
+                        show(context.getString(R.string.legalhelp_dialer_missing))
                     }
                 }
-                LegalHelpAction.OnCallbackRequest -> showSnackbar(R.string.legalhelp_hotline_callback_done)
-                is LegalHelpAction.OnBookLawyer -> showSnackbar(R.string.legalhelp_lawyer_book_done)
+                // No calls / voice in the API yet.
                 LegalHelpAction.OnVoiceInputClick,
                 is LegalHelpAction.OnCallLawyer,
                 is LegalHelpAction.OnVideoCallLawyer,
-                -> showSnackbar(R.string.legalhelp_coming_soon)
+                -> show(context.getString(R.string.legalhelp_coming_soon))
                 else -> viewModel.onAction(action)
             }
         },
@@ -151,6 +189,9 @@ internal fun LegalHelpScreen(
             else -> LegalHelpContent(uiState = uiState, onAction = onAction)
         }
 
+        uiState.callbackDialog?.let { dialog -> CallbackDialog(dialog = dialog, onAction = onAction) }
+        uiState.bookingDialog?.let { dialog -> BookingDialog(dialog = dialog, onAction = onAction) }
+
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
@@ -180,7 +221,11 @@ private fun LegalHelpContent(
             )
         }
         item(key = "quote") {
-            QuoteCard(modifier = Modifier.padding(horizontal = gutter))
+            QuoteCard(
+                quote = uiState.quote,
+                onClick = { onAction(LegalHelpAction.OnArticleClick(uiState.quote?.articleNumber ?: QUOTE_ARTICLE)) },
+                modifier = Modifier.padding(horizontal = gutter),
+            )
         }
         item(key = "assistant") {
             AiAssistantCard(
@@ -190,6 +235,7 @@ private fun LegalHelpContent(
                 onSend = { onAction(LegalHelpAction.OnAssistantSend) },
                 onVoiceClick = { onAction(LegalHelpAction.OnVoiceInputClick) },
                 onArticleClick = { onAction(LegalHelpAction.OnArticleClick(it)) },
+                onSignIn = { onAction(LegalHelpAction.OnSignInClick) },
                 modifier = Modifier.padding(horizontal = gutter),
             )
         }
@@ -211,8 +257,9 @@ private fun LegalHelpContent(
         }
         item(key = "filters") {
             LawyerFilterChips(
-                selected = uiState.selectedCategory,
-                onSelect = { onAction(LegalHelpAction.OnCategorySelect(it)) },
+                specialties = uiState.specialties,
+                selected = uiState.selectedSpecialty,
+                onSelect = { onAction(LegalHelpAction.OnSpecialtySelect(it)) },
                 contentPadding = PaddingValues(horizontal = gutter),
             )
         }
@@ -223,6 +270,7 @@ private fun LegalHelpContent(
                 onCall = { onAction(LegalHelpAction.OnCallLawyer(it)) },
                 onVideoCall = { onAction(LegalHelpAction.OnVideoCallLawyer(it)) },
                 onBook = { onAction(LegalHelpAction.OnBookLawyer(it)) },
+                openingChatForLawyerId = uiState.openingChatForLawyerId,
                 modifier = Modifier.padding(horizontal = gutter),
             )
         }
@@ -260,20 +308,25 @@ private fun LegalHelpHeader(onBack: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun QuoteCard(modifier: Modifier = Modifier) {
-    AsosCard(modifier = modifier.fillMaxWidth()) {
+private fun QuoteCard(quote: QuoteUi?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val text = quote?.text?.takeIf { it.isNotBlank() }?.let { "“$it”" } ?: stringResource(R.string.legalhelp_quote)
+    AsosCard(
+        modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
+        onClickLabel = stringResource(R.string.legalhelp_chat_open_article),
+    ) {
         Row(
             modifier = Modifier.padding(AsosSpacing.l),
             horizontalArrangement = Arrangement.spacedBy(AsosSpacing.m),
         ) {
             ArticleNumberBadge(
-                text = QUOTE_ARTICLE.toString(),
+                text = (quote?.articleNumber ?: QUOTE_ARTICLE).toString(),
                 size = 30.dp,
                 cornerRadius = 8.dp,
                 fontSize = 13.sp,
             )
             Text(
-                text = stringResource(R.string.legalhelp_quote),
+                text = text,
                 style = AsosTextStyles.SerifQuote.copy(fontStyle = FontStyle.Normal, fontSize = 17.sp, lineHeight = 25.sp),
                 modifier = Modifier.weight(1f),
             )
@@ -281,19 +334,109 @@ private fun QuoteCard(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+private fun CallbackDialog(dialog: CallbackDialogUi, onAction: (LegalHelpAction) -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onAction(LegalHelpAction.OnCallbackDismiss) },
+        containerColor = AsosColors.Surface,
+        shape = AsosShapes.R22,
+        title = { Text(stringResource(R.string.legalhelp_callback_title), style = AsosTextStyles.CardTitle) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(AsosSpacing.m)) {
+                Text(stringResource(R.string.legalhelp_callback_message), style = AsosTextStyles.BodySmall)
+                OutlinedTextField(
+                    value = dialog.phone,
+                    onValueChange = { onAction(LegalHelpAction.OnCallbackPhoneChange(it)) },
+                    label = { Text(stringResource(R.string.legalhelp_callback_phone)) },
+                    singleLine = true,
+                    isError = dialog.isInvalid,
+                    enabled = !dialog.isSending,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { onAction(LegalHelpAction.OnCallbackConfirm) }),
+                    supportingText = if (dialog.isInvalid || dialog.errorMessage != null) {
+                        {
+                            Text(
+                                if (dialog.isInvalid) {
+                                    stringResource(R.string.legalhelp_callback_invalid)
+                                } else {
+                                    dialog.errorMessage.orEmpty()
+                                },
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onAction(LegalHelpAction.OnCallbackConfirm) }, enabled = !dialog.isSending) {
+                Text(stringResource(R.string.legalhelp_callback_send), style = AsosTextStyles.Button, color = AsosColors.Brand600)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onAction(LegalHelpAction.OnCallbackDismiss) }) {
+                Text(stringResource(R.string.legalhelp_cancel), style = AsosTextStyles.Button, color = AsosColors.Text2)
+            }
+        },
+    )
+}
+
+@Composable
+private fun BookingDialog(dialog: BookingDialogUi, onAction: (LegalHelpAction) -> Unit) {
+    val message = if (dialog.slot.isToday) {
+        stringResource(R.string.legalhelp_book_message_today, dialog.lawyerName, dialog.slot.time)
+    } else {
+        stringResource(R.string.legalhelp_book_message_on, dialog.lawyerName, dialog.slot.dateLabel, dialog.slot.time)
+    }
+    AlertDialog(
+        onDismissRequest = { onAction(LegalHelpAction.OnBookingDismiss) },
+        containerColor = AsosColors.Surface,
+        shape = AsosShapes.R22,
+        title = { Text(stringResource(R.string.legalhelp_book_title), style = AsosTextStyles.CardTitle) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(AsosSpacing.s)) {
+                Text(message, style = AsosTextStyles.BodySmall)
+                dialog.errorMessage?.let { Text(it, style = AsosTextStyles.Meta, color = AsosColors.ErrorOnLight) }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onAction(LegalHelpAction.OnBookingConfirm) }, enabled = !dialog.isSending) {
+                Text(stringResource(R.string.legalhelp_book_confirm), style = AsosTextStyles.Button, color = AsosColors.Brand600)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onAction(LegalHelpAction.OnBookingDismiss) }) {
+                Text(stringResource(R.string.legalhelp_cancel), style = AsosTextStyles.Button, color = AsosColors.Text2)
+            }
+        },
+    )
+}
+
 // ---------------------------------------------------------------------- previews
 
 internal val PreviewLegalHelpState = LegalHelpUiState(
     isLoading = false,
+    quote = QuoteUi(articleNumber = 29, text = "Har kimga malakali yuridik yordam olish huquqi kafolatlanadi."),
+    assistant = AssistantUi(
+        title = "Asos AI yordamchi",
+        subtitle = "Tegishli moddalarni topib, sodda tushuntiradi",
+        suggestions = listOf("Ish haqi kechikdi", "Ijara muammosi", "Talaba huquqlari"),
+        disclaimer = "AI umumiy huquqiy ma’lumot beradi va advokat maslahati o‘rnini bosmaydi.",
+    ),
     hotline = HotlineUi(
         displayNumber = "+998 (71) 000-00-00",
         dialNumber = "+998710000000",
-        opensAt = "09:00",
-        closesAt = "21:00",
+        hours = "09:00–21:00",
+        everyDay = true,
         isFree = true,
         isOpenNow = true,
+        note = null,
     ),
     lawyers = PreviewLawyers,
+    lawyersOnline = 2,
+    specialties = listOf("Uy-joy", "Oila", "Mehnat", "Ta’lim"),
 )
 
 @AsosPreviews
@@ -306,6 +449,14 @@ private fun LegalHelpScreenPreview() {
 @Composable
 private fun LegalHelpScreenLoadingPreview() {
     AsosTheme { LegalHelpScreen(uiState = LegalHelpUiState(), onAction = {}) }
+}
+
+@AsosPreviews
+@Composable
+private fun LegalHelpScreenCallbackPreview() {
+    AsosTheme {
+        LegalHelpScreen(uiState = PreviewLegalHelpState.copy(callbackDialog = CallbackDialogUi()), onAction = {})
+    }
 }
 
 @AsosPreviews

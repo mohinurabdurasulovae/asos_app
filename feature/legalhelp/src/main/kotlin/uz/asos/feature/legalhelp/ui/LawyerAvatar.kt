@@ -33,7 +33,16 @@ import uz.asos.core.designsystem.theme.AsosColors
 import uz.asos.core.designsystem.theme.AsosShapes
 import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.core.designsystem.theme.AsosTheme
-import uz.asos.feature.legalhelp.data.temp.AvatarTone
+
+/** Avatar colours in the design: SR navy, MY light blue, BK orange. */
+enum class AvatarTone {
+    NAVY, BRAND, ORANGE;
+
+    companion object {
+        /** The API sends no colour, so pick one per lawyer id: stable across screens. */
+        fun forId(id: Int): AvatarTone = AvatarTone.entries[Math.floorMod(id - 1, AvatarTone.entries.size)]
+    }
+}
 
 private fun AvatarTone.colors(): Pair<Color, Color> = when (this) {
     AvatarTone.NAVY -> AsosColors.Navy to AsosColors.Surface
