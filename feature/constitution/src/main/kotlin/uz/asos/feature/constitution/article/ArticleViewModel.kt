@@ -222,7 +222,10 @@ internal fun Article.toUi(key: String): ArticleUi {
             append(heading)
             if (readableTitle != null) append(". ").append(readableTitle)
             append("\n\n")
-            parts.forEach { append(it.partNo).append(". ").append(it.body).append("\n") }
+            parts.forEach {
+                if (parts.size > 1) append(it.partNo).append(". ")
+                append(it.body).append("\n")
+            }
             append("\nO‘zbekiston Respublikasi Konstitutsiyasi · Asos")
         },
     )

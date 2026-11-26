@@ -136,6 +136,11 @@ internal fun ArticleDto.asModel() = Article(
     topics = topics.map { ArticleTopic(slug = it.slug, title = it.title, tone = it.tone) },
     parts = parts.sortedBy { it.partNo }.map {
         ArticlePart(partNo = it.partNo, body = it.body, highlights = it.highlight, isExtra = it.isExtra)
+    }.ifEmpty {
+        // No `parts` (e.g. the preamble): show `text` as a single block.
+        text?.takeIf { it.isNotBlank() }
+            ?.let { listOf(ArticlePart(partNo = 1, body = it.trim(), highlights = emptyList(), isExtra = false)) }
+            .orEmpty()
     },
     summary = plain?.takeIf { it.bullets.isNotEmpty() }?.let {
         ArticleSummary(

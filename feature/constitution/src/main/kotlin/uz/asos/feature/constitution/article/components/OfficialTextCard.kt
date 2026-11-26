@@ -69,13 +69,16 @@ internal fun OfficialTextCard(
         }
         visible.forEachIndexed { index, part ->
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                Text(
-                    text = part.number.toString(),
-                    style = AsosTextStyles.LegalPartNumber,
-                    modifier = Modifier
-                        .width(18.dp)
-                        .padding(top = 4.dp),
-                )
+                // A text with a single block (e.g. the preamble) has no part numbers.
+                if (parts.size > 1) {
+                    Text(
+                        text = part.number.toString(),
+                        style = AsosTextStyles.LegalPartNumber,
+                        modifier = Modifier
+                            .width(18.dp)
+                            .padding(top = 4.dp),
+                    )
+                }
                 Text(
                     text = highlighted(part.body, part.highlights),
                     style = bodyStyle,

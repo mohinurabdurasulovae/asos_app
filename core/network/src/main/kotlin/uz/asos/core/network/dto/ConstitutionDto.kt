@@ -147,6 +147,8 @@ data class ArticleDto(
     val chapter: ArticleChapterDto? = null,
     val topics: List<ArticleTopicDto> = emptyList(),
     val parts: List<ArticlePartDto> = emptyList(),
+    /** The whole official text as one string. The preamble sends this instead of `parts`. */
+    val text: String? = null,
     val plain: PlainSummaryDto? = null,
     val examples: List<ArticleExampleDto> = emptyList(),
     val related: List<RelatedArticleDto> = emptyList(),

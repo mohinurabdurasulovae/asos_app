@@ -32,7 +32,8 @@ interface AsosRoute
  */
 @Serializable
 data class ArticleRoute(val key: String) : AsosRoute {
-    constructor(number: Int) : this(number.toString())
+    /** Number 0 is the preamble (the API sends `number: 0` for it). */
+    constructor(number: Int) : this(if (number == 0) PREAMBLE else number.toString())
 
     companion object {
         const val PREAMBLE = "muqaddima"
