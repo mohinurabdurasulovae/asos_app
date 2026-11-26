@@ -2,4 +2,34 @@
 <!-- Strings for :feature:dictionary. Prefix keys with 'dictionary_'. -->
 <!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <string name="dictionary_title">Konstitutsiyaviy lug‘at</string>
+    <string name="dictionary_back">Orqaga</string>
+
+    <string name="dictionary_search_placeholder">Atamani qidiring</string>
+    <string name="dictionary_search_label">Atama qidirish</string>
+
+    <string name="dictionary_filter_all">Barcha atamalar</string>
+    <string name="dictionary_filter_saved">Saqlangan</string>
+    <string name="dictionary_saved_count">%1$d ta saqlangan atama</string>
+
+    <string name="dictionary_term_of_the_day">Kun atamasi</string>
+    <string name="dictionary_listen">Atamani tinglash</string>
+    <string name="dictionary_save">Saqlash</string>
+    <string name="dictionary_unsave">Saqlanganlardan olib tashlash</string>
+    <string name="dictionary_in_life">Hayotda</string>
+    <string name="dictionary_articles">Moddalar:</string>
+    <string name="dictionary_open_article">%1$s ni ochish</string>
+
+    <string name="dictionary_alphabet">Alifbo</string>
+    <string name="dictionary_letter_jump">%1$s harfiga o‘tish</string>
+
+    <string name="dictionary_load_error_title">Lug‘atni yuklab bo‘lmadi</string>
+    <string name="dictionary_retry">Qayta urinish</string>
+    <string name="dictionary_search_empty_title">Hech narsa topilmadi</string>
+    <string name="dictionary_search_empty_message">Boshqa so‘z bilan qidirib ko‘ring.</string>
+    <string name="dictionary_saved_empty_title">Saqlangan atamalar yo‘q</string>
+    <string name="dictionary_saved_empty_message">Atama yonidagi belgini bosing, u shu yerda paydo bo‘ladi.</string>
+    <string name="dictionary_saved_signin_title">Saqlash uchun tizimga kiring</string>
+    <string name="dictionary_saved_signin_message">Saqlangan atamalaringiz hisobingizda turadi.</string>
+    <string name="dictionary_signin_action">Kirish</string>
 </resources>

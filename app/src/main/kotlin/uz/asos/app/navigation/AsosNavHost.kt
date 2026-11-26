@@ -4,7 +4,7 @@
  *
  * NavHost that calls each feature's <feature>Screens() from its navigation/ file.
  *
- * Implemented features: constitution (Konstitutsiya, Modda).
+ * Implemented features: constitution (Konstitutsiya, Modda), dictionary (Lug‘at).
  * Every other route shows ComingSoonScreen so navigation from the finished screens never
  * crashes. When a feature lands, replace its comingSoon(...) lines with <feature>Screens().
  *
@@ -29,7 +29,6 @@ import uz.asos.core.navigation.CasesRoute
 import uz.asos.core.navigation.ChatRoute
 import uz.asos.core.navigation.CommunityRoute
 import uz.asos.core.navigation.ConstitutionRoute
-import uz.asos.core.navigation.DictionaryRoute
 import uz.asos.core.navigation.HomeRoute
 import uz.asos.core.navigation.LearnRoute
 import uz.asos.core.navigation.LegalHelpRoute
@@ -39,6 +38,7 @@ import uz.asos.core.navigation.ProfileRoute
 import uz.asos.core.navigation.QuizRoute
 import uz.asos.core.navigation.SearchRoute
 import uz.asos.feature.constitution.navigation.constitutionScreens
+import uz.asos.feature.dictionary.navigation.dictionaryScreens
 
 @Composable
 fun AsosNavHost(
@@ -54,11 +54,11 @@ fun AsosNavHost(
         modifier = modifier,
     ) {
         constitutionScreens(navController = navController, onNavigate = onNavigate)
+        dictionaryScreens(navController = navController, onNavigate = onNavigate)
 
         // Not built yet ------------------------------------------------------------------
         comingSoon<LoginRoute>(R.string.app_screen_login, onBack)
         comingSoon<HomeRoute>(R.string.app_screen_home, onBack = null)
-        comingSoon<DictionaryRoute>(R.string.app_screen_dictionary, onBack)
         comingSoon<LearnRoute>(R.string.app_screen_learn, onBack = null)
         comingSoon<QuizRoute>(R.string.app_screen_quiz, onBack)
         comingSoon<CasesRoute>(R.string.app_screen_cases, onBack)
