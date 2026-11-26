@@ -1,6 +1,6 @@
 # :feature:legalhelp · Huquqiy yordam + Chat (Legal help)
 
-**Work package:** WP-10. Owner: _assign a name here_
+**Work package:** WP-10. Owner: Charos Hakimova
 
 | Screen | Design artboard | Entry file | Route |
 |---|---|---|---|
@@ -31,9 +31,10 @@ See [`docs/api/openapi.yaml`](../../docs/api/openapi.yaml).
 
 ## Done when
 
-- [ ] Screens match the design artboards (spacing, colours, fonts, states)
-- [ ] UiState covers loading, empty and error states
+- [x] Screens match the design artboards (spacing, colours, fonts, states)
+- [x] UiState covers loading, empty and error states
 - [ ] Works on the fake repositories from `core:testing`, so it doesn't wait for the backend
+      (for now: a temporary in-memory repository in `data/temp/`, until WP-02 lands)
 - [ ] ViewModel unit tests pass
-- [ ] Previews exist for each screen and component
+- [x] Previews exist for each screen and component
 - [ ] Only depends on `core:*` modules
