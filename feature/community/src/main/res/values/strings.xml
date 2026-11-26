@@ -1,5 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:community. Prefix keys with 'community_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <string name="community_title">Hamjamiyat</string>
+    <string name="community_search_cd">Hamjamiyatdan qidirish</string>
+    <string name="community_bookmarks_cd">Saqlangan postlar</string>
+    <string name="community_notifications_cd">Bildirishnomalar</string>
+    <string name="community_ask_question">Savol berish</string>
+    <string name="community_ask_placeholder">Savol yoki vaziyatingizni yozing...</string>
+    <string name="community_anonymous">Anonim</string>
+    <string name="community_anonymous_user">Anonim foydalanuvchi</string>
+    <string name="community_anonymous_reply">Anonim javob berish</string>
+    <string name="community_lawyer_badge">Advokat</string>
+    <string name="community_verified_lawyer">Tasdiqlangan advokat</string>
+    <string name="community_best_answer">ENG YAXSHI JAVOB</string>
+    <string name="community_best_answers_sort">Eng yaxshilari</string>
+    <string name="community_comments_count">%1$d izoh</string>
+    <string name="community_save">Saqlash</string>
+    <string name="community_share">Ulashish</string>
+    <string name="community_join">Qo‘shilish</string>
+    <string name="community_joined">A‘zo bo‘lingan</string>
+    <string name="community_members_count">%1$s a‘zo</string>
+    <string name="community_back_cd">Orqaga qaytish</string>
+    <string name="community_reply_placeholder">Javobingizni yozing...</string>
+    <string name="community_send_reply_cd">Javobni yuborish</string>
+    <string name="community_reply_action">Javob berish</string>
+    <string name="community_write_lawyer">Advokatga yozish</string>
+    <string name="community_legal_disclaimer">Bu umumiy ma‘lumot. Aniq vaziyatingiz bo‘yicha shaxsiy maslahat oling.</string>
+    <string name="community_article_suffix">-modda</string>
+    <string name="community_article_card_cd">%1$s-modda: %2$s</string>
+    <string name="community_upvote_cd">Ovozlash: %1$d</string>
+    <string name="community_loading">Yuklanmoqda...</string>
+    <string name="community_empty_title">Hozircha savollar yo‘q</string>
+    <string name="community_empty_subtitle">Tanlangan bo‘limda birinchi savolni siz bering.</string>
+    <string name="community_error_title">Ma‘lumotlarni yuklab bo‘lmadi</string>
+    <string name="community_retry">Qayta urinish</string>
+    <string name="community_sheet_title">Yangi savol yoki vaziyat</string>
+    <string name="community_sheet_topic_label">Bo‘lim</string>
+    <string name="community_sheet_title_label">Sarlavha</string>
+    <string name="community_sheet_body_label">Vaziyat tafsilotlari</string>
+    <string name="community_sheet_submit">Chop etish</string>
+    <string name="community_sheet_cancel">Bekor qilish</string>
+    <string name="community_time_ago_format">%1$s oldin</string>
 </resources>
