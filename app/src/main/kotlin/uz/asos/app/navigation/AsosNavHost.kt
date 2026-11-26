@@ -4,7 +4,7 @@
  *
  * NavHost that calls each feature's <feature>Screens() from its navigation/ file.
  *
- * Implemented features: constitution (Konstitutsiya, Modda).
+ * Implemented features: constitution (Konstitutsiya, Modda), legalhelp (Huquqiy yordam, Chat).
  * Every other route shows ComingSoonScreen so navigation from the finished screens never
  * crashes. When a feature lands, replace its comingSoon(...) lines with <feature>Screens().
  *
@@ -26,19 +26,18 @@ import uz.asos.core.navigation.AsosRoute
 import uz.asos.core.navigation.BookmarksRoute
 import uz.asos.core.navigation.CaseRoute
 import uz.asos.core.navigation.CasesRoute
-import uz.asos.core.navigation.ChatRoute
 import uz.asos.core.navigation.CommunityRoute
 import uz.asos.core.navigation.ConstitutionRoute
 import uz.asos.core.navigation.DictionaryRoute
 import uz.asos.core.navigation.HomeRoute
 import uz.asos.core.navigation.LearnRoute
-import uz.asos.core.navigation.LegalHelpRoute
 import uz.asos.core.navigation.LoginRoute
 import uz.asos.core.navigation.PostRoute
 import uz.asos.core.navigation.ProfileRoute
 import uz.asos.core.navigation.QuizRoute
 import uz.asos.core.navigation.SearchRoute
 import uz.asos.feature.constitution.navigation.constitutionScreens
+import uz.asos.feature.legalhelp.navigation.legalHelpScreens
 
 @Composable
 fun AsosNavHost(
@@ -54,6 +53,7 @@ fun AsosNavHost(
         modifier = modifier,
     ) {
         constitutionScreens(navController = navController, onNavigate = onNavigate)
+        legalHelpScreens(navController = navController, onNavigate = onNavigate)
 
         // Not built yet ------------------------------------------------------------------
         comingSoon<LoginRoute>(R.string.app_screen_login, onBack)
@@ -65,8 +65,6 @@ fun AsosNavHost(
         comingSoon<CaseRoute>(R.string.app_screen_case, onBack)
         comingSoon<CommunityRoute>(R.string.app_screen_community, onBack = null)
         comingSoon<PostRoute>(R.string.app_screen_post, onBack)
-        comingSoon<LegalHelpRoute>(R.string.app_screen_legal_help, onBack)
-        comingSoon<ChatRoute>(R.string.app_screen_chat, onBack)
         comingSoon<ProfileRoute>(R.string.app_screen_profile, onBack = null)
         comingSoon<SearchRoute>(R.string.app_screen_search, onBack)
         comingSoon<BookmarksRoute>(R.string.app_screen_bookmarks, onBack)
