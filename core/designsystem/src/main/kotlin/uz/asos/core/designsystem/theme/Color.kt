@@ -61,6 +61,16 @@ object AsosColors {
     val WarningOnLight = Color(0xFF8A4B00)
     val WarningBg = Color(0xFFFDF1E1)
 
+    /** Streak flame (O‘rganish header pill, achievements). */
+    val StreakFlame = Color(0xFFF08A12)
+    val StreakBorder = Color(0xFFF3DDBD)
+
+    /** "Afsus, noto‘g‘ri" panel in Test savoli. */
+    val ErrorPanel = Color(0xFFFDEEEC)
+
+    /** Locked achievement icon circle. */
+    val LockedCircle = Color(0xFFE3E8F0)
+
     val Teal = Color(0xFF0F6B5C)
     val TealIcon = Color(0xFF0F7A68)
     val TealBg = Color(0xFFE3F5F1)

@@ -31,14 +31,13 @@ import uz.asos.core.navigation.CommunityRoute
 import uz.asos.core.navigation.ConstitutionRoute
 import uz.asos.core.navigation.DictionaryRoute
 import uz.asos.core.navigation.HomeRoute
-import uz.asos.core.navigation.LearnRoute
 import uz.asos.core.navigation.LegalHelpRoute
 import uz.asos.core.navigation.LoginRoute
 import uz.asos.core.navigation.PostRoute
 import uz.asos.core.navigation.ProfileRoute
-import uz.asos.core.navigation.QuizRoute
 import uz.asos.core.navigation.SearchRoute
 import uz.asos.feature.constitution.navigation.constitutionScreens
+import uz.asos.feature.learn.navigation.learnScreens
 
 @Composable
 fun AsosNavHost(
@@ -54,13 +53,12 @@ fun AsosNavHost(
         modifier = modifier,
     ) {
         constitutionScreens(navController = navController, onNavigate = onNavigate)
+        learnScreens(navController = navController, onNavigate = onNavigate)
 
         // Not built yet ------------------------------------------------------------------
         comingSoon<LoginRoute>(R.string.app_screen_login, onBack)
         comingSoon<HomeRoute>(R.string.app_screen_home, onBack = null)
         comingSoon<DictionaryRoute>(R.string.app_screen_dictionary, onBack)
-        comingSoon<LearnRoute>(R.string.app_screen_learn, onBack = null)
-        comingSoon<QuizRoute>(R.string.app_screen_quiz, onBack)
         comingSoon<CasesRoute>(R.string.app_screen_cases, onBack)
         comingSoon<CaseRoute>(R.string.app_screen_case, onBack)
         comingSoon<CommunityRoute>(R.string.app_screen_community, onBack = null)
