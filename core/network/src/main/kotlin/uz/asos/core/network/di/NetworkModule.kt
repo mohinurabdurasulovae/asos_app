@@ -19,6 +19,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import uz.asos.core.network.AsosApiConfig
 import uz.asos.core.network.BuildConfig
 import uz.asos.core.network.api.ConstitutionApi
+import uz.asos.core.network.api.DictionaryApi
 import uz.asos.core.network.api.UserApi
 import uz.asos.core.network.interceptor.AuthInterceptor
 import uz.asos.core.network.interceptor.LanguageInterceptor
@@ -73,6 +74,11 @@ object NetworkModule {
     @Singleton
     fun providesConstitutionApi(retrofit: Retrofit): ConstitutionApi =
         retrofit.create(ConstitutionApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providesDictionaryApi(retrofit: Retrofit): DictionaryApi =
+        retrofit.create(DictionaryApi::class.java)
 
     @Provides
     @Singleton

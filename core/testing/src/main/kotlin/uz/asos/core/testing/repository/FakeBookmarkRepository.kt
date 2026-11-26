@@ -14,10 +14,16 @@ class FakeBookmarkRepository : BookmarkRepository {
 
     var result: AsosResult<Unit> = AsosResult.Success(Unit)
     val savedArticleIds = mutableListOf<Int>()
+    val savedTermSlugs = mutableListOf<String>()
     val removed = mutableListOf<Pair<BookmarkType, Int>>()
 
     override suspend fun saveArticle(articleId: Int): AsosResult<Unit> {
         savedArticleIds += articleId
+        return result
+    }
+
+    override suspend fun saveTerm(slug: String): AsosResult<Unit> {
+        savedTermSlugs += slug
         return result
     }
 

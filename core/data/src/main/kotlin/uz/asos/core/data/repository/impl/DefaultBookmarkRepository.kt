@@ -33,6 +33,14 @@ internal class DefaultBookmarkRepository @Inject constructor(
         }.mapSuccess { }
     }
 
+    override suspend fun saveTerm(slug: String): AsosResult<Unit> = withContext(ioDispatcher) {
+        apiCaller.call {
+            userApi.addBookmark(
+                BookmarkRequestDto(kind = BookmarkType.TERM.apiValue, termSlug = slug),
+            )
+        }.mapSuccess { }
+    }
+
     override suspend fun remove(type: BookmarkType, id: Int): AsosResult<Unit> = withContext(ioDispatcher) {
         apiCaller.call { userApi.removeBookmark(kind = type.apiValue, id = id) }.mapSuccess { }
     }

@@ -6,7 +6,7 @@
  * need a signed-in user; for guests the API answers 401 with "Avval tizimga kiring.", which
  * comes back as AsosResult.Error with that message.
  *
- * Implemented: articles. Still to add: listing saved items (GET /v1/me/bookmarks).
+ * Implemented: articles, terms. Still to add: listing saved items (GET /v1/me/bookmarks).
  */
 package uz.asos.core.data.repository
 
@@ -20,6 +20,9 @@ interface BookmarkRepository {
      * the preamble too, which has no number).
      */
     suspend fun saveArticle(articleId: Int): AsosResult<Unit>
+
+    /** POST /v1/me/bookmarks { kind: "term", termSlug }. Remove with remove(TERM, Term.id). */
+    suspend fun saveTerm(slug: String): AsosResult<Unit>
 
     /** DELETE /v1/me/bookmarks/{kind}/{id}. [id] is the item's internal id (e.g. Article.id). */
     suspend fun remove(type: BookmarkType, id: Int): AsosResult<Unit>
