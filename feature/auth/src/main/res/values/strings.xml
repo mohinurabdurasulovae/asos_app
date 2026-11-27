@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:auth. Prefix keys with 'auth_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <string name="auth_app_name">Asos</string>
+    <string name="auth_logo_description">Asos logotipi</string>
+    <string name="auth_tagline_start">Konstitutsiyani o‘qing, tushuning va hayotda </string>
+    <string name="auth_tagline_accent">qo‘llang.</string>
+    <string name="auth_step_read">O‘qing</string>
+    <string name="auth_step_understand">Tushuning</string>
+    <string name="auth_step_apply">Qo‘llang</string>
+    <string name="auth_header_caption">O‘zbekiston Respublikasi Konstitutsiyasi · 2023-yil tahriri · 6 bo‘lim, 27 bob, 155 modda</string>
+
+    <string name="auth_welcome_title">Xush kelibsiz</string>
+    <string name="auth_welcome_message">Google orqali kiring yoki email manzilingizga tasdiqlash kodini yuboramiz.</string>
+    <string name="auth_email_label">Email manzil</string>
+    <string name="auth_email_placeholder">ism@example.com</string>
+    <string name="auth_request_code">Kod olish</string>
+    <string name="auth_sending">Yuborilmoqda…</string>
+    <string name="auth_or">yoki</string>
+    <string name="auth_google_continue">Google orqali davom etish</string>
+    <string name="auth_no_account">Akkauntingiz yo‘qmi?</string>
+    <string name="auth_sign_up">Ro‘yxatdan o‘tish</string>
+    <string name="auth_terms_prefix">Davom etib, </string>
+    <string name="auth_terms_link">Foydalanish shartlari</string>
+    <string name="auth_terms_middle"> va </string>
+    <string name="auth_privacy_link">Maxfiylik siyosati</string>
+    <string name="auth_terms_suffix">ga rozilik bildirasiz.</string>
+
+    <string name="auth_code_title">Kodni kiriting</string>
+    <string name="auth_code_message">%1$s manziliga yuborilgan 6 xonali kodni kiriting.</string>
+    <string name="auth_code_label">Tasdiqlash kodi</string>
+    <string name="auth_change_email">Email manzilni o‘zgartirish</string>
+    <string name="auth_spam_title">Xat kelmadimi?</string>
+    <string name="auth_spam_message">Kod %1$s manzilidan yuboriladi. Agar «Inbox»da ko‘rinmasa, «Spam» yoki «Promotions» papkasini ham tekshiring.</string>
+    <string name="auth_verify">Tasdiqlash</string>
+    <string name="auth_checking">Tekshirilmoqda…</string>
+    <string name="auth_resend">Kodni qayta yuborish</string>
+    <string name="auth_resend_in">Kodni %1$d:%2$02d dan keyin qayta yuborish mumkin</string>
+    <string name="auth_dev_code">Sinov rejimi: kod %1$s</string>
+
+    <string name="auth_back">Orqaga</string>
+    <string name="auth_register_tagline_start">Bir daqiqada </string>
+    <string name="auth_register_tagline_accent">akkaunt yarating.</string>
+    <string name="auth_register_caption">Ism, email manzil va tasdiqlash kodi — boshqa hech narsa kerak emas.</string>
+    <string name="auth_register_title">Ro‘yxatdan o‘tish</string>
+    <string name="auth_register_message">Ismingiz va email manzilingizni kiriting. Manzilga tasdiqlash kodini yuboramiz.</string>
+    <string name="auth_name_label">Ism va familiya</string>
+    <string name="auth_name_placeholder">Masalan: Aziza Karimova</string>
+    <string name="auth_name_error">Ismingizni kiriting: kamida 2 ta harf.</string>
+    <string name="auth_register_terms_suffix">ga roziman.</string>
+    <string name="auth_have_account">Akkauntingiz bormi?</string>
+    <string name="auth_sign_in">Kirish</string>
+
+    <string name="auth_google_unavailable">Google orqali kirish hali sozlanmagan. Hozircha email manzil orqali kiring.</string>
 </resources>

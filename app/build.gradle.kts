@@ -29,8 +29,16 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
 
+    implementation(project(":feature:auth"))
+    implementation(project(":feature:cases"))
+    implementation(project(":feature:community"))
+    implementation(project(":feature:home"))
     implementation(project(":feature:constitution"))
-    // Add the other features here as they land: :feature:home, :feature:auth, ...
+    implementation(project(":feature:dictionary"))
+    implementation(project(":feature:learn"))
+    implementation(project(":feature:legalhelp"))
+    implementation(project(":feature:profile"))
+    // Add the other features here as they land: :feature:dictionary, :feature:community, ...
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

@@ -1,6 +1,14 @@
 // :feature:profile  ·  WP-11
-// PLACEHOLDER: build configuration goes here.
-//
-// Apply the convention plugin: asos.android.feature (brings Compose, Hilt, core:designsystem, core:ui, core:navigation).
-// Extra dependencies: project(":core:domain"), project(":core:data").
+// Profil.
 // NEVER depend on another :feature:* module. Navigate through core:navigation routes.
+plugins {
+    alias(libs.plugins.asos.android.feature)
+}
+
+android {
+    namespace = "uz.asos.feature.profile"
+}
+
+dependencies {
+    implementation(project(":core:data"))
+}

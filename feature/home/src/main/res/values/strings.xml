@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:home. Prefix keys with 'home_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <string name="home_profile">Profil</string>
+    <string name="home_guest_name">Mehmon</string>
+    <string name="home_greeting_format">%1$s,</string>
+    <string name="home_notifications">Bildirishnomalar</string>
+    <string name="home_notifications_unread">Bildirishnomalar, o‘qilmaganlari bor</string>
+    <string name="home_headline_start">Konstitutsiyani o‘qing, tushuning va </string>
+    <string name="home_headline_accent">hayotda qo‘llang.</string>
+
+    <string name="home_search_placeholder">Modda, atama yoki vaziyat…</string>
+    <string name="home_search_open">Qidiruvni ochish</string>
+    <string name="home_voice_search">Ovozli qidiruv</string>
+
+    <string name="home_article_of_day">Kun moddasi</string>
+    <string name="home_read_plain">Sodda tilda o‘qish</string>
+    <string name="home_save">Saqlash</string>
+    <string name="home_saved">Saqlangan</string>
+
+    <string name="home_topics_title">Mavzular</string>
+    <string name="home_see_all">Barchasi</string>
+
+    <string name="home_continue_title">Davom ettiring</string>
+    <string name="home_continue_all">Hammasi</string>
+    <string name="home_case_tag">Kazus</string>
+
+    <string name="home_daily_title">Kunlik savol</string>
+
+    <string name="home_help_title">Yordam kerakmi?</string>
+    <string name="home_legal_help_title">Huquqiy yordam</string>
+    <string name="home_legal_help_text">Advokat bilan chat yoki qo‘ng‘iroq</string>
+    <string name="home_dictionary_title">Lug‘at</string>
+    <string name="home_dictionary_text">Huquqiy atamalar sodda tilda</string>
+    <string name="home_assistant_title">Asos AI yordamchi</string>
+    <string name="home_assistant_text">Vaziyatingizni yozing — moddani topamiz</string>
+
+    <string name="home_community_title">Hamjamiyatda</string>
+    <string name="home_post_upvotes">%1$s ovoz</string>
+    <string name="home_post_comments">%1$s izoh</string>
+    <string name="home_post_lawyer_answered">Advokat javob berdi</string>
+    <string name="home_post_in_discussion">Muhokamada</string>
+
+    <string name="home_load_error_title">Bosh sahifani yuklab bo‘lmadi</string>
+    <string name="home_signin_required">Buning uchun tizimga kiring</string>
+    <string name="home_signin_action">Kirish</string>
+    <string name="home_article_saved">Modda saqlandi</string>
+    <string name="home_points_earned">+%1$d ball</string>
+    <string name="home_notifications_soon">Bildirishnomalar tez orada qo‘shiladi</string>
 </resources>

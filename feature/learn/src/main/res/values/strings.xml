@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Strings for :feature:learn. Prefix keys with 'learn_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
+<!-- All user-facing text is Uzbek (Latin script). Use ‘ and ’ (not ʻ ʼ): the UI font has no ʻ ʼ. -->
 <resources>
+    <!-- O‘rganish (hub) -->
+    <string name="learn_title">O‘rganish</string>
+    <string name="learn_streak_label">%1$d kunlik seriya</string>
+    <string name="learn_points_label">%1$s ball</string>
+    <string name="learn_progress_title">Umumiy natija</string>
+    <string name="learn_progress_articles">%1$d / %2$d modda o‘rganildi</string>
+    <string name="learn_progress_goal">Bugungi maqsad · %1$d / %2$d dars</string>
+    <string name="learn_progress_ring">Umumiy natija %1$d foiz</string>
+    <string name="learn_signin_title">Natijangizni saqlang</string>
+    <string name="learn_signin_message">Testlar, ballar va seriya hisobga olinishi uchun tizimga kiring.</string>
+    <string name="learn_signin_action">Kirish</string>
+    <string name="learn_cases_overline">Amaliyot</string>
+    <string name="learn_cases_title">Kazuslar</string>
+    <string name="learn_cases_body">Hayotiy vaziyatni o‘qing, moddani toping va yechim taklif qiling.</string>
+    <string name="learn_cases_solved">%1$d ta yechildi</string>
+    <string name="learn_cases_new">%1$d ta yangi →</string>
+    <string name="learn_cases_open">Kazuslarni ochish</string>
+    <string name="learn_tests_title">Mavzular bo‘yicha testlar</string>
+    <string name="learn_difficulty_easy">Boshlang‘ich</string>
+    <string name="learn_difficulty_medium">O‘rta</string>
+    <string name="learn_difficulty_hard">Murakkab</string>
+    <string name="learn_tests_empty_title">Bu darajada hozircha test yo‘q</string>
+    <string name="learn_tests_empty_message">Boshqa qiyinlik darajasini tanlang.</string>
+    <string name="learn_test_start">Boshlash</string>
+    <string name="learn_test_done">Tugallangan</string>
+    <string name="learn_achievements_title">Yutuqlar</string>
+    <string name="learn_achievements_all">Barchasi</string>
+    <string name="learn_achievement_locked">Hali olinmagan</string>
+    <string name="learn_load_error_title">O‘rganish bo‘limi yuklanmadi</string>
+
+    <!-- Test savoli (quiz) -->
+    <string name="learn_quiz_close">Testni yopish</string>
+    <string name="learn_quiz_progress">%1$d savoldan %2$d-savol</string>
+    <string name="learn_quiz_counter">%1$d/%2$d</string>
+    <string name="learn_quiz_timer">Savolga sarflangan vaqt</string>
+    <string name="learn_quiz_pick">Javobni tanlang</string>
+    <string name="learn_quiz_checking">Tekshirilmoqda…</string>
+    <string name="learn_quiz_correct">To‘g‘ri!</string>
+    <string name="learn_quiz_wrong">Afsus, noto‘g‘ri</string>
+    <string name="learn_quiz_points">+%1$d ball</string>
+    <string name="learn_quiz_correct_answer">To‘g‘ri javob: %1$s</string>
+    <string name="learn_quiz_read_article">Moddani o‘qish</string>
+    <string name="learn_quiz_finish">Tugatish</string>
+    <string name="learn_quiz_next">Keyingi savol</string>
+    <string name="learn_quiz_see_result">Natijani ko‘rish</string>
+    <string name="learn_quiz_option_correct">To‘g‘ri javob</string>
+    <string name="learn_quiz_option_wrong">Noto‘g‘ri javob</string>
+    <string name="learn_quiz_signin_title">Testni boshlash uchun tizimga kiring</string>
+    <string name="learn_quiz_signin_message">Javoblaringiz va ballaringiz akkauntingizga saqlanadi.</string>
+    <string name="learn_quiz_load_error_title">Testni ochib bo‘lmadi</string>
+    <string name="learn_quiz_result_title">Test yakunlandi</string>
+    <string name="learn_quiz_result_perfect">Ajoyib! Hammasi to‘g‘ri</string>
+    <string name="learn_quiz_result_score">%1$d / %2$d savolga to‘g‘ri javob</string>
+    <string name="learn_quiz_result_points">+%1$d ball</string>
+    <string name="learn_quiz_result_ring">Natija %1$d foiz</string>
+    <string name="learn_quiz_result_new_achievement">Yangi yutuq</string>
+    <string name="learn_quiz_restart">Qaytadan</string>
+    <string name="learn_quiz_back_to_learn">O‘rganishga qaytish</string>
 </resources>

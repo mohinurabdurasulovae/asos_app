@@ -2,4 +2,59 @@
 <!-- Strings for :feature:community. Prefix keys with 'community_'. -->
 <!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <!-- Hamjamiyat -->
+    <string name="community_title">Hamjamiyat</string>
+    <string name="community_search">Qidirish</string>
+    <string name="community_saved">Saqlangan muhokamalar</string>
+    <string name="community_topic_all">Barchasi</string>
+    <string name="community_sort_popular">Ommabop</string>
+    <string name="community_sort_new">Yangi</string>
+    <string name="community_sort_unanswered">Javobsiz</string>
+    <string name="community_sort_subscriptions">Obunalar</string>
+    <string name="community_ask_placeholder">Savol yoki vaziyatingizni yozing…</string>
+    <string name="community_anonymous">Anonim</string>
+    <string name="community_ask_button">Savol berish</string>
+    <string name="community_author_age">%1$s · %2$s</string>
+    <string name="community_comment_count">%1$d izoh</string>
+    <string name="community_lawyer_line">%1$s · Advokat</string>
+    <string name="community_status_answered">Advokat javob berdi</string>
+    <string name="community_status_awaiting">Yurist javobi kutilmoqda</string>
+    <string name="community_vote_up">Yuqoriga ovoz berish</string>
+    <string name="community_vote_down">Pastga ovoz berish</string>
+    <string name="community_empty_title">Hozircha muhokama yo‘q</string>
+    <string name="community_empty_message">Birinchi savolni siz bering.</string>
+    <string name="community_load_error_title">Muhokamalarni yuklab bo‘lmadi</string>
+    <string name="community_notice_dismiss">Yopish</string>
+
+    <!-- Savol berish -->
+    <string name="community_ask_title">Savol berish</string>
+    <string name="community_ask_title_hint">Savolingiz sarlavhasi</string>
+    <string name="community_ask_body_hint">Vaziyatni batafsil yozing…</string>
+    <string name="community_ask_topic">Mavzu</string>
+    <string name="community_ask_anonymous">Anonim savol berish</string>
+    <string name="community_ask_send">Yuborish</string>
+
+    <!-- Muhokama -->
+    <string name="community_post_back">Orqaga</string>
+    <string name="community_post_join">Qo‘shilish</string>
+    <string name="community_post_leave">Chiqish</string>
+    <string name="community_post_share">Ulashish</string>
+    <string name="community_post_save">Saqlash</string>
+    <string name="community_post_saved">Saqlangan</string>
+    <string name="community_best_answer">Eng yaxshi javob</string>
+    <string name="community_verified_lawyer">Tasdiqlangan advokat</string>
+    <string name="community_lawyer_years">%1$d yil tajriba</string>
+    <string name="community_write_to_lawyer">Advokatga yozish</string>
+    <string name="community_reply">Javob berish</string>
+    <string name="community_reply_hint">Javobingizni yozing…</string>
+    <string name="community_reply_anonymous">Anonim javob berish</string>
+    <string name="community_reply_send">Yuborish</string>
+    <string name="community_comments_count">%1$d izoh</string>
+    <string name="community_show_replies">%1$d ta javobni ko‘rish</string>
+    <string name="community_author_badge">Muallif</string>
+    <string name="community_deleted_comment">Izoh o‘chirilgan</string>
+    <string name="community_post_error_title">Muhokamani yuklab bo‘lmadi</string>
+    <string name="community_article_number">%1$d-modda</string>
+    <string name="community_replying_to">%1$s ga javob</string>
+    <string name="community_cancel_reply">Bekor qilish</string>
 </resources>

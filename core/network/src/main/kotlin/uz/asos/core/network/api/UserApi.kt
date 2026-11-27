@@ -4,21 +4,33 @@
  *
  * Retrofit interface for the /v1/me endpoints (tag Profil in openapi.yaml). All calls need a token.
  *
- * Implemented: reading progress, bookmarks. Still to add: GET/PATCH /v1/me, profile,
- * achievements, points, notifications.
+ * Implemented: reading progress, bookmarks, the Profil screen and PATCH /v1/me.
+ * Still to add: notifications, sessions.
  */
 package uz.asos.core.network.api
 
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import uz.asos.core.network.dto.BookmarkRequestDto
 import uz.asos.core.network.dto.BookmarkResponseDto
+import uz.asos.core.network.dto.MeResponseDto
+import uz.asos.core.network.dto.ProfileResponseDto
 import uz.asos.core.network.dto.ReadingOverviewDto
+import uz.asos.core.network.dto.UpdateMeRequestDto
 
 interface UserApi {
+
+    /** The whole Profil screen in one call. */
+    @GET("v1/me/profile")
+    suspend fun getProfile(): ProfileResponseDto
+
+    /** Saves the settings the user changed on Profil. */
+    @PATCH("v1/me")
+    suspend fun updateMe(@Body body: UpdateMeRequestDto): MeResponseDto
 
     /** Overall reading result and the "Davom ettiring" card. */
     @GET("v1/me/progress")

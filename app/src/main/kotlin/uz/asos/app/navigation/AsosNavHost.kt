@@ -4,12 +4,14 @@
  *
  * NavHost that calls each feature's <feature>Screens() from its navigation/ file.
  *
- * Implemented features: constitution (Konstitutsiya, Modda).
+ * Implemented features: auth (Kirish, Ro‘yxatdan o‘tish), home (Bosh sahifa),
+ * constitution (Konstitutsiya, Modda), learn (O‘rganish, Test), cases (Kazuslar,
+ * Kazus — yechim), legalhelp (Huquqiy yordam, Advokat bilan chat).
  * Every other route shows ComingSoonScreen so navigation from the finished screens never
  * crashes. When a feature lands, replace its comingSoon(...) lines with <feature>Screens().
  *
- * Start destination: Konstitutsiya for now. Switch to HomeRoute (or LoginRoute when signed
- * out) once :feature:home and :feature:auth are built.
+ * Start destination: Bosh sahifa. Kirish opens on demand (each screen calls onSignIn when
+ * an action needs a signed-in user).
  */
 package uz.asos.app.navigation
 
@@ -24,21 +26,17 @@ import uz.asos.app.R
 import uz.asos.app.ui.ComingSoonScreen
 import uz.asos.core.navigation.AsosRoute
 import uz.asos.core.navigation.BookmarksRoute
-import uz.asos.core.navigation.CaseRoute
-import uz.asos.core.navigation.CasesRoute
-import uz.asos.core.navigation.ChatRoute
-import uz.asos.core.navigation.CommunityRoute
-import uz.asos.core.navigation.ConstitutionRoute
-import uz.asos.core.navigation.DictionaryRoute
 import uz.asos.core.navigation.HomeRoute
-import uz.asos.core.navigation.LearnRoute
-import uz.asos.core.navigation.LegalHelpRoute
-import uz.asos.core.navigation.LoginRoute
-import uz.asos.core.navigation.PostRoute
-import uz.asos.core.navigation.ProfileRoute
-import uz.asos.core.navigation.QuizRoute
 import uz.asos.core.navigation.SearchRoute
+import uz.asos.feature.auth.navigation.authScreens
+import uz.asos.feature.cases.navigation.casesScreens
+import uz.asos.feature.community.navigation.communityScreens
 import uz.asos.feature.constitution.navigation.constitutionScreens
+import uz.asos.feature.dictionary.navigation.dictionaryScreens
+import uz.asos.feature.home.navigation.homeScreens
+import uz.asos.feature.learn.navigation.learnScreens
+import uz.asos.feature.legalhelp.navigation.legalHelpScreens
+import uz.asos.feature.profile.navigation.profileScreens
 
 @Composable
 fun AsosNavHost(
@@ -50,24 +48,20 @@ fun AsosNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = ConstitutionRoute,
+        startDestination = HomeRoute,
         modifier = modifier,
     ) {
+        authScreens(navController = navController)
+        homeScreens(onNavigate = onNavigate)
         constitutionScreens(navController = navController, onNavigate = onNavigate)
+        dictionaryScreens(navController = navController, onNavigate = onNavigate)
+        learnScreens(navController = navController, onNavigate = onNavigate)
+        casesScreens(navController = navController, onNavigate = onNavigate)
+        communityScreens(navController = navController, onNavigate = onNavigate)
+        legalHelpScreens(navController = navController, onNavigate = onNavigate)
+        profileScreens(onNavigate = onNavigate)
 
         // Not built yet ------------------------------------------------------------------
-        comingSoon<LoginRoute>(R.string.app_screen_login, onBack)
-        comingSoon<HomeRoute>(R.string.app_screen_home, onBack = null)
-        comingSoon<DictionaryRoute>(R.string.app_screen_dictionary, onBack)
-        comingSoon<LearnRoute>(R.string.app_screen_learn, onBack = null)
-        comingSoon<QuizRoute>(R.string.app_screen_quiz, onBack)
-        comingSoon<CasesRoute>(R.string.app_screen_cases, onBack)
-        comingSoon<CaseRoute>(R.string.app_screen_case, onBack)
-        comingSoon<CommunityRoute>(R.string.app_screen_community, onBack = null)
-        comingSoon<PostRoute>(R.string.app_screen_post, onBack)
-        comingSoon<LegalHelpRoute>(R.string.app_screen_legal_help, onBack)
-        comingSoon<ChatRoute>(R.string.app_screen_chat, onBack)
-        comingSoon<ProfileRoute>(R.string.app_screen_profile, onBack = null)
         comingSoon<SearchRoute>(R.string.app_screen_search, onBack)
         comingSoon<BookmarksRoute>(R.string.app_screen_bookmarks, onBack)
     }

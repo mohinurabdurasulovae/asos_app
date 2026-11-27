@@ -2,4 +2,24 @@
 <!-- Strings for :feature:dictionary. Prefix keys with 'dictionary_'. -->
 <!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <string name="dictionary_title">Konstitutsiyaviy lug‘at</string>
+    <string name="dictionary_back">Orqaga</string>
+    <string name="dictionary_search_placeholder">Atamani qidiring</string>
+    <string name="dictionary_search_clear">Tozalash</string>
+    <string name="dictionary_tab_all">Barcha atamalar</string>
+    <string name="dictionary_tab_saved">Saqlangan</string>
+    <string name="dictionary_term_of_the_day">Kun atamasi</string>
+    <string name="dictionary_in_life">Hayotda</string>
+    <string name="dictionary_articles_label">Moddalar:</string>
+    <string name="dictionary_article_number">%1$d-modda</string>
+    <string name="dictionary_save">Saqlash</string>
+    <string name="dictionary_saved">Saqlangan</string>
+    <string name="dictionary_empty_search">Bunday atama topilmadi</string>
+    <string name="dictionary_empty_saved">Hali birorta atama saqlanmagan</string>
+    <string name="dictionary_load_error_title">Lug‘atni yuklab bo‘lmadi</string>
+
+    <plurals name="dictionary_article_list">
+        <item quantity="one">%1$s-modda</item>
+        <item quantity="other">%1$s-moddalar</item>
+    </plurals>
 </resources>

@@ -12,17 +12,17 @@
 home/
 ├── navigation/        public entry point: the only file the app module uses
 ├── (root)/  HomeScreen · HomeViewModel · HomeUiState · HomeAction · components/
+├── data/      HomeRepository + its Retrofit calls, models and Hilt module
 ```
 
-## API endpoints used (through `core:data` repositories)
+`data/` keeps the home feed calls inside this module so the feature needs no `core:*` changes.
+When `core:data` gets a HomeRepository, move `data/` there and switch the ViewModel to it.
 
-- `GET /articles/daily`
-- `GET /home`
-- `GET /me/continue`
-- `GET /posts/highlights`
-- `GET /quizzes/daily`
-- `GET /topics`
-- `PUT /me/bookmarks/{type}/{id}`
+## API endpoints used (through `data/HomeRepository`)
+
+- `GET /v1/home` (greeting, article of the day, topics, continue, case, daily question, posts)
+- `POST /v1/daily-question/answer`
+- `POST /v1/me/bookmarks` (save the article of the day)
 
 See [`docs/api/openapi.yaml`](../../docs/api/openapi.yaml).
 

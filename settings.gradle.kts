@@ -30,10 +30,16 @@ include(":core:designsystem")
 include(":core:ui")
 include(":core:testing")
 
+include(":feature:auth")
+include(":feature:cases")
+include(":feature:home")
+include(":feature:community")
 include(":feature:constitution")
+include(":feature:dictionary")
+include(":feature:learn")
+include(":feature:legalhelp")
+include(":feature:profile")
 
-// Still placeholders (their build.gradle.kts files are empty). Add each line when the
-// work package lands, together with the module's dependency in app/build.gradle.kts:
+// Every feature module is in. Still placeholders (their build.gradle.kts files are empty),
+// so they are not included yet:
 //   :core:database   :core:domain
-//   :feature:auth    :feature:home       :feature:dictionary   :feature:learn
-//   :feature:cases   :feature:community  :feature:legalhelp    :feature:profile

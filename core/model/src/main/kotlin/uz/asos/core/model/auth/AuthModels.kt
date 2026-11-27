@@ -6,7 +6,7 @@
  *
  * To include:
  *  - AuthSession
- *  - AuthProvider (PHONE, ONE_ID, GOOGLE)
+ *  - AuthProvider (EMAIL, GOOGLE)  — the app dropped phone and OneID sign-in
  *
  * PLACEHOLDER: not implemented yet.
  */

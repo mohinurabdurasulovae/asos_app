@@ -1,10 +1,15 @@
-/*
- * LoginUiState.kt
- * Module: :feature:auth   ·   Work package: WP-03
- * Screen: Kirish (design artboard: Kirish.dc.html)
- *
- * Immutable state the screen renders: Loading / Success(data) / Error. Everything LoginScreen
- * needs, already formatted.
- *
- * PLACEHOLDER: not implemented yet.
- */
+package uz.asos.feature.auth.login
+
+import uz.asos.feature.auth.common.OtpState
+
+data class LoginUiState(
+    val isCheckingSession: Boolean = true,
+    val otp: OtpState = OtpState(),
+)
+
+sealed interface LoginEvent {
+    data object SignedIn : LoginEvent
+
+    /** Google needs its SDK and a client id before the button can do anything. */
+    data object GoogleUnavailable : LoginEvent
+}

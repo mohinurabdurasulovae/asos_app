@@ -24,11 +24,19 @@ info:
 
     ## Kirish oqimi
 
-    1. `POST /v1/auth/request-code` — telefon raqamga SMS kodi yuboriladi.
-       Rivojlanish rejimida (`dev_mode: true`) javobda `devCode` ham qaytadi.
+    Ilova ikki yo‘l taklif qiladi: **Google** yoki **email kodi**. Telefon raqam va
+    OneID ilovadan olib tashlandi (`POST /v1/auth/oauth` hamon `oneid` ni qabul
+    qiladi, lekin ilova uni ko‘rsatmaydi).
+
+    1. `POST /v1/auth/request-code` — manzilga 6 xonali kod yuboriladi.
+       Jo‘natuvchi: **support@prteam.uz**. Rivojlanish rejimida (`dev_mode: true`)
+       javobda `devCode` ham qaytadi.
     2. `POST /v1/auth/verify` — kod to‘g‘ri bo‘lsa, token va foydalanuvchi qaytadi.
-       Raqam birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi (`isNew: true`).
+       Manzil birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi (`isNew: true`).
     3. Keyingi so‘rovlarda `Authorization: Bearer <accessToken>`.
+
+    Telefon raqam oqimi serverdan olib tashlandi: ikkala endpoint ham faqat
+    `email` ni qabul qiladi.
 
     ## Ekran — endpoint
 
@@ -76,7 +84,7 @@ tags:
   - name: Meta
     description: Xizmat holati va ilova sozlamalari
   - name: Kirish
-    description: Telefon + SMS kodi, tokenlar, qurilmalar
+    description: Email kodi yoki Google, tokenlar, qurilmalar
   - name: Profil
     description: O‘zim, statistika, yutuqlar, saqlanganlar, bildirishnomalar
   - name: Konstitutsiya
@@ -178,9 +186,13 @@ paths:
   /v1/auth/request-code:
     post:
       tags: [Kirish]
-      summary: SMS kodi yuborish
+      summary: Tasdiqlash kodini yuborish
       description: |
-        Bitta raqamga ketma-ket kod yuborish orasida kamida 60 sekund tanaffus.
+        6 xonali kod **support@prteam.uz** dan jo‘natiladi. Yangi
+        jo‘natuvchi ko‘pincha «Spam» yoki «Promotions» papkasiga tushadi, shuning
+        uchun ilova kod ekranida shu haqda ogohlantiradi.
+
+        Bitta manzilga ketma-ket kod yuborish orasida kamida 60 sekund tanaffus.
         Kod 5 daqiqa amal qiladi.
       security: []
       requestBody:
@@ -189,12 +201,13 @@ paths:
           application/json:
             schema:
               type: object
-              required: [phone]
+              required: [email]
               properties:
-                phone:
+                email:
                   type: string
-                  description: '+998901234567, 998901234567 yoki 901234567 — hammasi qabul qilinadi'
-                  example: '+998901234567'
+                  format: email
+                  maxLength: 254
+                  example: 'aziza@example.uz'
       responses:
         '200':
           description: Kod yuborildi
@@ -205,13 +218,25 @@ paths:
                   - $ref: '#/components/schemas/Ok'
                   - type: object
                     properties:
-                      phone:     { type: string, example: '+998901234567' }
+                      email:
+                        type: string
+                        example: 'aziza@example.uz'
                       expiresIn: { type: integer, example: 300 }
                       resendIn:  { type: integer, example: 60 }
                       devCode:
                         type: string
                         description: "Faqat `dev_mode: true` bo‘lganda. Serverda qaytmaydi."
                         example: '123456'
+        '502':
+          description: Xatni jo‘natib bo‘lmadi (SMTP xatosi)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      error: { type: string, example: mail_failed }
         '422':
           $ref: '#/components/responses/Validation'
         '429':
@@ -229,7 +254,8 @@ paths:
     post:
       tags: [Kirish]
       summary: Kodni tasdiqlash va token olish
-      description: Raqam birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi.
+      description: |
+        Manzil birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi.
       security: []
       requestBody:
         required: true
@@ -237,10 +263,10 @@ paths:
           application/json:
             schema:
               type: object
-              required: [phone, code]
+              required: [email, code]
               properties:
-                phone: { type: string, example: '+998901234567' }
-                code:  { type: string, example: '123456' }
+                email: { type: string, format: email, example: 'aziza@example.uz' }
+                code:  { type: string, minLength: 6, maxLength: 6, example: '123456' }
       responses:
         '200':
           description: Kirish muvaffaqiyatli
@@ -280,10 +306,13 @@ paths:
   /v1/auth/oauth:
     post:
       tags: [Kirish]
-      summary: OneID yoki Google orqali kirish
+      summary: Google (yoki OneID) orqali kirish
       description: |
         Provayder tokenini tekshirish ilova yoki provayder tomonida bo‘ladi;
         bu endpoint barqaror `subject` (provayderdagi id) kutadi.
+
+        Ilova hozir faqat `google` ni ko‘rsatadi; `oneid` eski mijozlar uchun
+        qoldirilgan.
       security: []
       requestBody:
         required: true

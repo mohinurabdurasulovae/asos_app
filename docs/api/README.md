@@ -4,6 +4,8 @@ The contract is [`openapi.yaml`](openapi.yaml) (OpenAPI 3.0.3, same as the live 
 
 > **Note:** the endpoint lists below were written for the first draft of the contract. The live API uses `/v1/...` paths and some different names (e.g. `POST /v1/me/bookmarks` instead of `PUT /me/bookmarks/{type}/{id}`). `openapi.yaml` is the source of truth; the Konstitutsiya and Modda sections are already updated.
 
+> **Email orqali kirish:** ilova tomoni tayyor, server tomoni hali yo'q. Backend topshirig'i — [`EMAIL-SIGN-IN.md`](EMAIL-SIGN-IN.md).
+
 ## Rules
 
 1. **Contract first.** Change `openapi.yaml` in its own PR before touching DTOs (`core/network/.../dto`) or Retrofit interfaces (`core/network/.../api`).

@@ -1,6 +1,14 @@
 // :feature:learn  ·  WP-07
-// PLACEHOLDER: build configuration goes here.
-//
-// Apply the convention plugin: asos.android.feature (brings Compose, Hilt, core:designsystem, core:ui, core:navigation).
-// Extra dependencies: project(":core:domain"), project(":core:data").
+// O‘rganish (learning hub) + Test savoli (quiz).
 // NEVER depend on another :feature:* module. Navigate through core:navigation routes.
+plugins {
+    alias(libs.plugins.asos.android.feature)
+}
+
+android {
+    namespace = "uz.asos.feature.learn"
+}
+
+dependencies {
+    implementation(project(":core:data"))
+}

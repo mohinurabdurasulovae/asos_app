@@ -2,4 +2,49 @@
 <!-- Strings for :feature:cases. Prefix keys with 'cases_'. -->
 <!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <!-- Kazuslar (list) -->
+    <string name="cases_title">Kazuslar</string>
+    <string name="cases_back">Orqaga</string>
+    <string name="cases_sort">Saralash</string>
+    <string name="cases_intro">Vaziyatni o‘qing, tegishli moddani toping va yechim taklif qiling. Javobni huquqshunos izohi bilan solishtiring.</string>
+    <string name="cases_filter_all">Barchasi</string>
+    <string name="cases_difficulty_label">Qiyinlik:</string>
+    <string name="cases_featured_badge">HAFTANING KAZUSI</string>
+    <string name="cases_featured_continue">Davom etish</string>
+    <string name="cases_featured_view">Ko‘rish</string>
+    <string name="cases_empty_title">Tanlangan filtr bo‘yicha kazus topilmadi</string>
+    <string name="cases_empty_action">Filtrlarni tozalash</string>
+    <string name="cases_load_error_title">Kazuslarni yuklab bo‘lmadi</string>
+
+    <!-- Saralash sheet -->
+    <string name="cases_filter_sheet_title">Kazuslarni saralash</string>
+    <string name="cases_filter_by_status">Holat bo‘yicha</string>
+    <string name="cases_filter_only_saved">Faqat saqlangan kazuslar</string>
+    <string name="cases_filter_apply">Qo‘llash</string>
+
+    <!-- Kazus — yechim -->
+    <string name="cases_bookmark">Saqlash</string>
+    <string name="cases_step_scenario">1 · Vaziyat</string>
+    <string name="cases_step_article">2 · Modda</string>
+    <string name="cases_step_solution">3 · Yechim</string>
+    <string name="cases_articles_question">1. Qaysi modda(lar) bu vaziyatga tegishli?</string>
+    <string name="cases_choice_correct">To‘g‘ri tanlov</string>
+    <string name="cases_choice_wrong">Noto‘g‘ri tanlov</string>
+    <string name="cases_solution_heading">2. Sizning yechimingiz</string>
+    <string name="cases_solution_placeholder">Vaziyat bo‘yicha o‘z huquqiy xulosangizni qisqacha yozing...</string>
+    <string name="cases_solution_check">Yechimni tekshirish</string>
+    <string name="cases_result_correct_title">Ajoyib! +%1$d ball</string>
+    <string name="cases_result_correct_subtitle">Modda to‘g‘ri topildi, yechim mantiqli</string>
+    <string name="cases_result_wrong_title">Modda noto‘g‘ri tanlandi</string>
+    <string name="cases_result_wrong_subtitle">Quyidagi huquqshunos izohini o‘qib, qayta urinib ko‘ring</string>
+    <string name="cases_lawyer_heading">Huquqshunos izohi</string>
+    <string name="cases_lawyer_read_article">Moddani o‘qish</string>
+    <string name="cases_lawyer_steps">AMALIY QADAMLAR</string>
+    <string name="cases_action_retry">Qaytadan</string>
+    <string name="cases_action_next">Keyingi kazus</string>
+
+    <!-- Modda sheet -->
+    <string name="cases_article_number">%1$d-modda</string>
+    <string name="cases_article_plain">Sodda qilib aytganda</string>
+    <string name="cases_article_open_reader">To‘liq moddani ochish</string>
 </resources>

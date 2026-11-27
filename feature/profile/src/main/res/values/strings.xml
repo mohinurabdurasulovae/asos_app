@@ -2,4 +2,46 @@
 <!-- Strings for :feature:profile. Prefix keys with 'profile_'. -->
 <!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
+    <string name="profile_title">Profil</string>
+    <string name="profile_settings">Sozlamalar</string>
+    <string name="profile_level">%1$d-daraja · %2$s</string>
+    <string name="profile_stat_points">ball</string>
+    <string name="profile_stat_quizzes">test</string>
+    <string name="profile_stat_cases">kazus</string>
+
+    <string name="profile_week_title">Bu hafta</string>
+    <string name="profile_week_summary">%1$d daqiqa · %2$d kun faol</string>
+    <string name="profile_next_level">%1$d-darajagacha</string>
+    <string name="profile_level_progress">%1$s / %2$s ball</string>
+    <string name="profile_max_level">Eng yuqori daraja</string>
+
+    <string name="profile_achievements">Yutuqlar</string>
+    <string name="profile_achievements_count">%1$d / %2$d</string>
+
+    <string name="profile_saved">Saqlanganlar</string>
+    <string name="profile_saved_articles">Moddalar</string>
+    <string name="profile_saved_posts">Muhokamalar</string>
+    <string name="profile_saved_terms">Atamalar</string>
+    <string name="profile_saved_cases">Kazuslar</string>
+
+    <string name="profile_settings_section">Sozlamalar</string>
+    <string name="profile_personal_data">Shaxsiy ma‘lumotlar</string>
+    <string name="profile_daily_reminders">Kunlik eslatmalar</string>
+    <string name="profile_language">Til</string>
+    <string name="profile_language_uz_latn">O‘zbekcha (lotin)</string>
+    <string name="profile_language_uz_cyrl">Ўзбекча (кирилл)</string>
+    <string name="profile_language_ru">Русский</string>
+    <string name="profile_language_en">English</string>
+    <string name="profile_text_size">Matn o‘lchami</string>
+    <string name="profile_text_size_small">Kichik</string>
+    <string name="profile_text_size_medium">O‘rtacha</string>
+    <string name="profile_text_size_large">Katta</string>
+    <string name="profile_text_size_xlarge">Juda katta</string>
+    <string name="profile_privacy">Maxfiylik va xavfsizlik</string>
+    <string name="profile_logout">Chiqish</string>
+
+    <string name="profile_guest_title">Tizimga kiring</string>
+    <string name="profile_guest_message">Natijalaringiz, yutuqlaringiz va saqlanganlar shu yerda saqlanadi.</string>
+    <string name="profile_guest_action">Kirish</string>
+    <string name="profile_load_error_title">Profilni yuklab bo‘lmadi</string>
 </resources>
