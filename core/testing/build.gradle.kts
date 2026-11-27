@@ -1,5 +1,3 @@
-// :core:testing  ·  WP-02
-// Fakes, sample data and test rules. Used as testImplementation by every module.
 plugins {
     alias(libs.plugins.asos.android.library)
 }

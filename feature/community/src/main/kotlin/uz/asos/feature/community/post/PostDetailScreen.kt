@@ -1,19 +1,3 @@
-/*
- * PostDetailScreen.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Muhokama (design artboard: Post.dc.html)
- *
- * Layout (top to bottom, 16 dp gutters):
- *   PostTopBar (back · topic · Qo'shilish)
- *   PostHeader (author · title · body · tags)
- *   PostActionBar (votes · comments · save · share)
- *   "N izoh"
- *   LawyerAnswerCard (the best answer, lifted out of the thread)
- *   ReplyThread per remaining comment
- *   ReplyComposer pinned to the bottom
- *
- * PostDetailRoute collects the ViewModel; PostDetailScreen(uiState, onAction) is stateless.
- */
 package uz.asos.feature.community.post
 
 import androidx.compose.foundation.background

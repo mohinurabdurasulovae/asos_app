@@ -1,9 +1,3 @@
-/*
- * DifficultySelector.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * Boshlang‘ich / O‘rta / Murakkab tabs above the test list (the shared segmented control).
- */
 package uz.asos.feature.learn.hub.components
 
 import androidx.compose.foundation.layout.padding

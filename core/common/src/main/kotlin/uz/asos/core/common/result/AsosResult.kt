@@ -1,21 +1,9 @@
-/*
- * AsosResult.kt
- * Module: :core:common   ·   Work package: WP-00
- *
- * Result wrapper shared by data and UI layers. Repositories return AsosResult so ViewModels
- * never see exceptions, HTTP codes or DTOs.
- */
 package uz.asos.core.common.result
 
 sealed interface AsosResult<out T> {
 
     data class Success<out T>(val data: T) : AsosResult<T>
 
-    /**
-     * @param message Uzbek text that can be shown to the user as-is (the API's `message`,
-     *   or a local fallback such as "Internet aloqasi yo‘q").
-     * @param code machine-readable code: the API's `error` field, or [AsosErrorCode].
-     */
     data class Error(
         val message: String,
         val code: String = AsosErrorCode.UNKNOWN,
@@ -32,7 +20,6 @@ object AsosErrorCode {
     const val RATE_LIMITED = "rate_limited"
 }
 
-/** Transforms the data of a Success; an Error passes through unchanged. */
 inline fun <T, R> AsosResult<T>.mapSuccess(transform: (T) -> R): AsosResult<R> = when (this) {
     is AsosResult.Success -> AsosResult.Success(transform(data))
     is AsosResult.Error -> this

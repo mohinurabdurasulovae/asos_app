@@ -1,12 +1,3 @@
-/*
- * CaseDetailViewModel.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * Loads one case, keeps the picked articles and the written solution, and checks the answer.
- * Checking compares the picked set with the case's correct set, which is the rule the
- * Kazuslar prototype used; the repository owns it so the backend can take it over.
- */
 package uz.asos.feature.cases.detail
 
 import androidx.lifecycle.SavedStateHandle
@@ -32,10 +23,6 @@ class CaseDetailViewModel @Inject constructor(
     private val casesRepository: CasesRepository,
 ) : ViewModel() {
 
-    /**
-     * CaseRoute(caseId) stores its argument under "caseId". Read directly (instead of
-     * toRoute()) so the ViewModel stays testable on the plain JVM.
-     */
     private val caseId: Int? = checkNotNull(savedStateHandle.get<String>(KEY_ARG)) {
         "CaseDetailViewModel needs the \"$KEY_ARG\" navigation argument"
     }.toIntOrNull()
@@ -62,7 +49,6 @@ class CaseDetailViewModel @Inject constructor(
             CaseDetailAction.OnArticlePreviewDismiss ->
                 _uiState.update { it.copy(previewArticle = null) }
             CaseDetailAction.OnReload -> load()
-            // Navigation is handled by CaseDetailRoute.
             is CaseDetailAction.OnOpenArticleReader,
             CaseDetailAction.OnNextCaseClick,
             CaseDetailAction.OnBackClick,
@@ -97,7 +83,6 @@ class CaseDetailViewModel @Inject constructor(
         return stored ?: CaseProgress(status = item.initialStatus)
     }
 
-    /** The first case that is neither this one nor already solved. */
     private suspend fun findNextCase(id: Int) {
         val all = (casesRepository.getCases() as? AsosResult.Success)?.data ?: return
         val stored = casesRepository.observeProgress().first()

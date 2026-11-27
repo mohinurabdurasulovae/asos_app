@@ -1,10 +1,3 @@
-/*
- * AsosBottomBar.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. The 5-tab TabBar (design artboard TabBar.dc.html): white bar with a
- * top border; the selected tab gets a Brand50 pill behind its icon and a Brand600 label.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

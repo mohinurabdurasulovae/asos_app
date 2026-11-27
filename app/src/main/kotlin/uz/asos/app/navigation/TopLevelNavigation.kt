@@ -1,10 +1,3 @@
-/*
- * TopLevelNavigation.kt
- * Module: :app   ·   Work package: WP-00
- *
- * Tab switching with a saved back stack per tab: leaving a tab keeps its screens, and
- * coming back restores them. Tapping the current tab again does nothing extra.
- */
 package uz.asos.app.navigation
 
 import androidx.navigation.NavController

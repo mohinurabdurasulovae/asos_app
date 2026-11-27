@@ -1,9 +1,3 @@
-/*
- * Shape.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Corner radii from the design: 10/12/14/16/18/20/22/24/26 dp cards, 99 dp pills.
- */
 package uz.asos.core.designsystem.theme
 
 import androidx.compose.foundation.shape.CircleShape

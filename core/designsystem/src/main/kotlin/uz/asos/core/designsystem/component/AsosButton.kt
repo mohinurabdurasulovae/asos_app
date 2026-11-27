@@ -1,10 +1,3 @@
-/*
- * AsosButton.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Primary (Brand600), secondary (outlined) and dark (Navy) variants;
- * 16 dp radius. Height defaults to 52 dp.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background
@@ -85,4 +78,3 @@ private fun AsosButtonPreview() {
         }
     }
 }
-

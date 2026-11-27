@@ -1,17 +1,3 @@
-/*
- * LearnScreen.kt
- * Module: :feature:learn   ·   Work package: WP-07
- * Screen: O‘rganish (design artboard: Organish.dc.html)
- *
- * Layout (top to bottom, 20 dp gutters, 22 dp gaps):
- *   LearnHeader (title · streak pill · points pill)
- *   OverallProgressCard  (guests: SignInPromptCard)
- *   CasesPromoCard
- *   "Mavzular bo‘yicha testlar" · DifficultySelector · TopicTestCard
- *   AchievementsRow
- *
- * LearnRoute collects the ViewModel; LearnScreen(uiState, onAction) is stateless and previewable.
- */
 package uz.asos.feature.learn.hub
 
 import androidx.compose.foundation.background
@@ -66,7 +52,6 @@ internal fun LearnRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Back from a quiz: refresh percents, points and streak.
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(LearnAction.OnResume)
         onPauseOrDispose { }
@@ -202,8 +187,6 @@ private fun LearnContent(
         }
     }
 }
-
-// ---------------------------------------------------------------------- previews
 
 private val previewState = LearnUiState(
     isLoading = false,

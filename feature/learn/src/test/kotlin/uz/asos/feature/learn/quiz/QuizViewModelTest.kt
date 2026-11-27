@@ -1,7 +1,3 @@
-/*
- * QuizViewModelTest.kt
- * Module: :feature:learn   ·   Work package: WP-07
- */
 package uz.asos.feature.learn.quiz
 
 import androidx.lifecycle.SavedStateHandle

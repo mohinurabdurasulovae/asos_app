@@ -1,17 +1,3 @@
-/*
- * ConstitutionScreen.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * ConstitutionRoute connects the ViewModel; ConstitutionScreen(uiState, onAction) is
- * stateless and previewable.
- *
- * Layout (top to bottom, as on the canvas):
- *   ConstitutionHeader · search · Mavzular | Tuzilish | Saqlangan
- *   Tuzilish:  ReadingProgressCard · topic chips · Muqaddima · SectionAccordion × 6
- *   Mavzular:  topic rows        Saqlangan: saved articles        Search: results
- * The bottom bar is drawn by the app scaffold.
- */
 package uz.asos.feature.constitution.browse
 
 import androidx.compose.foundation.background
@@ -63,7 +49,6 @@ internal fun ConstitutionRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Coming back from the reader: refresh progress (read status, "Oxirgi o‘qilgan").
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(ConstitutionAction.OnResume)
         onPauseOrDispose { }
@@ -270,8 +255,6 @@ private fun LazyListScope.articleList(
         )
     }
 }
-
-// ---------------------------------------------------------------------- previews
 
 private val previewState = ConstitutionUiState(
     isLoading = false,

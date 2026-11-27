@@ -1,19 +1,3 @@
-/*
- * DictionaryScreen.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * Layout (top to bottom, 20 dp gutters, 18 dp gaps):
- *   back · "Konstitutsiyaviy lug'at"
- *   DictionarySearchField
- *   SavedTermsFilter (Barcha atamalar · Saqlangan N)
- *   TermOfTheDayCard
- *   letter heading + TermListItem per term
- *   AlphabetIndex pinned down the right edge
- *
- * DictionaryRoute collects the ViewModel; DictionaryScreen(uiState, onAction) is stateless
- * and previewable.
- */
 package uz.asos.feature.dictionary
 
 import androidx.compose.foundation.background
@@ -137,7 +121,6 @@ private fun DictionaryContent(
                 .statusBarsPadding(),
             contentPadding = PaddingValues(
                 start = AsosSpacing.xl,
-                // Room for the alphabet rail.
                 end = AsosSpacing.xl + ALPHABET_RAIL_WIDTH,
                 top = AsosSpacing.m,
                 bottom = AsosSpacing.xxxl,

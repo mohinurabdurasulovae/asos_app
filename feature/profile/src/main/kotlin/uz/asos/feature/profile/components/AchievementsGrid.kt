@@ -1,10 +1,3 @@
-/*
- * AchievementsGrid.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * "Yutuqlar 3 / 12": a row of badges, the locked ones grey with their progress underneath.
- */
 package uz.asos.feature.profile.components
 
 import androidx.compose.foundation.background
@@ -107,7 +100,6 @@ private fun AchievementBadge(achievement: Achievement) {
     }
 }
 
-/** Icon for a badge, picked from the API's icon name, then its metric. */
 private fun Achievement.icon(): ImageVector = when (icon) {
     "flame" -> AsosIcons.Flame
     "star" -> AsosIcons.Star

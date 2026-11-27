@@ -1,5 +1,3 @@
-// :core:network  ·  WP-02
-// Retrofit + OkHttp + kotlinx.serialization. DTOs mirror docs/api/openapi.yaml.
 plugins {
     alias(libs.plugins.asos.android.library)
     alias(libs.plugins.asos.hilt)

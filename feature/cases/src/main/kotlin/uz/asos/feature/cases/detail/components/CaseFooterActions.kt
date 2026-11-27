@@ -1,10 +1,3 @@
-/*
- * CaseFooterActions.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * "Qaytadan" and "Keyingi kazus", shown once the answer is checked.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.layout.Arrangement

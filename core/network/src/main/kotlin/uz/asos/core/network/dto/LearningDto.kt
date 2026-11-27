@@ -1,16 +1,6 @@
-/*
- * LearningDto.kt
- * Module: :core:network   ·   Work package: WP-07
- *
- * @Serializable DTOs for the O‘rganish endpoints. Field names mirror the OpenAPI schemas
- * (Quiz, DailyGoal, Achievement, Attempt, AttemptQuestion, QuizOption, AttemptResult).
- * Every field has a default so a missing or new field never crashes parsing.
- */
 package uz.asos.core.network.dto
 
 import kotlinx.serialization.Serializable
-
-// ---------------------------------------------------------------- GET /v1/learn
 
 @Serializable
 data class LearnResponseDto(
@@ -18,13 +8,9 @@ data class LearnResponseDto(
     val quizzes: List<QuizDto> = emptyList(),
     val casesSolved: Int = 0,
     val casesNew: Int = 0,
-    /** Only with a token. */
     val overview: ReadingOverviewDto? = null,
-    /** Only with a token. */
     val dailyGoal: DailyGoalDto? = null,
-    /** Only with a token. */
     val points: Int? = null,
-    /** Only with a token. */
     val streakDays: Int? = null,
     val achievements: List<AchievementDto> = emptyList(),
 )
@@ -34,7 +20,6 @@ data class QuizDto(
     val id: Int = 0,
     val slug: String = "",
     val title: String = "",
-    /** boshlangich | orta | murakkab */
     val difficulty: String = "orta",
     val icon: String? = null,
     val tone: String? = null,
@@ -84,9 +69,6 @@ data class AchievementDto(
     val earnedAt: String? = null,
 )
 
-// ---------------------------------------------------------------- attempts
-
-/** POST /v1/quizzes/{id}/attempts and GET /v1/attempts/{id}. */
 @Serializable
 data class AttemptResponseDto(
     val ok: Boolean = true,
@@ -104,7 +86,6 @@ data class AttemptDto(
     val startedAt: String? = null,
     val finishedAt: String? = null,
     val isFinished: Boolean = false,
-    /** correct | wrong | current | pending, one per question. */
     val marks: List<String> = emptyList(),
     val nextQuestionId: Int? = null,
     val questions: List<AttemptQuestionDto> = emptyList(),
@@ -138,11 +119,9 @@ data class QuizOptionDto(
     val id: Int = 0,
     val label: String = "",
     val body: String = "",
-    /** Only present after the question is answered. */
     val isCorrect: Boolean? = null,
 )
 
-/** Body of POST /v1/attempts/{id}/answers. */
 @Serializable
 data class AnswerRequestDto(
     val questionId: Int,
@@ -164,7 +143,6 @@ data class AnswerResponseDto(
     val result: AttemptResultDto? = null,
 )
 
-/** POST /v1/attempts/{id}/finish. */
 @Serializable
 data class FinishResponseDto(
     val ok: Boolean = true,

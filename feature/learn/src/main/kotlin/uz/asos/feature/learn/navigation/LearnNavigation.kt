@@ -1,11 +1,3 @@
-/*
- * LearnNavigation.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * Public entry point of the feature: the only file the app module uses.
- *  - LearnRoute (tab)        → O‘rganish
- *  - QuizRoute(quizId)       → Test savoli (full screen, no bottom bar)
- */
 package uz.asos.feature.learn.navigation
 
 import androidx.navigation.NavController
@@ -30,10 +22,6 @@ fun NavController.navigateToQuiz(quizId: String, navOptions: NavOptions? = null)
     navigate(QuizDestination(quizId), navOptions)
 }
 
-/**
- * @param navController used to close the quiz.
- * @param onNavigate opens screens of other features through AsosRoutes.
- */
 fun NavGraphBuilder.learnScreens(
     navController: NavController,
     onNavigate: (AsosRoute) -> Unit,

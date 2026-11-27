@@ -1,15 +1,3 @@
-/*
- * AnswerOptionList.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * Answer options (design: Javob variantlari). 62 dp rows, 18 dp corners, 2 dp border,
- * 38 dp letter badge. Looks:
- *  - default:  grey border, grey badge
- *  - selected: blue (while the answer is being checked)
- *  - correct:  green border + background, green badge, check icon
- *  - wrong:    red border + background, red badge, x icon
- *  - dimmed:   other options after answering (55 % opacity)
- */
 package uz.asos.feature.learn.quiz.components
 
 import androidx.compose.foundation.background

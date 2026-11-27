@@ -1,9 +1,3 @@
-/*
- * DataStoreModule.kt
- * Module: :core:datastore   ·   Work package: WP-02
- *
- * Hilt module for DataStore. Two files: user preferences and the session token.
- */
 package uz.asos.core.datastore.di
 
 import android.content.Context

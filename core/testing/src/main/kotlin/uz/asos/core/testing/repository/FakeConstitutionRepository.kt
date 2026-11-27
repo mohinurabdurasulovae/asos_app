@@ -1,10 +1,3 @@
-/*
- * FakeConstitutionRepository.kt
- * Module: :core:testing   ·   Work package: WP-02
- *
- * In-memory fake of ConstitutionRepository with SampleData. Set the public vars to change
- * what it returns, and read the recorded calls to check what a ViewModel did.
- */
 package uz.asos.core.testing.repository
 
 import uz.asos.core.common.result.AsosResult

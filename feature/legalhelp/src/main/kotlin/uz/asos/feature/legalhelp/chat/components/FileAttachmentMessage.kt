@@ -1,9 +1,3 @@
-/*
- * FileAttachmentMessage.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * File card inside a message bubble: "Ogohlantirish_xati.docx · 24 KB · Word".
- */
 package uz.asos.feature.legalhelp.chat.components
 
 import androidx.compose.foundation.background

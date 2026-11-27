@@ -1,9 +1,3 @@
-/*
- * QuickReplyChips.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * Horizontally scrolling quick replies above the composer. Tapping one sends it.
- */
 package uz.asos.feature.legalhelp.chat.components
 
 import androidx.compose.foundation.background

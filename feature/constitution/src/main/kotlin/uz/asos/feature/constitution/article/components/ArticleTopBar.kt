@@ -1,11 +1,3 @@
-/*
- * ArticleTopBar.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Back · "II bo‘lim › IX bob" breadcrumb · Aa (text size) · save · share.
- * The save button turns light blue with a filled icon when the article is saved.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

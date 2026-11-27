@@ -1,10 +1,3 @@
-/*
- * DefaultUserRepository.kt
- * Module: :core:data   ·   Work package: WP-02 / WP-11
- *
- * Implementation of UserRepository. The reader text size lives on the device (DataStore) and
- * is mirrored to the server with PATCH /v1/me when the user is signed in.
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,7 +39,6 @@ internal class DefaultUserRepository @Inject constructor(
         textSize: ReaderTextSize?,
         notifyDaily: Boolean?,
     ): AsosResult<UserProfile?> = io {
-        // The reader size is a device setting first, so it applies even when the call fails.
         textSize?.let { preferences.setReaderTextSize(it) }
 
         apiCaller.call {

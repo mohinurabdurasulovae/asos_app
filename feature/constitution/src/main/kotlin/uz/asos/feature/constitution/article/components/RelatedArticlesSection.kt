@@ -1,11 +1,3 @@
-/*
- * RelatedArticlesSection.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * "Bog‘liq moddalar": three-column grid of tiles (serif number + short title). Tapping a tile
- * opens that article.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

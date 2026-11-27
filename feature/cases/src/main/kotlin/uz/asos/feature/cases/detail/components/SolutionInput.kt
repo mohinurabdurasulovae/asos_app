@@ -1,11 +1,3 @@
-/*
- * SolutionInput.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * "Sizning yechimingiz" text area + "Yechimni tekshirish" button. The button stays disabled
- * until an article is picked and a few words are written; the field locks after checking.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.layout.Arrangement

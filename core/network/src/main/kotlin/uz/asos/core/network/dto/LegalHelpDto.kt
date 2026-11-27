@@ -1,16 +1,6 @@
-/*
- * LegalHelpDto.kt
- * Module: :core:network   ·   Work package: WP-02 (legal-help slice written with WP-10)
- *
- * @Serializable DTOs for the "Yordam" endpoints. Field names mirror the OpenAPI schemas
- * (Hotline, Lawyer, Conversation, Message, Booking). Every field has a default so a missing
- * key never breaks parsing (Json is configured with ignoreUnknownKeys + coerceInputValues).
- */
 package uz.asos.core.network.dto
 
 import kotlinx.serialization.Serializable
-
-// ---------------------------------------------------------------- shared schemas
 
 @Serializable
 data class HotlineDto(
@@ -57,7 +47,6 @@ data class ConversationDto(
 @Serializable
 data class MessageAttachmentDto(
     val id: Int = 0,
-    /** "article" | "file" */
     val kind: String = "",
     val article: ArticleRefDto? = null,
     val fileName: String? = null,
@@ -80,13 +69,10 @@ data class MessageDto(
 data class BookingDto(
     val id: Int = 0,
     val slotAt: String = "",
-    /** pending | confirmed | cancelled */
     val status: String = "",
     val note: String? = null,
     val lawyer: LawyerDto? = null,
 )
-
-// ---------------------------------------------------------------- GET /v1/help
 
 @Serializable
 data class HelpResponseDto(
@@ -115,8 +101,6 @@ data class HelpAiDto(
     val disclaimer: String = "",
 )
 
-// ---------------------------------------------------------------- hotline / lawyers
-
 @Serializable
 data class HotlineResponseDto(
     val ok: Boolean = true,
@@ -128,8 +112,6 @@ data class LawyersResponseDto(
     val ok: Boolean = true,
     val items: List<LawyerDto> = emptyList(),
 )
-
-// ---------------------------------------------------------------- conversations
 
 @Serializable
 data class OpenConversationRequestDto(
@@ -181,8 +163,6 @@ data class MarkReadResponseDto(
     val unreadCount: Int = 0,
 )
 
-// ---------------------------------------------------------------- AI assistant
-
 @Serializable
 data class AiSuggestionsResponseDto(
     val ok: Boolean = true,
@@ -211,11 +191,8 @@ data class AiAskResponseDto(
     val answer: String = "",
     val articles: List<AiArticleDto> = emptyList(),
     val disclaimer: String? = null,
-    /** "stub" | "anthropic" */
     val driver: String? = null,
 )
-
-// ---------------------------------------------------------------- callback / bookings
 
 @Serializable
 data class CallbackRequestDto(
@@ -234,7 +211,6 @@ data class CallbackResponseDto(
 @Serializable
 data class BookingRequestDto(
     val lawyerId: Int,
-    /** "2026-11-21 15:00" */
     val slotAt: String,
     val note: String? = null,
 )

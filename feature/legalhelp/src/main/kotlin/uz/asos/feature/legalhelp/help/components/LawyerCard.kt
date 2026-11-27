@@ -1,10 +1,3 @@
-/*
- * LawyerCard.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * One verified lawyer: avatar with online dot, name + verified badge, specialty · years,
- * rating. Online: "Yozish" + call + video. Offline: free time today + "Vaqt band qilish".
- */
 package uz.asos.feature.legalhelp.help.components
 
 import androidx.compose.foundation.border

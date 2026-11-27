@@ -1,10 +1,3 @@
-/*
- * DictionaryNavigation.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- *
- * Public entry point of this feature: the only file the app module uses.
- *  - DictionaryRoute(termSlug) → Konstitutsiyaviy lug'at; a slug opens that term's sheet.
- */
 package uz.asos.feature.dictionary.navigation
 
 import androidx.navigation.NavController
@@ -23,10 +16,6 @@ fun NavController.navigateToDictionary(
     navigate(DictionaryDestination(termSlug), navOptions)
 }
 
-/**
- * @param navController used for back.
- * @param onNavigate opens screens of other features through AsosRoutes (the article reader).
- */
 fun NavGraphBuilder.dictionaryScreens(
     navController: NavController,
     onNavigate: (AsosRoute) -> Unit,

@@ -1,10 +1,3 @@
-/*
- * LoadingState.kt
- * Module: :core:ui   ·   Work package: WP-01
- *
- * Loading placeholders: a full-screen skeleton (grey blocks that pulse) and a small inline
- * spinner for parts of a screen.
- */
 package uz.asos.core.ui.state
 
 import androidx.compose.animation.core.RepeatMode
@@ -36,7 +29,6 @@ import uz.asos.core.designsystem.theme.AsosColors
 import uz.asos.core.designsystem.theme.AsosShapes
 import uz.asos.core.designsystem.theme.AsosTheme
 
-/** Full-screen skeleton. [blocks] are the heights of the grey cards, top to bottom. */
 @Composable
 fun LoadingState(
     modifier: Modifier = Modifier,
@@ -68,7 +60,6 @@ fun LoadingState(
     }
 }
 
-/** Small spinner for one part of a screen (e.g. a chapter's articles loading). */
 @Composable
 fun InlineLoading(modifier: Modifier = Modifier) {
     Box(

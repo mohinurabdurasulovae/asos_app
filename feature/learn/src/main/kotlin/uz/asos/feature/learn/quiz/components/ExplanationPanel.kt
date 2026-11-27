@@ -1,15 +1,3 @@
-/*
- * ExplanationPanel.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * Bottom panel after an answer: "To‘g‘ri!" (green) or "Afsus, noto‘g‘ri" (red), points or the
- * right answer, the explanation, "Moddani o‘qish" chip and the buttons.
- *
- * The design's left button is "Qaytadan", but the API accepts one answer per question (409), so
- * here it is "Tugatish" (finish the test now). "Qaytadan" lives on the result screen instead.
- *
- * PickAnswerBar is the disabled "Javobni tanlang" button shown before answering.
- */
 package uz.asos.feature.learn.quiz.components
 
 import androidx.compose.foundation.background
@@ -134,7 +122,6 @@ internal fun ExplanationPanel(
     }
 }
 
-/** White chip: navy serif number badge + "Moddani o‘qish". */
 @Composable
 private fun ArticleChip(number: Int, onClick: () -> Unit) {
     Row(
@@ -169,7 +156,6 @@ private fun ArticleChip(number: Int, onClick: () -> Unit) {
     }
 }
 
-/** Before answering: grey disabled button. */
 @Composable
 internal fun PickAnswerBar(
     isSubmitting: Boolean,

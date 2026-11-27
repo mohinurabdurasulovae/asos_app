@@ -1,10 +1,3 @@
-/*
- * DifficultyFilter.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * "Qiyinlik:" Barchasi / Oson / O'rta / Murakkab, the selected one underlined.
- */
 package uz.asos.feature.cases.list.components
 
 import androidx.compose.foundation.background

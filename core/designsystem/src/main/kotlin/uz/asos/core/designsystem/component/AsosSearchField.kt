@@ -1,10 +1,3 @@
-/*
- * AsosSearchField.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Rounded search input with a clear button and an optional voice button.
- * Flat (bordered) on list screens, elevated (soft shadow) on Bosh sahifa.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

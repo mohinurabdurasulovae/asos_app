@@ -1,10 +1,3 @@
-/*
- * AsosAppState.kt
- * Module: :app   ·   Work package: WP-00
- *
- * Holds the NavController, the current top-level destination and bottom-bar visibility.
- * TODO(WP-00): network status (offline banner) once :core:database gives an offline mode.
- */
 package uz.asos.app.ui
 
 import androidx.compose.runtime.Composable
@@ -37,7 +30,6 @@ class AsosAppState(
             return entry?.destination
         }
 
-    /** The tab the current screen belongs to, or null on pushed screens (Modda, Chat …). */
     val currentTopLevelDestination: TopLevelDestination?
         @Composable get() {
             val destination = currentDestination ?: return null
@@ -46,7 +38,6 @@ class AsosAppState(
             }
         }
 
-    /** The bottom bar shows on the five tab screens only (docs/SCREENS.md). */
     val shouldShowBottomBar: Boolean
         @Composable get() = currentTopLevelDestination != null
 

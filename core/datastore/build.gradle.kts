@@ -1,5 +1,3 @@
-// :core:datastore  ·  WP-02
-// Jetpack DataStore: reader preferences and the access token.
 plugins {
     alias(libs.plugins.asos.android.library)
     alias(libs.plugins.asos.hilt)

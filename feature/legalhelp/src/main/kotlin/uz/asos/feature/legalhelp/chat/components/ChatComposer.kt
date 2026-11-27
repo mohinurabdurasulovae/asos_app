@@ -1,9 +1,3 @@
-/*
- * ChatComposer.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * Bottom input row: attach, "Xabar yozing...", mic, send.
- */
 package uz.asos.feature.legalhelp.chat.components
 
 import androidx.compose.foundation.background

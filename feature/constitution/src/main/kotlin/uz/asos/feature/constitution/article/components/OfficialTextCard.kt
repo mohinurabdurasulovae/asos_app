@@ -1,12 +1,3 @@
-/*
- * OfficialTextCard.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * The official text: numbered parts in Source Serif 4, highlighted phrases on a light blue
- * background, "To‘liq matnni ochish" after the first three parts, and the source line.
- * The text is shown exactly as the API sends it (openapi.yaml: "Matn o‘zgartirilmagan").
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.border
@@ -69,7 +60,6 @@ internal fun OfficialTextCard(
         }
         visible.forEachIndexed { index, part ->
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                // A text with a single block (e.g. the preamble) has no part numbers.
                 if (parts.size > 1) {
                     Text(
                         text = part.number.toString(),
@@ -82,7 +72,6 @@ internal fun OfficialTextCard(
                 Text(
                     text = highlighted(part.body, part.highlights),
                     style = bodyStyle,
-                    // The design fades the last visible part a little when the text is collapsed.
                     color = if (!showAll && hasMore && index == visible.lastIndex) AsosColors.Text3 else AsosColors.Navy,
                     modifier = Modifier.weight(1f),
                 )
@@ -130,7 +119,6 @@ internal fun OfficialTextCard(
     }
 }
 
-/** Serif body text, sized by the reader text-size setting (line height 1.6). */
 internal fun legalBodyStyle(textSize: ReaderTextSize): TextStyle {
     val size = when (textSize) {
         ReaderTextSize.SMALL -> 17f
@@ -141,7 +129,6 @@ internal fun legalBodyStyle(textSize: ReaderTextSize): TextStyle {
     return AsosTextStyles.LegalBody.copy(fontSize = size.sp, lineHeight = (size * 1.6f).sp)
 }
 
-/** Marks every occurrence of each phrase with the light blue highlight. */
 @Composable
 private fun highlighted(body: String, phrases: List<String>): AnnotatedString = remember(body, phrases) {
     val ranges = phrases

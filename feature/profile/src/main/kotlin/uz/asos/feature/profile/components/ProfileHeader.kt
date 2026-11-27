@@ -1,11 +1,3 @@
-/*
- * ProfileHeader.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * Navy hero: "Profil" with the settings button, the avatar, name, @username · city and the
- * level pill.
- */
 package uz.asos.feature.profile.components
 
 import androidx.compose.foundation.background

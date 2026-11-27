@@ -1,10 +1,3 @@
-/*
- * ProfileNavigation.kt
- * Module: :feature:profile   ·   Work package: WP-11
- *
- * Public entry point of this feature: the only file the app module uses.
- *  - ProfileRoute → Profil (tab)
- */
 package uz.asos.feature.profile.navigation
 
 import androidx.navigation.NavController
@@ -24,9 +17,6 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
     navigate(ProfileDestination, navOptions)
 }
 
-/**
- * @param onNavigate opens screens of other features through AsosRoutes.
- */
 fun NavGraphBuilder.profileScreens(onNavigate: (AsosRoute) -> Unit) {
     composable<ProfileDestination> {
         ProfileRoute(
@@ -37,7 +27,6 @@ fun NavGraphBuilder.profileScreens(onNavigate: (AsosRoute) -> Unit) {
     }
 }
 
-/** Saved terms and discussions have their own screens; the rest go to Saqlanganlar. */
 private fun BookmarkType.savedRoute(): AsosRoute = when (this) {
     BookmarkType.TERM -> DictionaryRoute()
     BookmarkType.POST -> CommunityRoute()

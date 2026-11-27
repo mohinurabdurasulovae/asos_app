@@ -1,10 +1,3 @@
-/*
- * OverallProgressCard.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * "Umumiy natija" card: 104 dp ring with the percent (serif), articles learned, and the daily
- * goal as segmented bars. Guests see SignInPromptCard in the same place.
- */
 package uz.asos.feature.learn.hub.components
 
 import androidx.compose.foundation.background
@@ -51,7 +44,6 @@ internal fun OverallProgressCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(18.dp),
     ) {
-        // Design: r = 44 inside 104 with an 11 px stroke → 99 dp outer ring.
         Box(modifier = Modifier.size(104.dp), contentAlignment = Alignment.Center) {
             ProgressRing(
                 progress = progress.percent / 100f,
@@ -95,7 +87,6 @@ internal fun OverallProgressCard(
     }
 }
 
-/** One 7 dp bar per lesson of the daily goal; done ones are blue. */
 @Composable
 private fun GoalBars(goal: Int, done: Int) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -112,7 +103,6 @@ private fun GoalBars(goal: Int, done: Int) {
 
 private const val MAX_BARS = 10
 
-/** Guest version of the card. */
 @Composable
 internal fun SignInPromptCard(
     onSignIn: () -> Unit,

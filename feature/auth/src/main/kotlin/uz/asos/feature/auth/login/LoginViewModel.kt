@@ -50,8 +50,6 @@ class LoginViewModel @Inject constructor(
             LoginAction.OnVerifyClick -> otp.verify()
             LoginAction.OnResendClick -> otp.resend()
             LoginAction.OnChangeEmailClick -> otp.backToEmail()
-            // TODO: call emailAuthRepository.signInWithProvider(GOOGLE, …) once the Google
-            //  Sign-In SDK and the client id are in place.
             LoginAction.OnGoogleClick -> send(LoginEvent.GoogleUnavailable)
             LoginAction.OnSignUpClick -> Unit
         }

@@ -1,10 +1,3 @@
-/*
- * DefaultConstitutionRepository.kt
- * Module: :core:data   ·   Work package: WP-02
- *
- * Network implementation of ConstitutionRepository (Room cache comes later, see the
- * interface). Endpoints that need a token are skipped for guests instead of failing.
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher

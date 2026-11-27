@@ -1,21 +1,3 @@
-/*
- * AsosIcons.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * EVERY icon in the Asos app lives in this one file. They are taken path-for-path from the
- * design canvas (24×24 line icons, rounded caps/joins, 1.8–2 px strokes) and use the
- * Asos palette.
- *
- * How to use:
- *   Monochrome icons are drawn in Navy (#172B4D) and are meant to be tinted:
- *       Icon(AsosIcons.Search, contentDescription = "Qidirish", tint = AsosIconTint.Muted)
- *   Multicolour icons (Verified, CheckCircleFilled, XCircleFilled, CircleOutline, LogoMark,
- *   Google) already carry their palette colours. Draw them with tint = Color.Unspecified:
- *       Icon(AsosIcons.Verified, contentDescription = "Tasdiqlangan", tint = Color.Unspecified)
- *
- * Catalogue with recommended tints: docs/design/ICONS.md  ·  visual sheet: docs/design/icons-preview.html
- * This file is generated from the design. Add new icons here, in the same style.
- */
 package uz.asos.core.designsystem.icon
 
 import androidx.compose.ui.graphics.Color
@@ -26,41 +8,24 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
 
-/** Recommended icon tints from the Asos palette (mirror of theme/Color.kt). */
 object AsosIconTint {
-    /** #172B4D: Default icon colour, main text. */
     val Navy = Color(0xFF172B4D)
-    /** #5E6A80: Secondary icons, inactive tab. */
     val Muted = Color(0xFF5E6A80)
-    /** #3A4A66: Tertiary icons. */
     val Text3 = Color(0xFF3A4A66)
-    /** #8A94A6: Decoration only, locked states. */
     val SoftGray = Color(0xFF8A94A6)
-    /** #1C64C0: Selected tab, links, icon buttons on Brand50. */
     val Active = Color(0xFF1C64C0)
-    /** #2478DE: Large brand surfaces, progress. */
     val Brand = Color(0xFF2478DE)
-    /** #FFFFFF: Icons on Brand600/Navy surfaces. */
     val OnBrand = Color(0xFFFFFFFF)
-    /** #1E9E63: Correct, read, online. */
     val Success = Color(0xFF1E9E63)
-    /** #D9433A: Wrong, logout. */
     val Error = Color(0xFFD9433A)
-    /** #D9780A: Highlights, partial score. */
     val Warning = Color(0xFFD9780A)
-    /** #D9780A: Streak flame. */
     val Streak = Color(0xFFD9780A)
-    /** #5B3CC4: Dictionary accent. */
     val Dictionary = Color(0xFF5B3CC4)
-    /** #0F7A68: Achievement accent. */
     val Achievement = Color(0xFF0F7A68)
 }
 
 object AsosIcons {
 
-    // ---------------------------------------------------------------- Navigation
-
-    /** Back (Orqaga) on every pushed screen. Recommended tint: Navy. */
     val ChevronLeft: ImageVector by lazy {
         icon(
             "ChevronLeft", 24f,
@@ -68,7 +33,6 @@ object AsosIcons {
         )
     }
 
-    /** Row / card disclosure. Recommended tint: Muted. */
     val ChevronRight: ImageVector by lazy {
         icon(
             "ChevronRight", 24f,
@@ -76,7 +40,6 @@ object AsosIcons {
         )
     }
 
-    /** Primary CTA arrow (Kirish, Home cards). Recommended tint: OnBrand. */
     val ArrowRight: ImageVector by lazy {
         icon(
             "ArrowRight", 24f,
@@ -84,7 +47,6 @@ object AsosIcons {
         )
     }
 
-    /** Expand section, show more replies. Recommended tint: Muted. */
     val ChevronDown: ImageVector by lazy {
         icon(
             "ChevronDown", 24f,
@@ -92,7 +54,6 @@ object AsosIcons {
         )
     }
 
-    /** Collapse section. Recommended tint: Muted. */
     val ChevronUp: ImageVector by lazy {
         icon(
             "ChevronUp", 24f,
@@ -100,7 +61,6 @@ object AsosIcons {
         )
     }
 
-    /** Close quiz (Testni yopish). Recommended tint: Navy. */
     val Close: ImageVector by lazy {
         icon(
             "Close", 24f,
@@ -108,7 +68,6 @@ object AsosIcons {
         )
     }
 
-    /** Send to AI assistant. Recommended tint: OnBrand. */
     val ArrowUp: ImageVector by lazy {
         icon(
             "ArrowUp", 24f,
@@ -116,9 +75,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Status
-
-    /** Verified lawyer (Tasdiqlangan). Multicolour: use tint = Color.Unspecified. */
     val Verified: ImageVector by lazy {
         icon(
             "Verified", 24f,
@@ -127,7 +83,6 @@ object AsosIcons {
         )
     }
 
-    /** Read (O‘qilgan), correct answer, completed, solved. Multicolour: use tint = Color.Unspecified. */
     val CheckCircleFilled: ImageVector by lazy {
         icon(
             "CheckCircleFilled", 24f,
@@ -136,7 +91,6 @@ object AsosIcons {
         )
     }
 
-    /** Not started (Boshlanmagan). Multicolour: use tint = Color.Unspecified. */
     val CircleOutline: ImageVector by lazy {
         icon(
             "CircleOutline", 24f,
@@ -144,7 +98,6 @@ object AsosIcons {
         )
     }
 
-    /** Wrong answer (Noto‘g‘ri javob). Multicolour: use tint = Color.Unspecified. */
     val XCircleFilled: ImageVector by lazy {
         icon(
             "XCircleFilled", 24f,
@@ -153,9 +106,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Communication
-
-    /** Call lawyer / hotline. Recommended tint: Active. */
     val Phone: ImageVector by lazy {
         icon(
             "Phone", 24f,
@@ -163,7 +113,6 @@ object AsosIcons {
         )
     }
 
-    /** Video call. Recommended tint: Active. */
     val Video: ImageVector by lazy {
         icon(
             "Video", 24f,
@@ -172,7 +121,6 @@ object AsosIcons {
         )
     }
 
-    /** Anonymous posting (Anonim). Recommended tint: Muted. */
     val EyeOff: ImageVector by lazy {
         icon(
             "EyeOff", 24f,
@@ -181,7 +129,6 @@ object AsosIcons {
         )
     }
 
-    /** Comments count, "Muhokamada". Recommended tint: Muted. */
     val Comment: ImageVector by lazy {
         icon(
             "Comment", 24f,
@@ -189,7 +136,6 @@ object AsosIcons {
         )
     }
 
-    /** Asos AI yordamchi. Recommended tint: OnBrand. */
     val Sparkles: ImageVector by lazy {
         icon(
             "Sparkles", 24f,
@@ -198,7 +144,6 @@ object AsosIcons {
         )
     }
 
-    /** Book a time (Vaqt band qilish). Recommended tint: Active. */
     val Calendar: ImageVector by lazy {
         icon(
             "Calendar", 24f,
@@ -207,9 +152,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Content
-
-    /** File attachment (.docx). Recommended tint: Active. */
     val DocumentLines: ImageVector by lazy {
         icon(
             "DocumentLines", 24f,
@@ -218,7 +160,6 @@ object AsosIcons {
         )
     }
 
-    /** Dictionary (Lug‘at). Recommended tint: Dictionary. */
     val BookOpen: ImageVector by lazy {
         icon(
             "BookOpen", 24f,
@@ -226,7 +167,6 @@ object AsosIcons {
         )
     }
 
-    /** Official text (Rasmiy matn). Recommended tint: Active. */
     val Document: ImageVector by lazy {
         icon(
             "Document", 24f,
@@ -235,7 +175,6 @@ object AsosIcons {
         )
     }
 
-    /** Plain summary (Sodda qilib aytganda). Recommended tint: Warning. */
     val Lightbulb: ImageVector by lazy {
         icon(
             "Lightbulb", 24f,
@@ -243,7 +182,6 @@ object AsosIcons {
         )
     }
 
-    /** Achievement: Birinchi qadam. Recommended tint: Active. */
     val Book: ImageVector by lazy {
         icon(
             "Book", 24f,
@@ -252,7 +190,6 @@ object AsosIcons {
         )
     }
 
-    /** Language setting. Recommended tint: Navy. */
     val Globe: ImageVector by lazy {
         icon(
             "Globe", 24f,
@@ -261,7 +198,6 @@ object AsosIcons {
         )
     }
 
-    /** Quiz timer, reading time. Recommended tint: Muted. */
     val Clock: ImageVector by lazy {
         icon(
             "Clock", 24f,
@@ -270,9 +206,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Actions
-
-    /** Attach file in chat. Recommended tint: Text3. */
     val Attach: ImageVector by lazy {
         icon(
             "Attach", 24f,
@@ -280,7 +213,6 @@ object AsosIcons {
         )
     }
 
-    /** Voice search, chat voice input. Recommended tint: Muted. */
     val Microphone: ImageVector by lazy {
         icon(
             "Microphone", 24f,
@@ -289,7 +221,6 @@ object AsosIcons {
         )
     }
 
-    /** Send message / reply (Yuborish). Recommended tint: OnBrand. */
     val Send: ImageVector by lazy {
         icon(
             "Send", 24f,
@@ -298,7 +229,6 @@ object AsosIcons {
         )
     }
 
-    /** Search fields (Qidirish). Recommended tint: Muted. */
     val Search: ImageVector by lazy {
         icon(
             "Search", 24f,
@@ -307,7 +237,6 @@ object AsosIcons {
         )
     }
 
-    /** Save / saved (Saqlash, Saqlanganlar). Recommended tint: Navy. */
     val Bookmark: ImageVector by lazy {
         icon(
             "Bookmark", 24f,
@@ -315,7 +244,6 @@ object AsosIcons {
         )
     }
 
-    /** Saved state of Bookmark (Saqlangan), filled. Recommended tint: Active. */
     val BookmarkFilled: ImageVector by lazy {
         icon(
             "BookmarkFilled", 24f,
@@ -323,7 +251,6 @@ object AsosIcons {
         )
     }
 
-    /** "Barchasi" community chip. Recommended tint: Navy. */
     val ListAll: ImageVector by lazy {
         icon(
             "ListAll", 24f,
@@ -331,7 +258,6 @@ object AsosIcons {
         )
     }
 
-    /** Vote up. Recommended tint: Muted / Active when voted. */
     val Upvote: ImageVector by lazy {
         icon(
             "Upvote", 24f,
@@ -339,7 +265,6 @@ object AsosIcons {
         )
     }
 
-    /** Vote down. Recommended tint: Muted. */
     val Downvote: ImageVector by lazy {
         icon(
             "Downvote", 24f,
@@ -347,7 +272,6 @@ object AsosIcons {
         )
     }
 
-    /** Share (Ulashish). Recommended tint: Navy. */
     val Share: ImageVector by lazy {
         icon(
             "Share", 24f,
@@ -358,7 +282,6 @@ object AsosIcons {
         )
     }
 
-    /** Ask a question (Savol berish). Recommended tint: OnBrand. */
     val Edit: ImageVector by lazy {
         icon(
             "Edit", 24f,
@@ -366,7 +289,6 @@ object AsosIcons {
         )
     }
 
-    /** Checkbox tick. Recommended tint: OnBrand. */
     val Check: ImageVector by lazy {
         icon(
             "Check", 24f,
@@ -374,7 +296,6 @@ object AsosIcons {
         )
     }
 
-    /** Sort (Saralash), settings (Sozlamalar). Recommended tint: Navy. */
     val Sliders: ImageVector by lazy {
         icon(
             "Sliders", 24f,
@@ -385,7 +306,6 @@ object AsosIcons {
         )
     }
 
-    /** Continue reading. Recommended tint: OnBrand. */
     val Play: ImageVector by lazy {
         icon(
             "Play", 24f,
@@ -393,7 +313,6 @@ object AsosIcons {
         )
     }
 
-    /** Listen to term (Tinglash). Recommended tint: Active. */
     val VolumeUp: ImageVector by lazy {
         icon(
             "VolumeUp", 24f,
@@ -402,7 +321,6 @@ object AsosIcons {
         )
     }
 
-    /** Notifications, daily reminders. Recommended tint: Navy. */
     val Bell: ImageVector by lazy {
         icon(
             "Bell", 24f,
@@ -411,7 +329,6 @@ object AsosIcons {
         )
     }
 
-    /** Chiqish. Recommended tint: Error. */
     val Logout: ImageVector by lazy {
         icon(
             "Logout", 24f,
@@ -419,9 +336,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Tab bar
-
-    /** Tab: Bosh sahifa; community Uy-joy chip. Recommended tint: Active/Inactive. */
     val Home: ImageVector by lazy {
         icon(
             "Home", 24f,
@@ -429,7 +343,6 @@ object AsosIcons {
         )
     }
 
-    /** Tab: Profil; personal info row. Recommended tint: Active/Inactive. */
     val Person: ImageVector by lazy {
         icon(
             "Person", 24f,
@@ -438,7 +351,6 @@ object AsosIcons {
         )
     }
 
-    /** Tab: Konstitutsiya. Recommended tint: Active/Inactive. */
     val TabConstitution: ImageVector by lazy {
         icon(
             "TabConstitution", 24f,
@@ -448,7 +360,6 @@ object AsosIcons {
         )
     }
 
-    /** Tab: O‘rganish. Recommended tint: Active/Inactive. */
     val TabLearn: ImageVector by lazy {
         icon(
             "TabLearn", 24f,
@@ -458,7 +369,6 @@ object AsosIcons {
         )
     }
 
-    /** Tab: Hamjamiyat. Recommended tint: Active/Inactive. */
     val TabCommunity: ImageVector by lazy {
         icon(
             "TabCommunity", 24f,
@@ -467,9 +377,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Topics
-
-    /** Community chip: Ta’lim; quiz CTA. Recommended tint: Navy. */
     val GraduationCap: ImageVector by lazy {
         icon(
             "GraduationCap", 24f,
@@ -478,7 +385,6 @@ object AsosIcons {
         )
     }
 
-    /** Community chip: Mehnat. Recommended tint: Navy. */
     val BriefcaseSimple: ImageVector by lazy {
         icon(
             "BriefcaseSimple", 24f,
@@ -487,7 +393,6 @@ object AsosIcons {
         )
     }
 
-    /** Community chip: Oila. Recommended tint: Navy. */
     val People: ImageVector by lazy {
         icon(
             "People", 24f,
@@ -497,7 +402,6 @@ object AsosIcons {
         )
     }
 
-    /** Legal help / Sud. Recommended tint: Active. */
     val Scales: ImageVector by lazy {
         icon(
             "Scales", 24f,
@@ -506,7 +410,6 @@ object AsosIcons {
         )
     }
 
-    /** Topic: Shaxsiy huquqlar. Recommended tint: Active. */
     val ShieldCheck: ImageVector by lazy {
         icon(
             "ShieldCheck", 24f,
@@ -515,7 +418,6 @@ object AsosIcons {
         )
     }
 
-    /** Topic: Siyosiy huquqlar. Recommended tint: Active. */
     val Ballot: ImageVector by lazy {
         icon(
             "Ballot", 24f,
@@ -525,7 +427,6 @@ object AsosIcons {
         )
     }
 
-    /** Topic: Ijtimoiy huquqlar. Recommended tint: Active. */
     val Briefcase: ImageVector by lazy {
         icon(
             "Briefcase", 24f,
@@ -534,7 +435,6 @@ object AsosIcons {
         )
     }
 
-    /** Topic: Burchlar (duties). Recommended tint: Active. */
     val ClipboardCheck: ImageVector by lazy {
         icon(
             "ClipboardCheck", 24f,
@@ -544,7 +444,6 @@ object AsosIcons {
         )
     }
 
-    /** Topic: Oila va yoshlar. Recommended tint: Active. */
     val Family: ImageVector by lazy {
         icon(
             "Family", 24f,
@@ -555,7 +454,6 @@ object AsosIcons {
         )
     }
 
-    /** Topic: Davlat hokimiyati. Recommended tint: Active. */
     val Government: ImageVector by lazy {
         icon(
             "Government", 24f,
@@ -564,9 +462,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Learning
-
-    /** Case score banner. Recommended tint: OnBrand. */
     val Trophy: ImageVector by lazy {
         icon(
             "Trophy", 24f,
@@ -575,7 +470,6 @@ object AsosIcons {
         )
     }
 
-    /** Streak (kunlik seriya). Recommended tint: Streak. */
     val Flame: ImageVector by lazy {
         icon(
             "Flame", 24f,
@@ -583,7 +477,6 @@ object AsosIcons {
         )
     }
 
-    /** Points, rating, level. Recommended tint: Warning. */
     val Star: ImageVector by lazy {
         icon(
             "Star", 24f,
@@ -591,7 +484,6 @@ object AsosIcons {
         )
     }
 
-    /** Achievement: Burchlar bilimdoni. Recommended tint: Achievement. */
     val TrophyLarge: ImageVector by lazy {
         icon(
             "TrophyLarge", 24f,
@@ -600,7 +492,6 @@ object AsosIcons {
         )
     }
 
-    /** Locked achievement. Recommended tint: SoftGray. */
     val Lock: ImageVector by lazy {
         icon(
             "Lock", 24f,
@@ -609,9 +500,6 @@ object AsosIcons {
         )
     }
 
-    // ---------------------------------------------------------------- Brand
-
-    /** Logo glyph without the tile (watermarks, profile). Recommended tint: Navy / OnBrand. */
     val LogoPillars: ImageVector by lazy {
         icon(
             "LogoPillars", 32f,
@@ -623,7 +511,6 @@ object AsosIcons {
         )
     }
 
-    /** Asos logo: app icon, login, design system. Multicolour: use tint = Color.Unspecified. */
     val LogoMark: ImageVector by lazy {
         icon(
             "LogoMark", 32f,
@@ -636,7 +523,6 @@ object AsosIcons {
         )
     }
 
-    /** OneID login button. Recommended tint: Navy. */
     val OneId: ImageVector by lazy {
         icon(
             "OneId", 24f,
@@ -646,7 +532,6 @@ object AsosIcons {
         )
     }
 
-    /** Google login button (official colours). Multicolour: use tint = Color.Unspecified. */
     val Google: ImageVector by lazy {
         icon(
             "Google", 24f,

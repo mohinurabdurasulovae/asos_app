@@ -1,11 +1,3 @@
-/*
- * FeaturedCaseCard.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * Dark "HAFTANING KAZUSI" card: the case number watermarked in serif behind the text,
- * progress bar and "Davom etish" ("Ko'rish" once solved).
- */
 package uz.asos.feature.cases.list.components
 
 import androidx.compose.foundation.background

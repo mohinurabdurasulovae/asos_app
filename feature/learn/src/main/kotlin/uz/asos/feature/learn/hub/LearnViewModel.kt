@@ -1,13 +1,3 @@
-/*
- * LearnViewModel.kt
- * Module: :feature:learn   ·   Work package: WP-07
- * Screen: O‘rganish (design artboard: Organish.dc.html)
- *
- * Holds StateFlow<LearnUiState> and handles LearnAction. No Android UI types.
- *
- * API used (through LearningRepository, see docs/api/openapi.yaml):
- *  - GET /v1/learn   quizzes, cases counts, overview, daily goal, points, streak, achievements
- */
 package uz.asos.feature.learn.hub
 
 import androidx.lifecycle.ViewModel
@@ -39,7 +29,6 @@ class LearnViewModel @Inject constructor(
     val uiState: StateFlow<LearnUiState> = _uiState.asStateFlow()
 
     private var hasLoaded = false
-    /** The user picked a level: keep it across refreshes. */
     private var userPickedDifficulty = false
     private var loadJob: Job? = null
 
@@ -56,7 +45,6 @@ class LearnViewModel @Inject constructor(
             }
             LearnAction.OnRetry -> load(showSkeleton = true)
             LearnAction.OnResume -> if (hasLoaded) load(showSkeleton = false)
-            // Navigation is handled by LearnRoute.
             is LearnAction.OnQuizClick,
             LearnAction.OnCasesClick,
             LearnAction.OnAchievementsClick,
@@ -123,7 +111,6 @@ class LearnViewModel @Inject constructor(
         }
     }
 
-    /** O‘rta, as in the design; otherwise the first level that has tests. */
     private fun defaultDifficulty(quizzes: List<QuizRowUi>): QuizDifficulty {
         val levels = quizzes.map { it.difficulty }.toSet()
         return when {
@@ -132,8 +119,6 @@ class LearnViewModel @Inject constructor(
         }
     }
 }
-
-// ---------------------------------------------------------------------- mapping to UI models
 
 internal fun Quiz.toRow(): QuizRowUi {
     val best = best

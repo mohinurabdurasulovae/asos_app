@@ -1,9 +1,3 @@
-/*
- * DefaultBookmarkRepository.kt
- * Module: :core:data   ·   Work package: WP-02
- *
- * Network implementation of BookmarkRepository.
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher

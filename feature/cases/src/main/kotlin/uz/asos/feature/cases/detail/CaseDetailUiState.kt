@@ -1,10 +1,3 @@
-/*
- * CaseDetailUiState.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * Everything CaseDetailScreen draws, already formatted. No Android UI types.
- */
 package uz.asos.feature.cases.detail
 
 import uz.asos.feature.cases.data.model.ArticleOption
@@ -15,7 +8,6 @@ import uz.asos.feature.cases.data.model.LawyerComment
 data class CaseDetailUiState(
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
-    /** "Kazus № 14" */
     val titleLabel: String = "",
     val title: String = "",
     val topic: CaseTopic? = null,
@@ -30,16 +22,12 @@ data class CaseDetailUiState(
     val isBookmarked: Boolean = false,
     val rewardPoints: Int = 0,
     val lawyerComment: LawyerComment? = null,
-    /** The correct articles, shown as "Moddani o'qish" chips under the explanation. */
     val correctArticles: List<ArticleOption> = emptyList(),
-    /** Non-null while the article sheet is open. */
     val previewArticle: ArticleOption? = null,
-    /** The next unsolved case, for "Keyingi kazus"; null hides the button. */
     val nextCaseId: Int? = null,
 ) {
     val hasNextCase: Boolean get() = nextCaseId != null
 
-    /** 1 Vaziyat · 2 Modda · 3 Yechim. */
     val currentStep: Int
         get() = when {
             isSubmitted -> STEP_SOLUTION
@@ -47,7 +35,6 @@ data class CaseDetailUiState(
             else -> STEP_SCENARIO
         }
 
-    /** The prototype's rule: at least one article and a few words of reasoning. */
     val canSubmit: Boolean
         get() = !isSubmitted &&
             options.any { it.isSelected } &&
@@ -67,7 +54,6 @@ data class PersonaUi(
     val subtitle: String,
 )
 
-/** Whether it is right is only revealed once the screen is submitted. */
 data class ArticleChoiceUi(
     val option: ArticleOption,
     val isSelected: Boolean,

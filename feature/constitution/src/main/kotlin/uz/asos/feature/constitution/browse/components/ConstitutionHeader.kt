@@ -1,10 +1,3 @@
-/*
- * ConstitutionHeader.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * Title "Konstitutsiya", edition subtitle and the saved-items button (46 dp, outlined).
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.foundation.background

@@ -105,7 +105,6 @@ security:
 
 paths:
 
-  # ------------------------------------------------------------------ Meta
 
   /v1/health:
     get:
@@ -181,7 +180,6 @@ paths:
         '304':
           description: O‘zgarmagan (If-None-Match)
 
-  # ----------------------------------------------------------------- Kirish
 
   /v1/auth/request-code:
     post:
@@ -458,7 +456,6 @@ paths:
                     properties: { removed: { type: boolean } }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
-  # ------------------------------------------------------------- Bosh sahifa
 
   /v1/home:
     get:
@@ -514,7 +511,6 @@ paths:
                       dailyGoal: { $ref: '#/components/schemas/DailyGoal' }
                       unreadNotifications: { type: integer }
 
-  # ----------------------------------------------------------- Konstitutsiya
 
   /v1/constitution:
     get:
@@ -804,7 +800,6 @@ paths:
                             commentCount: { type: integer }
         '422': { $ref: '#/components/responses/Validation' }
 
-  # ----------------------------------------------------------------- Lug'at
 
   /v1/terms:
     get:
@@ -900,7 +895,6 @@ paths:
                       term: { $ref: '#/components/schemas/Term' }
         '404': { $ref: '#/components/responses/NotFound' }
 
-  # ----------------------------------------------------------------- Profil
 
   /v1/me:
     get:
@@ -1277,7 +1271,6 @@ paths:
                                 points: { type: integer }
                                 isMe:   { type: boolean }
 
-  # -------------------------------------------------------------- O'rganish
 
   /v1/learn:
     get:
@@ -1547,7 +1540,6 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
 
-  # --------------------------------------------------------------- Kazuslar
 
   /v1/case-categories:
     get:
@@ -1767,7 +1759,6 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
-  # ------------------------------------------------------------- Hamjamiyat
 
   /v1/communities:
     get:
@@ -2144,7 +2135,6 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/Validation' }
 
-  # ----------------------------------------------------------------- Yordam
 
   /v1/help:
     get:
@@ -2641,7 +2631,6 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
-# =====================================================================
 
 components:
 

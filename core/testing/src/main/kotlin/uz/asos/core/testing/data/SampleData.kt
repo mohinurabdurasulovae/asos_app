@@ -1,11 +1,3 @@
-/*
- * SampleData.kt
- * Module: :core:testing   ·   Work package: WP-02
- *
- * Sample content from the design for tests: the Constitution tree (6 sections, 27 chapters,
- * 155 articles) and 50-modda. Chapter titles and article ranges are from the 2023 text.
- * Still to add: Kazus № 14, lawyers, posts.
- */
 package uz.asos.core.testing.data
 
 import uz.asos.core.model.constitution.Article
@@ -178,7 +170,6 @@ object SampleData {
         }
     }
 
-    /** 50-modda. Parts 1–3 are the official text; the rest of the article is cut for tests. */
     val article50 = Article(
         id = 50,
         number = 50,

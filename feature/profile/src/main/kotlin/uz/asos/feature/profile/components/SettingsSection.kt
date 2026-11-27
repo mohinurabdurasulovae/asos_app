@@ -1,10 +1,3 @@
-/*
- * SettingsSection.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * "Sozlamalar": personal data, the daily-reminder switch, language, text size, privacy.
- */
 package uz.asos.feature.profile.components
 
 import androidx.compose.foundation.layout.Arrangement

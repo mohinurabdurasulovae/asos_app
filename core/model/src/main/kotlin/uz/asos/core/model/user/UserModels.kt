@@ -1,14 +1,5 @@
-/*
- * UserModels.kt
- * Module: :core:model   ·   Work package: WP-02
- *
- * Domain models shared by every layer.
- *
- * Profil (WP-11): UserProfile and everything GET /v1/me/profile returns.
- */
 package uz.asos.core.model.user
 
-/** Kinds accepted by /v1/me/bookmarks. [apiValue] is the value the API expects. */
 enum class BookmarkType(val apiValue: String) {
     ARTICLE("article"),
     TERM("term"),
@@ -16,7 +7,6 @@ enum class BookmarkType(val apiValue: String) {
     CASE("case"),
 }
 
-/** Reader text size. [apiValue] matches PATCH /v1/me `textSize`. */
 enum class ReaderTextSize(val apiValue: String) {
     SMALL("small"),
     MEDIUM("medium"),
@@ -29,7 +19,6 @@ enum class ReaderTextSize(val apiValue: String) {
     }
 }
 
-/** The signed-in user, as GET /v1/me/profile describes them. */
 data class User(
     val id: Int,
     val name: String,
@@ -45,16 +34,13 @@ data class User(
     val notifyDaily: Boolean,
 )
 
-/** "3-daraja · Bilimdon", and how many points the next level needs. */
 data class UserLevel(
     val number: Int,
     val title: String,
     val minPoints: Int,
-    /** Points at which the next level starts; null on the last one. */
     val nextAt: Int?,
 )
 
-/** The three numbers across the top of Profil. */
 data class UserStats(
     val points: Int,
     val quizzesDone: Int,
@@ -64,7 +50,6 @@ data class UserStats(
     val streakDays: Int,
 )
 
-/** The Du–Ya columns in the "Bu hafta" card. */
 data class WeekActivity(
     val days: List<ActivityDay>,
     val totalMinutes: Int,
@@ -72,7 +57,6 @@ data class WeekActivity(
 )
 
 data class ActivityDay(
-    /** "Du", "Se"… */
     val label: String,
     val date: String,
     val minutes: Int,
@@ -81,14 +65,12 @@ data class ActivityDay(
     val isFuture: Boolean,
 )
 
-/** Daily goal in lessons. */
 data class DailyGoal(
     val goal: Int,
     val done: Int,
     val completed: Boolean,
 )
 
-/** What an achievement is counted against. */
 enum class AchievementMetric(val apiValue: String) {
     ARTICLES_READ("articles_read"),
     QUIZZES_DONE("quizzes_done"),
@@ -110,7 +92,6 @@ data class Achievement(
     val slug: String,
     val title: String,
     val hint: String?,
-    /** Icon name from the API, used to pick an AsosIcons entry. */
     val icon: String?,
     val tone: String?,
     val metric: AchievementMetric,
@@ -119,7 +100,6 @@ data class Achievement(
     val earned: Boolean,
 )
 
-/** How many of each kind the user saved, for the "Saqlanganlar" rows. */
 data class BookmarkCounts(
     val articles: Int,
     val terms: Int,
@@ -127,7 +107,6 @@ data class BookmarkCounts(
     val cases: Int,
 )
 
-/** Everything GET /v1/me/profile returns: the whole Profil screen in one call. */
 data class UserProfile(
     val user: User,
     val stats: UserStats,

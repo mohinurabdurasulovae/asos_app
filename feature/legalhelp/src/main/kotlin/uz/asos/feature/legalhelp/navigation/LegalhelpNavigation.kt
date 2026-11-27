@@ -1,16 +1,3 @@
-/*
- * LegalhelpNavigation.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * Public entry point of this feature. Registers its screens in the app NavHost and exposes
- * navigateTo… helpers. The app module calls these and nothing else.
- *
- *  - LegalHelpScreen → LegalHelpRoute
- *  - ChatScreen      → ChatRoute(chatId), chatId = conversation id from the API
- *
- * The screen composables are also called LegalHelpRoute / ChatRoute (docs/ARCHITECTURE.md
- * "XRoute" pattern), so the route classes are imported here as …Destination.
- */
 package uz.asos.feature.legalhelp.navigation
 
 import androidx.navigation.NavController
@@ -33,10 +20,6 @@ fun NavController.navigateToChat(conversationId: Int, navOptions: NavOptions? = 
     navigate(ChatDestination(conversationId), navOptions)
 }
 
-/**
- * @param navController used for back.
- * @param onNavigate opens screens of other features through AsosRoutes (the article reader).
- */
 fun NavGraphBuilder.legalHelpScreens(
     navController: NavController,
     onNavigate: (AsosRoute) -> Unit,

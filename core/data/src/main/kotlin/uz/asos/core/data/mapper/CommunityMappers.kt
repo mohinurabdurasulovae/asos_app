@@ -1,9 +1,3 @@
-/*
- * CommunityMappers.kt
- * Module: :core:data   ·   Work package: WP-02
- *
- * Hamjamiyat DTO → domain model. Nothing above :core:data ever sees a DTO.
- */
 package uz.asos.core.data.mapper
 
 import uz.asos.core.model.community.ArticleRef

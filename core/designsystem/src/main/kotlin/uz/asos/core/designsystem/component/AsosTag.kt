@@ -1,9 +1,3 @@
-/*
- * AsosTag.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Small coloured tag (Ta’lim, Mehnat, Uy-joy, Sud, "4 daqiqa" ...).
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

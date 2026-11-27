@@ -1,9 +1,3 @@
-/*
- * UserMappers.kt
- * Module: :core:data   ·   Work package: WP-11
- *
- * Profil DTO → domain model. Nothing above :core:data ever sees a DTO.
- */
 package uz.asos.core.data.mapper
 
 import uz.asos.core.model.user.Achievement
@@ -84,7 +78,6 @@ internal fun ActivityDayDto.asModel() = ActivityDay(
     isFuture = isFuture,
 )
 
-/** Named apart from the O‘rganish mapper, which turns the same DTO into its own model. */
 internal fun DailyGoalDto.asUserModel() = DailyGoal(
     goal = goal,
     done = done,

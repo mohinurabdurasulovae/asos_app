@@ -1,17 +1,3 @@
-/*
- * LegalHelpViewModel.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- * Screen: Huquqiy yordam (design artboard: Yordam.dc.html)
- *
- * Holds StateFlow<LegalHelpUiState> and handles LegalHelpAction. No Android UI types.
- *
- * API used (through LegalHelpRepository, see docs/api/openapi.yaml):
- *  - GET  /v1/help                        whole screen (public)
- *  - POST /v1/ai/ask                      AI assistant (token)
- *  - POST /v1/lawyers/{id}/conversations  "Yozish" (token)
- *  - POST /v1/callback-requests           "Menga qo‘ng‘iroq" (token optional)
- *  - POST /v1/bookings                    "Vaqt band qilish" (token)
- */
 package uz.asos.feature.legalhelp.help
 
 import androidx.lifecycle.ViewModel
@@ -72,7 +58,6 @@ class LegalHelpViewModel @Inject constructor(
             LegalHelpAction.OnAssistantSend -> askAssistant()
             is LegalHelpAction.OnSpecialtySelect -> _uiState.update { it.copy(selectedSpecialty = action.specialty) }
             LegalHelpAction.OnRetry -> load(showSkeleton = true)
-            // Coming back from a chat: online status may have changed.
             LegalHelpAction.OnResume -> if (hasLoaded) load(showSkeleton = false)
 
             is LegalHelpAction.OnWriteToLawyer -> openChat(action.lawyerId)
@@ -88,7 +73,6 @@ class LegalHelpViewModel @Inject constructor(
             LegalHelpAction.OnBookingConfirm -> confirmBooking()
             LegalHelpAction.OnBookingDismiss -> _uiState.update { it.copy(bookingDialog = null) }
 
-            // Navigation and system actions are handled by LegalHelpRoute.
             LegalHelpAction.OnBackClick,
             LegalHelpAction.OnSignInClick,
             is LegalHelpAction.OnArticleClick,
@@ -100,15 +84,12 @@ class LegalHelpViewModel @Inject constructor(
         }
     }
 
-    // ------------------------------------------------------------------ loading
-
     private fun observeSession() {
         viewModelScope.launch {
             authRepository.isSignedIn.collect { signedIn ->
                 _uiState.update { state ->
                     state.copy(
                         isSignedIn = signedIn,
-                        // Signed in now: the "sign in to ask" hint is no longer true.
                         assistant = if (signedIn) state.assistant.copy(needsSignIn = false) else state.assistant,
                     )
                 }
@@ -128,7 +109,6 @@ class LegalHelpViewModel @Inject constructor(
                 is AsosResult.Error -> _uiState.update {
                     it.copy(
                         isLoading = false,
-                        // Keep old content on a quiet refresh.
                         errorMessage = if (it.lawyers.isEmpty()) result.message else null,
                     )
                 }
@@ -154,13 +134,10 @@ class LegalHelpViewModel @Inject constructor(
                 lawyers = help.lawyers.map { it.toUi(today) },
                 lawyersOnline = help.lawyersOnline,
                 specialties = specialties,
-                // Drop a selection that no longer exists.
                 selectedSpecialty = state.selectedSpecialty?.takeIf { it in specialties },
             )
         }
     }
-
-    // ------------------------------------------------------------------ AI assistant
 
     private fun askAssistant() {
         val question = _uiState.value.assistant.input.trim()
@@ -197,8 +174,6 @@ class LegalHelpViewModel @Inject constructor(
         _uiState.update { it.copy(assistant = transform(it.assistant)) }
     }
 
-    // ------------------------------------------------------------------ chat
-
     private fun openChat(lawyerId: Int) {
         if (_uiState.value.openingChatForLawyerId != null) return
         if (!_uiState.value.isSignedIn) {
@@ -216,10 +191,7 @@ class LegalHelpViewModel @Inject constructor(
         }
     }
 
-    // ------------------------------------------------------------------ callback
-
     private fun onCallbackRequest() {
-        // Signed in: the server takes the number from the profile.
         if (_uiState.value.isSignedIn) {
             viewModelScope.launch {
                 when (val result = repository.requestCallback(topic = _uiState.value.selectedSpecialty)) {
@@ -254,8 +226,6 @@ class LegalHelpViewModel @Inject constructor(
         }
     }
 
-    // ------------------------------------------------------------------ booking
-
     private fun onBookLawyer(lawyerId: Int) {
         val lawyer = _uiState.value.lawyers.firstOrNull { it.id == lawyerId } ?: return
         val slot = lawyer.nextFree
@@ -283,7 +253,6 @@ class LegalHelpViewModel @Inject constructor(
                     _uiState.update { it.copy(bookingDialog = null) }
                     _events.send(LegalHelpEvent.NeedsSignIn)
                 } else {
-                    // e.g. 409 "Bu vaqt band": show the server's text in the dialog.
                     _uiState.update { state ->
                         state.copy(bookingDialog = state.bookingDialog?.copy(isSending = false, errorMessage = result.message))
                     }
@@ -296,12 +265,9 @@ class LegalHelpViewModel @Inject constructor(
         if (code == AsosErrorCode.UNAUTHORIZED) LegalHelpEvent.NeedsSignIn else LegalHelpEvent.ShowError(message)
 
     internal companion object {
-        /** +998 and 9 digits. */
         fun isValidUzPhone(phone: String): Boolean = Regex("""\+998\d{9}""").matches(phone)
     }
 }
-
-// ---------------------------------------------------------------------- mapping to UI models
 
 private fun Lawyer.toUi(today: java.time.LocalDate) = LawyerUi(
     id = id,

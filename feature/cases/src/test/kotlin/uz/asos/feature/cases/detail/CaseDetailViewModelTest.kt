@@ -1,8 +1,3 @@
-/*
- * CaseDetailViewModelTest.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- */
 package uz.asos.feature.cases.detail
 
 import androidx.lifecycle.SavedStateHandle
@@ -24,7 +19,6 @@ class CaseDetailViewModelTest {
 
     private val repository = FakeCasesRepository()
 
-    /** Kazus № 14 "Direktor va telefon": the correct article is 31. */
     private fun viewModel(caseId: String = "14") =
         CaseDetailViewModel(SavedStateHandle(mapOf("caseId" to caseId)), repository)
 
@@ -157,7 +151,6 @@ class CaseDetailViewModelTest {
 
     @Test
     fun `offers the first unsolved case as the next one`() {
-        // 13 and 10 are already solved in the sample data, so 12 is the first one left.
         assertEquals(12, viewModel().uiState.value.nextCaseId)
     }
 

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:community. Prefix keys with 'community_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
-    <!-- Hamjamiyat -->
     <string name="community_title">Hamjamiyat</string>
     <string name="community_search">Qidirish</string>
     <string name="community_saved">Saqlangan muhokamalar</string>
@@ -26,7 +23,6 @@
     <string name="community_load_error_title">Muhokamalarni yuklab bo‘lmadi</string>
     <string name="community_notice_dismiss">Yopish</string>
 
-    <!-- Savol berish -->
     <string name="community_ask_title">Savol berish</string>
     <string name="community_ask_title_hint">Savolingiz sarlavhasi</string>
     <string name="community_ask_body_hint">Vaziyatni batafsil yozing…</string>
@@ -34,7 +30,6 @@
     <string name="community_ask_anonymous">Anonim savol berish</string>
     <string name="community_ask_send">Yuborish</string>
 
-    <!-- Muhokama -->
     <string name="community_post_back">Orqaga</string>
     <string name="community_post_join">Qo‘shilish</string>
     <string name="community_post_leave">Chiqish</string>

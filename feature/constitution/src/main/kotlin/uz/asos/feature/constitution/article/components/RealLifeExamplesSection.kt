@@ -1,11 +1,3 @@
-/*
- * RealLifeExamplesSection.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * "Hayotiy misollar": each card shows the situation ("VAZIYAT") and a verdict strip,
- * green when the situation is lawful, red when it breaks the article.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

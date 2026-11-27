@@ -1,9 +1,3 @@
-/*
- * LegalHelpMappers.kt
- * Module: :core:data   ·   Work package: WP-02 (legal-help slice written with WP-10)
- *
- * DTO → core:model mappers for the "Yordam" endpoints.
- */
 package uz.asos.core.data.mapper
 
 import uz.asos.core.model.legalhelp.AssistantAnswer
@@ -79,7 +73,6 @@ internal fun ConversationDto.asModel() = Conversation(
 
 internal fun ConversationDetailResponseDto.asModel() = ConversationDetail(
     conversation = conversation.asModel(),
-    // The API does not promise an order: show oldest first.
     messages = messages.map { it.asModel() }.sortedBy { it.id },
 )
 
@@ -123,6 +116,5 @@ internal fun BookingResponseDto.asModel() = BookingResult(
     status = status,
 )
 
-/** "Sardor Rahimov" → "SR" (fallback when the API sends no initials). */
 private fun String.initials(): String =
     split(' ').filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }

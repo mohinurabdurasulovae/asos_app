@@ -1,5 +1,3 @@
-// :build-logic  ·  WP-00
-// Included build for convention plugins. Reads ../gradle/libs.versions.toml.
 dependencyResolutionManagement {
     repositories {
         google()

@@ -1,10 +1,3 @@
-/*
- * CommunityTopicChips.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * Barchasi · Uy-joy · Ta'lim · Mehnat · Oila · Sud, each a tinted circle over its name.
- */
 package uz.asos.feature.community.feed.components
 
 import androidx.compose.foundation.background
@@ -125,7 +118,6 @@ private fun TopicChip(
     }
 }
 
-/** Icon for a topic, picked from its slug; falls back to a speech bubble. */
 private fun CommunityTopic.icon(): ImageVector = when (slug) {
     "uy-joy" -> AsosIcons.Home
     "talim" -> AsosIcons.GraduationCap

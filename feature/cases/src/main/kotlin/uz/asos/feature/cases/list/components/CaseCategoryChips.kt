@@ -1,10 +1,3 @@
-/*
- * CaseCategoryChips.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * Barchasi · Shaxsiy hayot · Ta'lim · Mehnat · Sud · Uy-joy. Scrolls sideways.
- */
 package uz.asos.feature.cases.list.components
 
 import androidx.compose.foundation.BorderStroke

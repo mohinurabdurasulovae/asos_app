@@ -1,10 +1,3 @@
-/*
- * ReplyThread.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Muhokama (design artboard: Post.dc.html)
- *
- * A comment and its one level of replies, the nested level indented behind a rule.
- */
 package uz.asos.feature.community.post.components
 
 import androidx.compose.foundation.background

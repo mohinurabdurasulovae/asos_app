@@ -1,10 +1,3 @@
-/*
- * DefaultLegalHelpRepository.kt
- * Module: :core:data   ·   Work package: WP-02 (legal-help slice written with WP-10)
- *
- * Implementation of LegalHelpRepository on top of LegalHelpApi. Network only: nothing here
- * is cached yet (chats change on the server, so a cache would need invalidation).
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -73,7 +66,6 @@ internal class DefaultLegalHelpRepository @Inject constructor(
 
     override suspend fun getOlderMessages(conversationId: Int, beforeMessageId: Int): AsosResult<List<ChatMessage>> = io {
         apiCaller.call { legalHelpApi.getMessages(conversationId, before = beforeMessageId) }
-            // Newest first from the API: flip to oldest first.
             .mapSuccess { response -> response.items.map { it.asModel() }.sortedBy { it.id } }
     }
 
@@ -110,7 +102,6 @@ internal class DefaultLegalHelpRepository @Inject constructor(
     private suspend fun <T> io(block: suspend () -> T): T = withContext(ioDispatcher) { block() }
 
     private companion object {
-        /** openapi: articleNumbers maxItems 5. */
         const val MAX_ARTICLES = 5
     }
 }

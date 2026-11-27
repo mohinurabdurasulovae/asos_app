@@ -1,11 +1,3 @@
-/*
- * ProfileViewModel.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * Loads the whole Profil screen in one call, works out how far the next level is, and saves
- * the settings rows. Guests get the sign-in card instead of a failed request.
- */
 package uz.asos.feature.profile
 
 import androidx.lifecycle.ViewModel
@@ -54,12 +46,10 @@ class ProfileViewModel @Inject constructor(
             ProfileAction.OnNoticeDismiss -> _uiState.update { it.copy(notice = null) }
             ProfileAction.OnRetry -> load()
             ProfileAction.OnResume -> if (hasLoaded) load()
-            // Not wired to an endpoint yet.
             ProfileAction.OnPersonalDataClick,
             ProfileAction.OnPrivacyClick,
             ProfileAction.OnSettingsClick,
             -> _uiState.update { it.copy(notice = NOT_READY) }
-            // Navigation and sign-out are handled by ProfileRoute.
             ProfileAction.OnAchievementsClick,
             is ProfileAction.OnSavedClick,
             ProfileAction.OnLogoutClick,
@@ -75,7 +65,6 @@ class ProfileViewModel @Inject constructor(
                 if (signedIn) {
                     load()
                 } else {
-                    // Nothing to show a guest, and /v1/me/profile would only answer 401.
                     hasLoaded = false
                     _uiState.update {
                         it.copy(isLoading = false, errorMessage = null, user = null)
@@ -127,7 +116,6 @@ class ProfileViewModel @Inject constructor(
     private fun setTextSize(size: ReaderTextSize) {
         _uiState.update { it.copy(textSize = size, isTextSizeSheetOpen = false) }
         viewModelScope.launch {
-            // The device setting is applied by the repository even if the call fails.
             val result = userRepository.updateSettings(textSize = size)
             if (result is AsosResult.Error && _uiState.value.isSignedIn) {
                 _uiState.update { it.copy(notice = result.message) }
@@ -161,7 +149,6 @@ class ProfileViewModel @Inject constructor(
     }
 }
 
-/** Fills the screen from one GET /v1/me/profile response. */
 private fun ProfileUiState.withProfile(profile: UserProfile): ProfileUiState = copy(
     isLoading = false,
     errorMessage = null,
@@ -178,7 +165,6 @@ private fun ProfileUiState.withProfile(profile: UserProfile): ProfileUiState = c
     notifyDaily = profile.user.notifyDaily,
 )
 
-/** null on the last level, where there is nothing left to climb to. */
 private fun UserProfile.levelProgress(): LevelProgressUi? {
     val nextAt = user.level.nextAt ?: return null
     val floor = user.level.minPoints

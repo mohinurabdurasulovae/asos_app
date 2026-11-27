@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Window theme. Compose draws everything else with AsosTheme. -->
 <resources>
     <style name="Theme.Asos" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/asos_background</item>

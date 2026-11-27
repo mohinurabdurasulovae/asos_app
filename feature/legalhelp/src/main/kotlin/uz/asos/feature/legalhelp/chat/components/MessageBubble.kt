@@ -1,10 +1,3 @@
-/*
- * MessageBubble.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * One chat message. Mine: right, Brand600, white text, "14:02 · O‘qildi".
- * Lawyer's: left, white card; may also hold a file and an article link.
- */
 package uz.asos.feature.legalhelp.chat.components
 
 import androidx.compose.foundation.background
@@ -49,7 +42,6 @@ internal fun MessageBubble(
     ) {
         Column(
             modifier = Modifier
-                // Bubbles with cards are wider, like on the canvas.
                 .widthIn(max = if (hasCards) 320.dp else 290.dp)
                 .then(
                     if (message.fromMe) {

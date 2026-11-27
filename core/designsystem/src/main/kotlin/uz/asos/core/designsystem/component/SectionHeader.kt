@@ -1,10 +1,3 @@
-/*
- * SectionHeader.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Section title with an optional link on the right ("Barchasi",
- * "Kazuslar →").
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.clickable

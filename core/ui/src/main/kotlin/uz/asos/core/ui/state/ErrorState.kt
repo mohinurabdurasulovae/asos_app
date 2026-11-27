@@ -1,10 +1,3 @@
-/*
- * ErrorState.kt
- * Module: :core:ui   ·   Work package: WP-01
- *
- * Error message with a "Qayta urinish" (retry) button. [message] is usually the API's Uzbek
- * `message`, which can be shown unchanged.
- */
 package uz.asos.core.ui.state
 
 import androidx.compose.foundation.background

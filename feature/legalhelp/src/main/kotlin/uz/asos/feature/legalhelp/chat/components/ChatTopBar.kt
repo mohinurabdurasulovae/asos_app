@@ -1,10 +1,3 @@
-/*
- * ChatTopBar.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * Back, lawyer avatar with online dot, name + verified badge, "Onlayn · advokat",
- * and call / video buttons. White bar with a bottom divider.
- */
 package uz.asos.feature.legalhelp.chat.components
 
 import androidx.compose.foundation.background

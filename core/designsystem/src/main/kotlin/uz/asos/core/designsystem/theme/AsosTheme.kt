@@ -1,10 +1,3 @@
-/*
- * AsosTheme.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * AsosTheme { } wraps MaterialTheme with the Asos colours, typography and shapes.
- * The design is light-only for now.
- */
 package uz.asos.core.designsystem.theme
 
 import androidx.compose.material3.MaterialTheme

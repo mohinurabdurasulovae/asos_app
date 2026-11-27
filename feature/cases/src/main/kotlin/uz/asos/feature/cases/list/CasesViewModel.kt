@@ -1,14 +1,3 @@
-/*
- * CasesViewModel.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * Loads the cases, applies the topic / difficulty / status / bookmark filters and keeps the
- * list in step with the progress the user makes on the detail screen.
- *
- * The prototype filtered inside the composable; the filtering lives here so the rules can be
- * unit-tested and the screen stays stateless.
- */
 package uz.asos.feature.cases.list
 
 import androidx.lifecycle.ViewModel
@@ -59,7 +48,6 @@ class CasesViewModel @Inject constructor(
                 )
             }
             CasesAction.OnRetry -> load()
-            // Navigation is handled by CasesRoute.
             is CasesAction.OnCaseClick,
             CasesAction.OnBackClick,
             -> Unit
@@ -94,7 +82,6 @@ class CasesViewModel @Inject constructor(
         }
     }
 
-    /** Re-applies the filters after a state or progress change. */
     private fun patch(transform: (CasesUiState) -> CasesUiState) {
         _uiState.update(transform)
         reduce()
@@ -159,7 +146,6 @@ class CasesViewModel @Inject constructor(
     }
 
     private companion object {
-        /** Articles picked but not checked yet, as on the prototype's featured card. */
         const val PARTIAL_PROGRESS = 0.66f
     }
 }

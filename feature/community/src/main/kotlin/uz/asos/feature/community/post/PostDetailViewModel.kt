@@ -1,11 +1,3 @@
-/*
- * PostDetailViewModel.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Muhokama (design artboard: Post.dc.html)
- *
- * Loads one discussion, lifts the best answer out of the comment list, votes without waiting
- * for a reload and posts replies.
- */
 package uz.asos.feature.community.post
 
 import androidx.lifecycle.SavedStateHandle
@@ -32,7 +24,6 @@ class PostDetailViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    /** PostRoute(postId). */
     private val postId: Int = checkNotNull(savedStateHandle.get<Int>(KEY_ARG)) {
         "PostDetailViewModel needs the \"$KEY_ARG\" navigation argument"
     }
@@ -65,10 +56,8 @@ class PostDetailViewModel @Inject constructor(
             PostDetailAction.OnReplySend -> sendReply()
             PostDetailAction.OnNoticeDismiss -> _uiState.update { it.copy(notice = null) }
             PostDetailAction.OnRetry -> load()
-            // Saving and sharing are not wired to an endpoint yet.
             PostDetailAction.OnSaveToggle -> _uiState.update { it.copy(notice = NOT_READY) }
             PostDetailAction.OnShareClick -> Unit
-            // Navigation is handled by PostDetailRoute.
             is PostDetailAction.OnArticleClick,
             is PostDetailAction.OnWriteToLawyer,
             PostDetailAction.OnSignInClick,
@@ -178,7 +167,6 @@ class PostDetailViewModel @Inject constructor(
             when (result) {
                 is AsosResult.Success -> {
                     _uiState.update { it.copy(reply = ReplyDraft(isAnonymous = draft.isAnonymous)) }
-                    // Reload so the new comment lands where the server put it in the thread.
                     load()
                 }
                 is AsosResult.Error -> _uiState.update {
@@ -217,7 +205,6 @@ class PostDetailViewModel @Inject constructor(
     }
 }
 
-/** Splits the loaded discussion into the best answer and the rest. */
 private fun PostDetailUiState.withPost(detail: PostDetail): PostDetailUiState {
     val best = detail.comments.firstOrNull { it.isBest }
     return copy(
@@ -235,7 +222,6 @@ private fun PostDetailUiState.findComment(id: Int): Comment? =
 private fun Comment.find(id: Int): Comment? =
     if (this.id == id) this else replies.firstNotNullOfOrNull { it.find(id) }
 
-/** Applies [transform] to the matching comment anywhere in the thread. */
 private fun Comment.patch(id: Int, transform: (Comment) -> Comment): Comment = when {
     this.id == id -> transform(this)
     replies.isEmpty() -> this

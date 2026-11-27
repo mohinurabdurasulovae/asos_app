@@ -1,10 +1,3 @@
-/*
- * CaseStepper.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * Three steps: 1 · Vaziyat, 2 · Modda, 3 · Yechim. The bar of every reached step is filled.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.background

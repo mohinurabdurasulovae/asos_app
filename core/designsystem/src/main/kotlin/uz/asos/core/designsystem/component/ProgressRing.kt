@@ -1,9 +1,3 @@
-/*
- * ProgressRing.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Circular progress (26 dp in rows, 104 dp on O‘rganish).
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.Canvas
@@ -30,10 +24,6 @@ import androidx.compose.ui.unit.dp
 import uz.asos.core.designsystem.theme.AsosColors
 import uz.asos.core.designsystem.theme.AsosTheme
 
-/**
- * @param progress 0f..1f
- * @param contentDescription e.g. "62 foiz"
- */
 @Composable
 fun ProgressRing(
     progress: Float,

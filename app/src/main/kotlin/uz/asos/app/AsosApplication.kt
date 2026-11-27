@@ -1,9 +1,3 @@
-/*
- * AsosApplication.kt
- * Module: :app   ·   Work package: WP-00
- *
- * @HiltAndroidApp Application class.
- */
 package uz.asos.app
 
 import android.app.Application

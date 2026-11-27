@@ -1,10 +1,3 @@
-/*
- * StatusIcon.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Read / in progress / not started / correct / wrong status icons.
- * Content descriptions are in Uzbek for TalkBack.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +16,6 @@ import uz.asos.core.designsystem.theme.AsosTheme
 
 sealed interface AsosStatus {
     data object Read : AsosStatus
-    /** @param percent 0..100 */
     data class InProgress(val percent: Int) : AsosStatus
     data object NotStarted : AsosStatus
     data object Correct : AsosStatus

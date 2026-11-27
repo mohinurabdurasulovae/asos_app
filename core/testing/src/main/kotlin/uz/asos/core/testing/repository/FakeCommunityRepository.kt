@@ -1,10 +1,3 @@
-/*
- * FakeCommunityRepository.kt
- * Module: :core:testing   ·   Work package: WP-09
- *
- * In-memory CommunityRepository for ViewModel tests. Every result is a var, so a test can
- * swap in an error; calls are recorded for assertions. Sample content: CommunitySampleData.
- */
 package uz.asos.core.testing.repository
 
 import uz.asos.core.common.result.AsosResult
@@ -20,7 +13,6 @@ import uz.asos.core.testing.data.CommunitySampleData
 
 class FakeCommunityRepository : CommunityRepository {
 
-    /** null = filter CommunitySampleData the way the API would. */
     var postsResult: AsosResult<PostsPage>? = null
     var communitiesResult: AsosResult<List<CommunityTopic>> =
         AsosResult.Success(CommunitySampleData.communities)
@@ -38,7 +30,6 @@ class FakeCommunityRepository : CommunityRepository {
     val createdPosts = mutableListOf<String>()
     val addedComments = mutableListOf<Triple<Int, String, Int?>>()
     val memberships = mutableListOf<Pair<String, Boolean>>()
-    /** Vote tallies the fake keeps, so a second vote behaves like the server's. */
     private val postTallies = mutableMapOf<Int, Pair<Int, VoteState>>()
     private val commentTallies = mutableMapOf<Int, Pair<Int, VoteState>>()
 
@@ -163,7 +154,6 @@ class FakeCommunityRepository : CommunityRepository {
     }
 }
 
-/** Finds a comment anywhere in the thread, including the nested replies. */
 private fun List<Comment>.findById(id: Int): Comment? =
     firstNotNullOfOrNull { comment ->
         if (comment.id == id) comment else comment.replies.findById(id)

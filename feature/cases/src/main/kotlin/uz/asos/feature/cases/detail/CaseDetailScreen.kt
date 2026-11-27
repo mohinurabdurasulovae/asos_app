@@ -1,21 +1,3 @@
-/*
- * CaseDetailScreen.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * Layout (top to bottom, 16 dp gutters, 16 dp gaps):
- *   top bar (back · "Kazus № 14" · bookmark)
- *   CaseStepper
- *   title + topic and difficulty tags
- *   CaseScenarioCard
- *   ArticleChoiceList
- *   SolutionInput
- *   after checking: ScoreBanner · LawyerExplanationCard · CaseFooterActions
- *   ArticlePreviewSheet behind "Moddani o'qish"
- *
- * CaseDetailRoute collects the ViewModel; CaseDetailScreen(uiState, onAction) is stateless
- * and previewable.
- */
 package uz.asos.feature.cases.detail
 
 import androidx.compose.animation.AnimatedVisibility

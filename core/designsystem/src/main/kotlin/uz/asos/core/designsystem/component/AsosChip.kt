@@ -1,10 +1,3 @@
-/*
- * AsosChip.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Filter chip / pill (selected = Navy, unselected = white with border).
- * 38 dp tall; the touch area is padded to the 44 dp minimum.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

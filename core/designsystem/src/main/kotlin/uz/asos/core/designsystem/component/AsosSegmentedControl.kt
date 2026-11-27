@@ -1,11 +1,3 @@
-/*
- * AsosSegmentedControl.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Grey track with equal-width segments; the selected one is a white
- * pill with a soft shadow. Used on Konstitutsiya (Mavzular · Tuzilish · Saqlangan) and
- * O‘rganish (Boshlang‘ich · O‘rta · Murakkab).
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

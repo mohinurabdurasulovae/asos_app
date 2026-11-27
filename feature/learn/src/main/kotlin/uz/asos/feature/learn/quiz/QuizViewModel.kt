@@ -1,19 +1,3 @@
-/*
- * QuizViewModel.kt
- * Module: :feature:learn   ·   Work package: WP-07
- * Screen: Test savoli (design artboard: Test.dc.html)
- *
- * Runs one quiz attempt. No Android UI types.
- *
- * API used (through LearningRepository, see docs/api/openapi.yaml):
- *  - POST /v1/quizzes/{id}/attempts   open (or resume) an attempt — token required
- *  - POST /v1/attempts/{id}/answers   answer one question; returns the right option,
- *                                     explanation, article and, on the last one, the result
- *  - POST /v1/attempts/{id}/finish    finish early ("Tugatish") or when nothing is left
- *
- * The server never sends the right answer in advance, so the screen only colours options after
- * POST …/answers returns. A question can be answered once (409 otherwise).
- */
 package uz.asos.feature.learn.quiz
 
 import androidx.lifecycle.SavedStateHandle
@@ -49,7 +33,6 @@ class QuizViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    /** QuizRoute(quizId): slug or id. */
     private val quizKey: String = checkNotNull(savedStateHandle.get<String>(KEY_ARG)) {
         "QuizViewModel needs the \"$KEY_ARG\" navigation argument"
     }
@@ -62,7 +45,6 @@ class QuizViewModel @Inject constructor(
 
     private var attempt: QuizAttempt? = null
     private var currentQuestionId: Int? = null
-    /** Sent with the answer to the last question: shown when the user taps "Natijani ko‘rish". */
     private var pendingResult: AttemptResult? = null
     private var started = false
     private var startJob: Job? = null
@@ -88,12 +70,9 @@ class QuizViewModel @Inject constructor(
             QuizAction.OnNextClick -> next()
             QuizAction.OnFinishClick -> pendingResult?.let(::showResult) ?: finish()
             QuizAction.OnRestartClick, QuizAction.OnRetry -> start()
-            // Navigation is handled by QuizRoute.
             is QuizAction.OnArticleClick, QuizAction.OnCloseClick, QuizAction.OnSignInClick -> Unit
         }
     }
-
-    // ------------------------------------------------------------------ attempt
 
     private fun start() {
         started = true
@@ -114,7 +93,6 @@ class QuizViewModel @Inject constructor(
                             it.copy(phase = QuizPhase.ERROR, errorMessage = MSG_NO_QUESTIONS)
                         }
                         first != null -> showQuestion(first.id)
-                        // Everything answered but not finished yet: close it and show the score.
                         else -> finish()
                     }
                 }
@@ -175,8 +153,6 @@ class QuizViewModel @Inject constructor(
             else -> QuestionMark.PENDING
         }
     }
-
-    // ------------------------------------------------------------------ answering
 
     private fun answer(optionId: Int) {
         val state = _uiState.value
@@ -301,7 +277,6 @@ class QuizViewModel @Inject constructor(
     private fun now(): Long = System.currentTimeMillis()
 
     companion object {
-        /** Name of the QuizRoute field (core:navigation). */
         internal const val KEY_ARG = "quizId"
         private const val MAX_SECONDS = 3600
         private const val MSG_NO_QUESTIONS = "Bu testda hozircha savol yo‘q."

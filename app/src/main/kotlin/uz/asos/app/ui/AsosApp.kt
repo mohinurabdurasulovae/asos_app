@@ -1,10 +1,3 @@
-/*
- * AsosApp.kt
- * Module: :app   ·   Work package: WP-00
- *
- * Root scaffold: AsosNavHost + AsosBottomBar (visible on the 5 top-level tabs only).
- * Screens draw their own status-bar inset; the scaffold only reserves the bottom bar.
- */
 package uz.asos.app.ui
 
 import androidx.compose.foundation.layout.WindowInsets

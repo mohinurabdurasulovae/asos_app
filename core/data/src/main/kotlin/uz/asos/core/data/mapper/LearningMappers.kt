@@ -1,9 +1,3 @@
-/*
- * LearningMappers.kt
- * Module: :core:data   ·   Work package: WP-07
- *
- * DTO → core:model mappers for the O‘rganish endpoints.
- */
 package uz.asos.core.data.mapper
 
 import uz.asos.core.model.constitution.ArticleRef
@@ -125,6 +119,5 @@ internal fun AttemptResultDto.asModel() = AttemptResult(
     achievements = achievements.map { it.asModel() },
 )
 
-/** ArticleRef is nullable in the API; number 0 means "no article". */
 internal fun ArticleRefDto.asModel(): ArticleRef? =
     if (number <= 0) null else ArticleRef(number = number, title = title, slug = slug)

@@ -1,11 +1,3 @@
-/*
- * AuthInterceptor.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * Adds "Authorization: Bearer <accessToken>" when the user is signed in. The API has no
- * refresh endpoint, so a 401 on a request that carried a token means the token expired:
- * it is cleared and the app carries on as a guest until the user signs in again.
- */
 package uz.asos.core.network.interceptor
 
 import kotlinx.coroutines.runBlocking

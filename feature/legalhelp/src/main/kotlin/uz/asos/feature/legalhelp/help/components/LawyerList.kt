@@ -1,10 +1,3 @@
-/*
- * LawyerList.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * "Advokatlar" header with the online count, the category filter chips and the filtered
- * LawyerCards (or an empty message).
- */
 package uz.asos.feature.legalhelp.help.components
 
 import androidx.compose.foundation.background
@@ -91,7 +84,6 @@ internal fun LawyerFilterChips(
     }
 }
 
-/** Cards for the lawyers that match the selected chip. */
 @Composable
 internal fun LawyerList(
     lawyers: List<LawyerUi>,

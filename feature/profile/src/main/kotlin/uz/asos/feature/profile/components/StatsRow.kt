@@ -1,10 +1,3 @@
-/*
- * StatsRow.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * The three numbers on the Navy hero: ball · test · kazus.
- */
 package uz.asos.feature.profile.components
 
 import androidx.compose.foundation.layout.Arrangement

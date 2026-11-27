@@ -1,9 +1,3 @@
-/*
- * JvmLibraryConventionPlugin.kt
- * Module: :build-logic   ·   Work package: WP-00
- *
- * Pure Kotlin/JVM modules (:core:model, :core:common). No Android types allowed there.
- */
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project

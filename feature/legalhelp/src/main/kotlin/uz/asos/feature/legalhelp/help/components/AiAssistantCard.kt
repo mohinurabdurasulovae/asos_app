@@ -1,10 +1,3 @@
-/*
- * AiAssistantCard.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * Navy "Asos AI yordamchi" card: situation input, voice input, send, suggestion chips,
- * the answer with its article link, and the disclaimer.
- */
 package uz.asos.feature.legalhelp.help.components
 
 import androidx.compose.foundation.background
@@ -49,7 +42,6 @@ import uz.asos.feature.legalhelp.help.AnswerArticleUi
 import uz.asos.feature.legalhelp.help.AssistantAnswerUi
 import uz.asos.feature.legalhelp.help.AssistantUi
 
-/** Light border / field fill on the navy card. */
 private val OnNavyBorder = AsosColors.Surface.copy(alpha = 0.14f)
 private val OnNavyField = AsosColors.Surface.copy(alpha = 0.06f)
 
@@ -73,7 +65,6 @@ internal fun AiAssistantCard(
             .padding(AsosSpacing.xl),
         verticalArrangement = Arrangement.spacedBy(AsosSpacing.l),
     ) {
-        // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
@@ -97,7 +88,6 @@ internal fun AiAssistantCard(
             }
         }
 
-        // Input
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,7 +144,6 @@ internal fun AiAssistantCard(
             }
         }
 
-        // Suggestions (sent by the API)
         if (state.suggestions.isNotEmpty()) {
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(AsosSpacing.s),

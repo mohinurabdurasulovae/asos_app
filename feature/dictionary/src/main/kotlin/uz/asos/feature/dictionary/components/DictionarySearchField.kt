@@ -1,10 +1,3 @@
-/*
- * DictionarySearchField.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * 52 dp white field, R16, search icon, placeholder "Atamani qidiring".
- */
 package uz.asos.feature.dictionary.components
 
 import androidx.compose.foundation.BorderStroke

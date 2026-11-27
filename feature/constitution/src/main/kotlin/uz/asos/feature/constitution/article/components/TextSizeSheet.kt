@@ -1,11 +1,3 @@
-/*
- * TextSizeSheet.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Bottom sheet opened by "Aa": four sizes for the official text, with a live sample.
- * The choice is saved on the device and used for every article.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

@@ -1,6 +1,3 @@
-// Root build file  ·  WP-00
-// Plugins are declared here with `apply false` so every module and the convention
-// plugins in build-logic share the same plugin versions.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false

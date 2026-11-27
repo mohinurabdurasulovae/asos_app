@@ -1,13 +1,3 @@
-/*
- * ApiCaller.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * Runs one Retrofit call and turns every outcome into AsosResult:
- *  - success                → AsosResult.Success
- *  - HTTP error with JSON    → AsosResult.Error(message = API "message", code = API "error")
- *  - no connection / timeout → AsosResult.Error(code = network)
- * The API's Uzbek "message" is safe to show unchanged (openapi.yaml, Umumiy qoidalar).
- */
 package uz.asos.core.network
 
 import kotlinx.serialization.SerializationException

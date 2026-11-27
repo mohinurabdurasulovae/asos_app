@@ -1,9 +1,3 @@
-/*
- * NetworkModule.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * Hilt module: Json, OkHttpClient, Retrofit and every *Api interface.
- */
 package uz.asos.core.network.di
 
 import dagger.Module

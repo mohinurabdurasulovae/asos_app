@@ -1,11 +1,3 @@
-/*
- * ArticleChoiceList.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * Selectable article cards. Before checking: picked or not. After checking: the correct
- * article turns green (even if it was missed) and a wrong pick turns red.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.BorderStroke
@@ -185,7 +177,6 @@ private fun ChoiceCheckbox(
         contentAlignment = Alignment.Center,
     ) {
         when {
-            // A wrong pick is crossed out, so this comes before the tick.
             revealedWrong -> Icon(
                 imageVector = AsosIcons.Close,
                 contentDescription = null,

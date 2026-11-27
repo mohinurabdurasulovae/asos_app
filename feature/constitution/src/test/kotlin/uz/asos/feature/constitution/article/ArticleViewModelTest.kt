@@ -1,10 +1,3 @@
-/*
- * ArticleViewModelTest.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Unit tests for ArticleViewModel using fakes from core:testing (no network).
- */
 package uz.asos.feature.constitution.article
 
 import androidx.lifecycle.SavedStateHandle
@@ -105,7 +98,6 @@ class ArticleViewModelTest {
         }
         assertEquals("50" to ReadingStatus.READ, constitution.progressUpdates.last())
 
-        // Only once per visit.
         viewModel.onAction(ArticleAction.OnReachedEnd)
         assertEquals(2, constitution.progressUpdates.size)
     }

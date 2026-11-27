@@ -1,18 +1,3 @@
-/*
- * ProfileScreen.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * Layout (top to bottom):
- *   ProfileHeader (Navy hero: name, level, StatsRow)
- *   WeeklyActivityChart ("Bu hafta" + the next-level bar)
- *   AchievementsGrid
- *   SavedItemsSection
- *   SettingsSection
- *
- * Profil is a tab, so there is no back button. Guests see the sign-in card instead.
- * ProfileRoute collects the ViewModel; ProfileScreen(uiState, onAction) is stateless.
- */
 package uz.asos.feature.profile
 
 import androidx.compose.foundation.background
@@ -66,7 +51,6 @@ internal fun ProfileRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Back from a quiz or a case: points and the streak may have moved.
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(ProfileAction.OnResume)
         onPauseOrDispose { }

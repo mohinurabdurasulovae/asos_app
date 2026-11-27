@@ -1,23 +1,9 @@
-/*
- * UserDto.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * @Serializable DTOs for the /v1/me endpoints. Field names mirror the OpenAPI schemas.
- *
- * Implemented: bookmarks (save / remove). Still to add: Me, profile screen, points,
- * notifications, achievements.
- */
 package uz.asos.core.network.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * POST /v1/me/bookmarks. Send [kind] plus one of: [targetId], [articleNumber], [termSlug],
- * [caseNumber]. Null fields are left out of the JSON.
- */
 @Serializable
 data class BookmarkRequestDto(
-    /** article | term | post | case */
     val kind: String,
     val targetId: Int? = null,
     val articleNumber: Int? = null,
@@ -33,7 +19,6 @@ data class BookmarkResponseDto(
     val targetId: Int? = null,
 )
 
-/** GET /v1/me/profile — the whole Profil screen in one response. */
 @Serializable
 data class ProfileResponseDto(
     val ok: Boolean = true,
@@ -101,7 +86,6 @@ data class ActivityDayDto(
     val isFuture: Boolean = false,
 )
 
-/** DailyGoalDto and AchievementDto are shared with O'rganish: see LearningDto.kt. */
 @Serializable
 data class AchievementsDto(
     val earned: Int = 0,
@@ -117,7 +101,6 @@ data class BookmarkCountsDto(
     val case: Int = 0,
 )
 
-/** PATCH /v1/me — only the fields the user changed. */
 @Serializable
 data class UpdateMeRequestDto(
     val name: String? = null,

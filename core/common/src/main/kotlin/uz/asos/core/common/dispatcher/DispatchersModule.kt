@@ -1,9 +1,3 @@
-/*
- * DispatchersModule.kt
- * Module: :core:common   ·   Work package: WP-00
- *
- * Hilt module providing coroutine dispatchers.
- */
 package uz.asos.core.common.dispatcher
 
 import dagger.Module

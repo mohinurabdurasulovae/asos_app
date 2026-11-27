@@ -1,9 +1,3 @@
-/*
- * AndroidLibraryConventionPlugin.kt
- * Module: :build-logic   ·   Work package: WP-00
- *
- * Same SDK settings for every library module.
- */
 import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project

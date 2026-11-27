@@ -1,16 +1,7 @@
-/*
- * ConstitutionModels.kt
- * Module: :core:model   ·   Work package: WP-02
- *
- * Domain models for the Constitution, shared by every layer. Field meanings follow
- * docs/api/openapi.yaml (schemas ConstitutionStats, Section, Chapter, ArticleBrief, Article,
- * Topic, ReadingOverview).
- */
 package uz.asos.core.model.constitution
 
 import uz.asos.core.model.dictionary.TermSummary
 
-/** Edition 2023: 6 sections, 27 chapters, 155 articles (the preamble is not counted). */
 data class ConstitutionInfo(
     val edition: String,
     val sections: Int,
@@ -21,7 +12,6 @@ data class ConstitutionInfo(
 
 enum class ReadingStatus { NOT_STARTED, IN_PROGRESS, READ }
 
-/** Bo‘lim. Section VI has no chapters: articles 154–155 belong to it directly. */
 data class Section(
     val id: Int,
     val roman: String,
@@ -35,7 +25,6 @@ data class Section(
     val chapters: List<Chapter>,
 )
 
-/** Bob. */
 data class Chapter(
     val id: Int,
     val roman: String,
@@ -53,7 +42,6 @@ data class ConstitutionTree(
     val sections: List<Section>,
 )
 
-/** Mavzu (topic). [tone] is a design-system colour name: brand, teal, orange, purple, pink, navy. */
 data class Topic(
     val id: Int,
     val slug: String,
@@ -63,7 +51,6 @@ data class Topic(
     val articleCount: Int,
 )
 
-/** Short reference to an article (number + title), used in links. */
 data class ArticleRef(
     val number: Int,
     val title: String,
@@ -76,10 +63,6 @@ data class ReadingProgress(
     val lastReadAt: String?,
 )
 
-/**
- * Article in a list. When [titleAuto] is true the article has no editorial title and [title]
- * is just "130-modda": show [excerpt] instead.
- */
 data class ArticleBrief(
     val id: Int,
     val number: Int,
@@ -94,7 +77,6 @@ data class ArticleBrief(
     val progress: ReadingProgress?,
 )
 
-/** One numbered part (band) of the official text. */
 data class ArticlePart(
     val partNo: Int,
     val body: String,
@@ -102,7 +84,6 @@ data class ArticlePart(
     val isExtra: Boolean,
 )
 
-/** "Sodda qilib aytganda": editorial plain-language summary, not official text. */
 data class ArticleSummary(
     val bullets: List<String>,
     val reviewedBy: String?,
@@ -114,7 +95,6 @@ data class ArticleExample(
     val id: Int,
     val situation: String,
     val verdict: String,
-    /** true = the situation is lawful (green), false = it breaks the article (red). */
     val isLawful: Boolean,
 )
 
@@ -147,7 +127,6 @@ data class SectionRef(val roman: String, val title: String)
 
 data class ChapterRef(val id: Int, val roman: String, val title: String)
 
-/** Everything the article reader (Modda) shows. */
 data class Article(
     val id: Int,
     val number: Int,
@@ -174,7 +153,6 @@ data class Article(
     val source: String?,
 )
 
-/** "Davom ettiring": where the signed-in user stopped reading. */
 data class ReadingOverview(
     val articlesTotal: Int,
     val articlesRead: Int,
@@ -192,14 +170,12 @@ data class ContinueReading(
     val chapterTitle: String?,
 )
 
-/** Result of POST /v1/articles/{key}/progress. */
 data class ReadProgressResult(
     val pointsEarned: Int,
     val totalPoints: Int,
     val streakDays: Int,
 )
 
-/** Filters for GET /v1/articles. */
 data class ArticleQuery(
     val topic: String? = null,
     val chapter: String? = null,

@@ -1,10 +1,3 @@
-/*
- * CasesHeader.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * Back button, "Kazuslar" title, sort button, intro text.
- */
 package uz.asos.feature.cases.list.components
 
 import androidx.compose.foundation.BorderStroke

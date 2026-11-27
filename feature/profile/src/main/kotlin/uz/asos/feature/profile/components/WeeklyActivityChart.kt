@@ -1,11 +1,3 @@
-/*
- * WeeklyActivityChart.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * "Bu hafta": seven columns (Du–Ya) scaled to the busiest day, then the bar showing how far
- * the next level is.
- */
 package uz.asos.feature.profile.components
 
 import androidx.compose.foundation.background

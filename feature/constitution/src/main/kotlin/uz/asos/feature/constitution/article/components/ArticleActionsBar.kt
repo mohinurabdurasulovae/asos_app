@@ -1,11 +1,3 @@
-/*
- * ArticleActionsBar.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Bottom bar of the reader: ‹ previous article · "Bilimni sinash" (quiz) · next article ›.
- * The community entry is the DiscussionCard above it, as in the design.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

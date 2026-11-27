@@ -1,9 +1,3 @@
-/*
- * ProgressBar.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Linear progress (Brand500 on a light track, 7 dp, pill ends).
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background
@@ -22,7 +16,6 @@ import uz.asos.core.designsystem.theme.AsosColors
 import uz.asos.core.designsystem.theme.AsosShapes
 import uz.asos.core.designsystem.theme.AsosTheme
 
-/** @param progress 0f..1f */
 @Composable
 fun ProgressBar(
     progress: Float,

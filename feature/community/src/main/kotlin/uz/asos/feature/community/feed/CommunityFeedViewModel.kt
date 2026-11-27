@@ -1,11 +1,3 @@
-/*
- * CommunityFeedViewModel.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * Loads the feed with its topic chips, applies the topic filter and the sort tabs, votes on a
- * post without waiting for a reload, and sends a new question.
- */
 package uz.asos.feature.community.feed
 
 import androidx.lifecycle.SavedStateHandle
@@ -32,7 +24,6 @@ class CommunityFeedViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    /** CommunityRoute(articleNumber): 0 = the whole feed. */
     private val articleNumber: Int? =
         savedStateHandle.get<Int>(KEY_ARG)?.takeIf { it > 0 }
 
@@ -72,7 +63,6 @@ class CommunityFeedViewModel @Inject constructor(
             CommunityFeedAction.OnNoticeDismiss -> _uiState.update { it.copy(notice = null) }
             CommunityFeedAction.OnRetry -> load(showSkeleton = true)
             CommunityFeedAction.OnResume -> if (hasLoaded) load(showSkeleton = false)
-            // Navigation is handled by CommunityFeedRoute.
             is CommunityFeedAction.OnPostClick,
             CommunityFeedAction.OnSearchClick,
             CommunityFeedAction.OnSavedClick,
@@ -110,7 +100,6 @@ class CommunityFeedViewModel @Inject constructor(
                             isLoading = false,
                             errorMessage = null,
                             posts = result.data.posts,
-                            // The chips come with the feed; keep the old ones if empty.
                             topics = result.data.communities.ifEmpty { it.topics },
                         )
                     }
@@ -125,10 +114,6 @@ class CommunityFeedViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Moves the arrow and the count straight away, then asks the server; a failure puts the
-     * old numbers back, so the row never lies about what the server stored.
-     */
     private fun vote(postId: Int, vote: VoteState) {
         val current = _uiState.value.posts.firstOrNull { it.id == postId } ?: return
         if (!_uiState.value.isSignedIn) {

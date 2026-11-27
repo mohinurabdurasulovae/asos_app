@@ -1,9 +1,3 @@
-/*
- * CasesPromoCard.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * Navy "Kazuslar" card with the scales drawing in the corner. Opens Kazuslar.
- */
 package uz.asos.feature.learn.hub.components
 
 import androidx.compose.foundation.background

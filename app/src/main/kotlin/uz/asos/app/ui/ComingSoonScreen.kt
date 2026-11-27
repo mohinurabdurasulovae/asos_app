@@ -1,11 +1,3 @@
-/*
- * ComingSoonScreen.kt
- * Module: :app   ·   Work package: WP-00
- *
- * Temporary screen for routes whose feature is not built yet, so links from finished
- * screens (e.g. "Kazuslar →" in Modda) open something instead of crashing.
- * Delete it once every feature is registered in AsosNavHost.
- */
 package uz.asos.app.ui
 
 import androidx.annotation.StringRes

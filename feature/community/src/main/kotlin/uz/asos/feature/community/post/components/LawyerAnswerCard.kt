@@ -1,11 +1,3 @@
-/*
- * LawyerAnswerCard.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Muhokama (design artboard: Post.dc.html)
- *
- * "Eng yaxshi javob": the verified lawyer, the answer, the article it cites, the disclaimer
- * and the "Advokatga yozish" link.
- */
 package uz.asos.feature.community.post.components
 
 import androidx.compose.foundation.background
@@ -189,7 +181,6 @@ internal fun LawyerAnswerCard(
     }
 }
 
-/** "Tasdiqlangan advokat · Uy-joy ishlari · 1 soat" */
 @Composable
 private fun lawyerSubtitle(comment: Comment): String {
     val parts = buildList {

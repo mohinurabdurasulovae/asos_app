@@ -1,5 +1,3 @@
-// :core:navigation  ·  WP-00
-// Navigation Compose + kotlinx.serialization (type-safe routes).
 plugins {
     alias(libs.plugins.asos.android.library)
     alias(libs.plugins.asos.android.compose)

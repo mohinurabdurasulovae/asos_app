@@ -1,9 +1,3 @@
-/*
- * FakeLearningRepository.kt
- * Module: :core:testing   ·   Work package: WP-07
- *
- * In-memory fake of LearningRepository. Results can be swapped per test; calls are recorded.
- */
 package uz.asos.core.testing.repository
 
 import uz.asos.core.common.result.AsosResult
@@ -20,7 +14,6 @@ class FakeLearningRepository : LearningRepository {
     var attemptResult: AsosResult<QuizAttempt> = AsosResult.Success(LearnSampleData.attempt)
     var finishResult: AsosResult<AttemptResult> = AsosResult.Success(LearnSampleData.result)
 
-    /** Answer per question id; default: [LearnSampleData.answerFor]. */
     var answerResults: MutableMap<Int, AsosResult<AnswerResult>> = mutableMapOf()
 
     data class AnswerCall(val attemptId: Int, val questionId: Int, val optionId: Int, val seconds: Int)

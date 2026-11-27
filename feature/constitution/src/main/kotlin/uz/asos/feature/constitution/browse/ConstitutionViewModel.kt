@@ -1,17 +1,3 @@
-/*
- * ConstitutionViewModel.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * Holds StateFlow<ConstitutionUiState> and handles ConstitutionAction. No Android UI types.
- *
- * API used (through repositories, see docs/api/openapi.yaml):
- *  - GET /v1/constitution        section / chapter tree (+ progress with a token)
- *  - GET /v1/topics              topic chips and the Mavzular tab
- *  - GET /v1/chapters/{roman}    articles of an opened chapter
- *  - GET /v1/articles            search, topic filter, Saqlangan (status=saved), section VI
- *  - GET /v1/me/progress         "Oxirgi o‘qilgan" card (signed in only)
- */
 package uz.asos.feature.constitution.browse
 
 import androidx.lifecycle.ViewModel
@@ -84,12 +70,9 @@ class ConstitutionViewModel @Inject constructor(
             ConstitutionAction.OnRetry -> load(showSkeleton = true)
             ConstitutionAction.OnListRetry -> refreshList()
             ConstitutionAction.OnResume -> if (hasLoaded) load(showSkeleton = false)
-            // Navigation is handled by ConstitutionRoute.
             is ConstitutionAction.OnArticleClick, ConstitutionAction.OnSignInClick -> Unit
         }
     }
-
-    // ------------------------------------------------------------------ loading
 
     private fun observeSession() {
         viewModelScope.launch {
@@ -119,7 +102,6 @@ class ConstitutionViewModel @Inject constructor(
                     val continueReading = overview.await().getOrNull()?.continueReading
                     val loadedTopics = topics.await().getOrNull()
                     applyTree(result.data, continueReading, loadedTopics)
-                    // Opened chapters show reading progress, so refresh them too.
                     _uiState.value.expandedChapters.forEach { loadChapter(it, quiet = true) }
                 }
                 is AsosResult.Error -> _uiState.update {
@@ -151,14 +133,11 @@ class ConstitutionViewModel @Inject constructor(
         }
     }
 
-    /** Open the section the user is reading; otherwise section II (rights), as in the design. */
     private fun defaultExpandedSections(sections: List<Section>, chapterRoman: String?): Set<String> {
         val reading = chapterRoman?.let { roman -> sections.firstOrNull { s -> s.chapters.any { it.roman == roman } } }
         val section = reading ?: sections.firstOrNull { it.roman == "II" } ?: sections.firstOrNull()
         return setOfNotNull(section?.roman)
     }
-
-    // ------------------------------------------------------------------ table of contents
 
     private fun onSectionToggle(roman: String) {
         val expanding = roman !in _uiState.value.expandedSections
@@ -166,7 +145,6 @@ class ConstitutionViewModel @Inject constructor(
             it.copy(expandedSections = if (expanding) it.expandedSections + roman else it.expandedSections - roman)
         }
         val section = _uiState.value.sections.firstOrNull { it.roman == roman } ?: return
-        // Section VI has no chapters: load its articles when it opens.
         if (expanding && section.directArticlesQuery != null && sectionKey(roman) !in _uiState.value.chapterArticles) {
             loadGroup(sectionKey(roman), ArticleQuery(section = section.directArticlesQuery))
         }
@@ -211,8 +189,6 @@ class ConstitutionViewModel @Inject constructor(
     private fun setGroup(key: String, state: ArticleListState) {
         _uiState.update { it.copy(chapterArticles = it.chapterArticles + (key to state)) }
     }
-
-    // ------------------------------------------------------------------ search / topic / saved list
 
     private fun onQueryChange(query: String) {
         _uiState.update { it.copy(query = query) }
@@ -266,8 +242,6 @@ class ConstitutionViewModel @Inject constructor(
         internal fun sectionKey(roman: String) = "$SECTION_PREFIX$roman"
     }
 }
-
-// ---------------------------------------------------------------------- mapping to UI models
 
 private fun Section.toUi() = SectionUi(
     roman = roman,

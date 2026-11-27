@@ -1,11 +1,3 @@
-/*
- * PostCard.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * Vote column on the left; topic dot, author and age; title; excerpt; the lawyer's answer
- * preview when there is one; comment count and the status line.
- */
 package uz.asos.feature.community.feed.components
 
 import androidx.compose.foundation.background

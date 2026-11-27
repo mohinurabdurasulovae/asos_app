@@ -1,11 +1,3 @@
-/*
- * TermOfTheDayCard.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * "KUN ATAMASI": purple overline, bookmark button, the term in serif, the definition, the
- * «Hayotda» box and the article chips.
- */
 package uz.asos.feature.dictionary.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +34,6 @@ internal fun TermOfTheDayCard(
     onSaveToggle: () -> Unit,
     onArticleClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    /** false in the term sheet, where the card shows an ordinary term. */
     isTermOfTheDay: Boolean = true,
 ) {
     AsosCard(
@@ -168,7 +159,6 @@ private fun ArticleChip(number: Int, onClick: () -> Unit) {
     }
 }
 
-/** "ot · arabcha “daxl” — tegish, aralashish"; null when neither part is known. */
 internal fun TermDetail.grammarLine(): String? =
     listOfNotNull(partOfSpeech, etymology)
         .filter { it.isNotBlank() }

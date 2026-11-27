@@ -1,10 +1,3 @@
-/*
- * CommunityApi.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * Retrofit interface for the Hamjamiyat tag of docs/api/openapi.yaml.
- * Reading works without a token; voting, writing and joining need one.
- */
 package uz.asos.core.network.api
 
 import retrofit2.http.Body
@@ -25,14 +18,9 @@ import uz.asos.core.network.dto.VoteResponseDto
 
 interface CommunityApi {
 
-    /** Topic chips above the feed. */
     @GET("v1/communities")
     suspend fun getCommunities(): CommunitiesResponseDto
 
-    /**
-     * @param community topic slug, or "all".
-     * @param sort popular · new · unanswered · subscriptions (the last needs a token).
-     */
     @GET("v1/posts")
     suspend fun getPosts(
         @Query("community") community: String? = null,
@@ -46,7 +34,6 @@ interface CommunityApi {
     @GET("v1/posts/{id}")
     suspend fun getPost(@Path("id") id: Int): PostResponseDto
 
-    /** A new post starts in the `awaiting_lawyer` state. */
     @POST("v1/posts")
     suspend fun createPost(@Body body: CreatePostRequestDto): PostResponseDto
 

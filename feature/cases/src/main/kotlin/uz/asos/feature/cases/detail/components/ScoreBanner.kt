@@ -1,11 +1,3 @@
-/*
- * ScoreBanner.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * "Ajoyib! +40 ball" after a correct answer, or "Modda noto'g'ri tanlandi" with a nudge to
- * read the lawyer's explanation.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.BorderStroke

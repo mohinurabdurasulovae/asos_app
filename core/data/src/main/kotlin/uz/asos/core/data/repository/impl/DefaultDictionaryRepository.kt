@@ -1,9 +1,3 @@
-/*
- * DefaultDictionaryRepository.kt
- * Module: :core:data   ·   Work package: WP-02
- *
- * DictionaryRepository backed by DictionaryApi.
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -56,7 +50,6 @@ internal class DefaultDictionaryRepository @Inject constructor(
     }
 
     override suspend fun getLetters(): AsosResult<List<AlphabetLetter>> = io {
-        // The list endpoint already carries the rail; asking for one row keeps it cheap.
         apiCaller.call { dictionaryApi.getTerms(perPage = 1) }
             .mapSuccess { response -> response.asModel().letters }
     }

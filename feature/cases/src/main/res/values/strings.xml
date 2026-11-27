@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:cases. Prefix keys with 'cases_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
-    <!-- Kazuslar (list) -->
     <string name="cases_title">Kazuslar</string>
     <string name="cases_back">Orqaga</string>
     <string name="cases_sort">Saralash</string>
@@ -16,13 +13,11 @@
     <string name="cases_empty_action">Filtrlarni tozalash</string>
     <string name="cases_load_error_title">Kazuslarni yuklab bo‘lmadi</string>
 
-    <!-- Saralash sheet -->
     <string name="cases_filter_sheet_title">Kazuslarni saralash</string>
     <string name="cases_filter_by_status">Holat bo‘yicha</string>
     <string name="cases_filter_only_saved">Faqat saqlangan kazuslar</string>
     <string name="cases_filter_apply">Qo‘llash</string>
 
-    <!-- Kazus — yechim -->
     <string name="cases_bookmark">Saqlash</string>
     <string name="cases_step_scenario">1 · Vaziyat</string>
     <string name="cases_step_article">2 · Modda</string>
@@ -43,7 +38,6 @@
     <string name="cases_action_retry">Qaytadan</string>
     <string name="cases_action_next">Keyingi kazus</string>
 
-    <!-- Modda sheet -->
     <string name="cases_article_number">%1$d-modda</string>
     <string name="cases_article_plain">Sodda qilib aytganda</string>
     <string name="cases_article_open_reader">To‘liq moddani ochish</string>

@@ -12,10 +12,6 @@ import uz.asos.feature.auth.login.LoginRoute
 import uz.asos.feature.auth.register.RegisterRoute
 import uz.asos.core.navigation.LoginRoute as LoginDestination
 
-/**
- * Ro‘yxatdan o‘tish. Only reached from Kirish, so the route lives in this module instead of
- * core:navigation/AsosRoutes.kt.
- */
 @Serializable
 internal data object RegisterDestination : AsosRoute
 

@@ -1,15 +1,3 @@
-/*
- * LegalHelpScreen.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- * Screen: Huquqiy yordam (design artboard: Yordam.dc.html)
- *
- * LegalHelpRoute connects the ViewModel and handles navigation, the dialer and snackbars;
- * LegalHelpScreen(uiState, onAction) is stateless and previewable.
- *
- * Layout (top to bottom, as on the canvas):
- *   back + title · article 29 quote · AiAssistantCard · HotlineCard ·
- *   "Advokatlar" header · filter chips · LawyerList
- */
 package uz.asos.feature.legalhelp.help
 
 import android.content.ActivityNotFoundException
@@ -84,7 +72,6 @@ import uz.asos.feature.legalhelp.help.components.LawyerList
 import uz.asos.feature.legalhelp.help.components.LawyersHeader
 import uz.asos.feature.legalhelp.help.components.PreviewLawyers
 
-/** The article quoted at the top: "Har kimga malakali yuridik yordam olish huquqi kafolatlanadi." */
 private const val QUOTE_ARTICLE = 29
 
 @Composable
@@ -128,7 +115,6 @@ internal fun LegalHelpRoute(
         }
     }
 
-    // Coming back from a chat: refresh online status quietly.
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(LegalHelpAction.OnResume)
         onPauseOrDispose { }
@@ -150,7 +136,6 @@ internal fun LegalHelpRoute(
                         show(context.getString(R.string.legalhelp_dialer_missing))
                     }
                 }
-                // No calls / voice in the API yet.
                 LegalHelpAction.OnVoiceInputClick,
                 is LegalHelpAction.OnCallLawyer,
                 is LegalHelpAction.OnVideoCallLawyer,
@@ -413,8 +398,6 @@ private fun BookingDialog(dialog: BookingDialogUi, onAction: (LegalHelpAction) -
         },
     )
 }
-
-// ---------------------------------------------------------------------- previews
 
 internal val PreviewLegalHelpState = LegalHelpUiState(
     isLoading = false,

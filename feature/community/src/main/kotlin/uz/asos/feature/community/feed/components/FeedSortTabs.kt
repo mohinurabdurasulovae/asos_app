@@ -1,10 +1,3 @@
-/*
- * FeedSortTabs.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * Ommabop · Yangi · Javobsiz · Obunalar.
- */
 package uz.asos.feature.community.feed.components
 
 import androidx.compose.foundation.layout.Arrangement

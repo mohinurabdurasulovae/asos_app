@@ -1,10 +1,3 @@
-/*
- * AskQuestionSheet.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * "Savol berish": title, body, topic chips and the anonymous switch.
- */
 package uz.asos.feature.community.feed.components
 
 import androidx.compose.foundation.horizontalScroll

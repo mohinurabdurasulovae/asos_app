@@ -1,9 +1,3 @@
-/*
- * FakeAuthRepository.kt
- * Module: :core:testing   ·   Work package: WP-02
- *
- * In-memory fake of AuthRepository. Call setSignedIn() to simulate signing in or out.
- */
 package uz.asos.core.testing.repository
 
 import kotlinx.coroutines.flow.Flow

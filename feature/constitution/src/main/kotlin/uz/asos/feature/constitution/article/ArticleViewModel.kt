@@ -1,17 +1,3 @@
-/*
- * ArticleViewModel.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Holds StateFlow<ArticleUiState> and handles ArticleAction. No Android UI types.
- *
- * API used (through repositories, see docs/api/openapi.yaml):
- *  - GET  /v1/articles/{key}            the whole reader
- *  - POST /v1/articles/{key}/progress   "reading" on open, "read" at the end (+10 points once)
- *  - POST /v1/me/bookmarks              save
- *  - DELETE /v1/me/bookmarks/article/{id}  unsave
- * Progress and bookmarks need a signed-in user; guests can read everything.
- */
 package uz.asos.feature.constitution.article
 
 import androidx.lifecycle.SavedStateHandle
@@ -50,10 +36,6 @@ class ArticleViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    /**
-     * ArticleRoute(key) stores its argument under "key". Read directly (instead of toRoute())
-     * so the ViewModel stays testable on the plain JVM.
-     */
     private val articleKey: String = checkNotNull(savedStateHandle.get<String>(KEY_ARG)) {
         "ArticleViewModel needs the \"$KEY_ARG\" navigation argument"
     }
@@ -82,7 +64,6 @@ class ArticleViewModel @Inject constructor(
             ArticleAction.OnToggleFullText -> updateSuccess { it.copy(showFullText = !it.showFullText) }
             ArticleAction.OnReachedEnd -> markRead()
             ArticleAction.OnRetry -> load()
-            // Navigation and sharing are handled by ArticleRoute.
             ArticleAction.OnBack,
             ArticleAction.OnShareClick,
             is ArticleAction.OnArticleClick,
@@ -120,7 +101,6 @@ class ArticleViewModel @Inject constructor(
                         textSize = textSize,
                     )
                     if (!alreadyRead) {
-                        // Ignore the result: guests get Success(null), errors are not worth a message.
                         constitutionRepository.updateProgress(articleKey, ReadingStatus.IN_PROGRESS, 0)
                     }
                 }
@@ -139,7 +119,6 @@ class ArticleViewModel @Inject constructor(
                     alreadyRead = result.data != null
                     val points = result.data?.pointsEarned ?: 0
                     if (points > 0) _events.send(ArticleEvent.PointsEarned(points))
-                    // Signed out (data == null): allow a retry after signing in.
                     if (result.data == null) markReadSent = false
                 }
                 is AsosResult.Error -> markReadSent = false
@@ -180,8 +159,6 @@ class ArticleViewModel @Inject constructor(
         internal const val KEY_ARG = "key"
     }
 }
-
-// ---------------------------------------------------------------------- mapping to UI model
 
 internal fun Article.toUi(key: String): ArticleUi {
     val display = UzbekFormatters::display

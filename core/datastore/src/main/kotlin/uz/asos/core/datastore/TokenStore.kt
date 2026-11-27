@@ -1,13 +1,3 @@
-/*
- * TokenStore.kt
- * Module: :core:datastore   ·   Work package: WP-02
- *
- * Storage for the access token returned by POST /v1/auth/verify (token.accessToken).
- * The API has no refresh token: when the token expires, the user signs in again.
- *
- * TODO(WP-02): encrypt at rest (e.g. Android Keystore + Tink) before release.
- * TODO(WP-03): the Kirish screen calls save() after a successful verify.
- */
 package uz.asos.core.datastore
 
 import androidx.datastore.core.DataStore
@@ -28,7 +18,6 @@ class TokenStore @Inject constructor(
     private val accessTokenKey = stringPreferencesKey("access_token")
     private val expiresAtKey = stringPreferencesKey("expires_at")
 
-    /** Cached in memory so the OkHttp interceptor does not hit the disk on every request. */
     @Volatile
     private var cached: String? = null
 

@@ -1,11 +1,3 @@
-/*
- * PostHeader.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Muhokama (design artboard: Post.dc.html)
- *
- * Back, the topic with its member count and the "Qo'shilish" button; then the question
- * itself: author, title, body and the tag row.
- */
 package uz.asos.feature.community.post.components
 
 import androidx.compose.foundation.BorderStroke

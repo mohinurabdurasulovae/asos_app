@@ -1,11 +1,3 @@
-/*
- * LawyerExplanationCard.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * Verified lawyer comment, "Moddani o'qish" chips for the correct articles, and the
- * numbered "AMALIY QADAMLAR" list.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.background

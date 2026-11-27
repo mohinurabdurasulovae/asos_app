@@ -1,18 +1,3 @@
-/*
- * CommunityFeedScreen.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * Layout (top to bottom, 16 dp gutters):
- *   CommunityTopBar ("Hamjamiyat" · search · saved)
- *   CommunityTopicChips
- *   AskQuestionComposer
- *   FeedSortTabs
- *   PostCard per discussion
- *   AskQuestionButton floating bottom-right, AskQuestionSheet behind both entry points
- *
- * Hamjamiyat is a tab, so there is no back button and the app module draws the bottom bar.
- */
 package uz.asos.feature.community.feed
 
 import androidx.compose.foundation.background
@@ -70,7 +55,6 @@ internal fun CommunityFeedRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Back from a discussion: pick up new comments and vote counts.
     LifecycleResumeEffect(Unit) {
         viewModel.onAction(CommunityFeedAction.OnResume)
         onPauseOrDispose { }

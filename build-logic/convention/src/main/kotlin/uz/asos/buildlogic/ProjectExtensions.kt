@@ -1,10 +1,3 @@
-/*
- * ProjectExtensions.kt
- * Module: :build-logic   ·   Work package: WP-00
- *
- * Shared helpers for the convention plugins: version catalog access and the SDK / JVM
- * settings every Android module uses.
- */
 package uz.asos.buildlogic
 
 import com.android.build.api.dsl.CommonExtension

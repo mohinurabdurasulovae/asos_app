@@ -1,10 +1,3 @@
-/*
- * CaseScenarioCard.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazus — yechim (design artboard: Kazus.dc.html)
- *
- * The person, the story (serif, as in the reader) and the question in brand blue.
- */
 package uz.asos.feature.cases.detail.components
 
 import androidx.compose.foundation.background

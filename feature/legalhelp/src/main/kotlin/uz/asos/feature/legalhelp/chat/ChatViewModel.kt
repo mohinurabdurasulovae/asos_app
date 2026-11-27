@@ -1,18 +1,3 @@
-/*
- * ChatViewModel.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- * Screen: Advokat bilan chat (design artboard: Chat.dc.html)
- *
- * Holds StateFlow<ChatUiState> and handles ChatAction. No Android UI types.
- *
- * The API has no push or websocket for chats, so while the screen is visible (OnResume →
- * OnPause) the conversation is re-read every [POLL_MS] to show the lawyer's replies.
- *
- * API used (through LegalHelpRepository, see docs/api/openapi.yaml):
- *  - GET  /v1/conversations/{id}           conversation + messages (token)
- *  - POST /v1/conversations/{id}/messages  send (token)
- *  - POST /v1/conversations/{id}/read      mark the lawyer's messages read (token)
- */
 package uz.asos.feature.legalhelp.chat
 
 import androidx.lifecycle.SavedStateHandle
@@ -45,11 +30,6 @@ class ChatViewModel @Inject constructor(
     private val repository: LegalHelpRepository,
 ) : ViewModel() {
 
-    /**
-     * ChatRoute(chatId) stores its argument under "chatId": the conversation id from
-     * POST /v1/lawyers/{id}/conversations. Read directly (instead of toRoute()) so the
-     * ViewModel stays testable on the plain JVM.
-     */
     private val conversationId: Int = checkNotNull(savedStateHandle.get<Int>(CHAT_ID_ARG)) {
         "ChatViewModel needs the \"$CHAT_ID_ARG\" navigation argument"
     }
@@ -77,7 +57,6 @@ class ChatViewModel @Inject constructor(
                 pollJob = null
             }
             ChatAction.OnSendErrorShown -> _uiState.update { it.copy(sendError = null) }
-            // Navigation and system actions are handled by ChatRoute.
             ChatAction.OnBackClick,
             ChatAction.OnSignInClick,
             is ChatAction.OnArticleClick,
@@ -89,8 +68,6 @@ class ChatViewModel @Inject constructor(
             -> Unit
         }
     }
-
-    // ------------------------------------------------------------------ loading
 
     private fun load(showSkeleton: Boolean) {
         loadJob?.cancel()
@@ -107,7 +84,6 @@ class ChatViewModel @Inject constructor(
             is AsosResult.Error -> _uiState.update {
                 when {
                     result.code == AsosErrorCode.UNAUTHORIZED -> it.copy(isLoading = false, needsSignIn = true)
-                    // A failed background refresh keeps the chat on screen.
                     !showSkeleton && it.lawyer != null -> it
                     else -> it.copy(isLoading = false, errorMessage = result.message)
                 }
@@ -118,7 +94,6 @@ class ChatViewModel @Inject constructor(
     private fun apply(detail: ConversationDetail) {
         val loaded = detail.messages.map { it.toUi() }
         _uiState.update { state ->
-            // Keep messages sent while this request was in flight.
             val loadedIds = loaded.mapTo(HashSet()) { it.id }
             val pending = state.messages.filter { it.fromMe && it.id !in loadedIds && it.id > (loaded.lastOrNull()?.id ?: 0) }
             state.copy(
@@ -148,8 +123,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    // ------------------------------------------------------------------ sending
-
     private fun send(text: String, fromInput: Boolean) {
         val trimmed = text.trim()
         val state = _uiState.value
@@ -165,7 +138,6 @@ class ChatViewModel @Inject constructor(
                 is AsosResult.Error -> _uiState.update {
                     it.copy(
                         isSending = false,
-                        // Put the text back so the user doesn't lose it.
                         input = if (fromInput && it.input.isEmpty()) trimmed else it.input,
                         sendError = result.message,
                         needsSignIn = result.code == AsosErrorCode.UNAUTHORIZED,
@@ -180,8 +152,6 @@ class ChatViewModel @Inject constructor(
         const val POLL_MS = 8_000L
     }
 }
-
-// ---------------------------------------------------------------------- mapping to UI models
 
 private fun Lawyer.toChatUi() = ChatLawyerUi(
     name = UzbekFormatters.display(name),

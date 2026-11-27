@@ -1,10 +1,3 @@
-/*
- * AsosPreviews.kt
- * Module: :core:ui   ·   Work package: WP-01
- *
- * Multi-preview annotation: the design's phone size (390×844) and the same screen with
- * large system font, to catch text that overflows.
- */
 package uz.asos.core.ui.preview
 
 import androidx.compose.ui.tooling.preview.Preview

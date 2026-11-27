@@ -1,12 +1,3 @@
-/*
- * TopicTestCard.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * White card with one row per quiz ("Mavzular bo‘yicha testlar"). Three row looks:
- *  - IN_PROGRESS: title + percent, progress bar, "12 savol · 9/12 to‘g‘ri · Davom etish"
- *  - NEW:         title, "10 savol · ≈ 6 daqiqa", blue "Boshlash" button
- *  - DONE:        title, green "8/8 to‘g‘ri · Tugallangan", green check
- */
 package uz.asos.feature.learn.hub.components
 
 import androidx.compose.foundation.background

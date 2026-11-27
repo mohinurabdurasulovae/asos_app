@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:constitution. Prefix keys with 'constitution_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
-    <!-- Konstitutsiya (browse) -->
     <string name="constitution_title">Konstitutsiya</string>
     <string name="constitution_saved_button">Saqlanganlar</string>
     <string name="constitution_search_placeholder">Modda raqami yoki so‘z, masalan: ta’lim</string>
@@ -30,7 +27,6 @@
     <string name="constitution_signin_action">Kirish</string>
     <string name="constitution_load_error_title">Konstitutsiyani yuklab bo‘lmadi</string>
 
-    <!-- Modda (article reader) -->
     <string name="constitution_back">Orqaga</string>
     <string name="constitution_text_size">Matn o‘lchami</string>
     <string name="constitution_save">Saqlash</string>

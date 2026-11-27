@@ -1,11 +1,3 @@
-/*
- * DictionaryViewModel.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * Loads the terms, debounces the search box, groups the results under their letter and keeps
- * the saved-terms count in step.
- */
 package uz.asos.feature.dictionary
 
 import androidx.lifecycle.SavedStateHandle
@@ -30,7 +22,6 @@ class DictionaryViewModel @Inject constructor(
     private val dictionaryRepository: DictionaryRepository,
 ) : ViewModel() {
 
-    /** DictionaryRoute(termSlug): "" = just the list. */
     private val openSlug: String = savedStateHandle.get<String>(KEY_ARG).orEmpty()
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
@@ -70,14 +61,12 @@ class DictionaryViewModel @Inject constructor(
                 load()
                 loadTermOfTheDay()
             }
-            // Navigation is handled by DictionaryRoute.
             is DictionaryAction.OnArticleClick,
             DictionaryAction.OnBackClick,
             -> Unit
         }
     }
 
-    /** The search box reloads a short moment after the user stops typing. */
     private fun scheduleSearch(immediate: Boolean = false) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -123,7 +112,6 @@ class DictionaryViewModel @Inject constructor(
     private fun loadTermOfTheDay() {
         viewModelScope.launch {
             val result = dictionaryRepository.getTermOfTheDay()
-            // The card is decoration: a failure must not take the list down with it.
             if (result is AsosResult.Success) {
                 _uiState.update { it.copy(termOfTheDay = result.data) }
             }
@@ -161,7 +149,6 @@ class DictionaryViewModel @Inject constructor(
                 )
             }
             state.copy(
-                // In "Saqlangan" an unsaved term leaves the list at once.
                 groups = if (state.savedOnly && !nowSaved) {
                     groups.map { it.copy(terms = it.terms.filter { term -> term.id != termId }) }
                         .filter { it.terms.isNotEmpty() }
@@ -185,7 +172,6 @@ class DictionaryViewModel @Inject constructor(
     }
 }
 
-/** Keeps the API's order and starts a new group whenever the letter changes. */
 private fun List<TermSummary>.groupIntoLetters(): List<TermGroupUi> {
     val groups = mutableListOf<TermGroupUi>()
     forEach { term ->

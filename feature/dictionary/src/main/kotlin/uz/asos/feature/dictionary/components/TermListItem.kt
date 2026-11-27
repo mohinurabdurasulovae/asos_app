@@ -1,10 +1,3 @@
-/*
- * TermListItem.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * White R18 row: term, short definition, the articles it points at, bookmark on the right.
- */
 package uz.asos.feature.dictionary.components
 
 import androidx.compose.foundation.layout.Arrangement

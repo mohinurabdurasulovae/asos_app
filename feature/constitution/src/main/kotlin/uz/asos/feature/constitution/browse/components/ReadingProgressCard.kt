@@ -1,11 +1,3 @@
-/*
- * ReadingProgressCard.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * "Oxirgi o‘qilgan" card: dark serif number tile, title, chapter + minutes left, and a play
- * button that continues reading. Shown only when the user is signed in and has progress.
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.foundation.background

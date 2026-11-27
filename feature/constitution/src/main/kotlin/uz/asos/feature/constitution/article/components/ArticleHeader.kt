@@ -1,11 +1,3 @@
-/*
- * ArticleHeader.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Chapter title (blue), "50-modda" in large serif, editorial title, and tags:
- * topics · reading time · "01.05.2023 dan kuchda".
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.layout.Arrangement

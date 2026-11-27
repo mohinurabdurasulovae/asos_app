@@ -1,10 +1,3 @@
-/*
- * QuizTopBar.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * X button, progress strip (green = right, red = wrong, blue = current, grey = not yet) and
- * the "5/10" counter.
- */
 package uz.asos.feature.learn.quiz.components
 
 import androidx.compose.foundation.background
@@ -79,7 +72,6 @@ internal fun QuizTopBar(
     }
 }
 
-/** 44 dp X button (also used on the sign-in, error and result views). */
 @Composable
 internal fun QuizCloseButton(
     onClose: () -> Unit,

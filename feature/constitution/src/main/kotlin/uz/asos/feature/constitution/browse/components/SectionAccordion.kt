@@ -1,12 +1,3 @@
-/*
- * SectionAccordion.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * Expandable bo‘lim with its chapters (chevron down / up), plus the Muqaddima row.
- * Collapsed: outlined card. Expanded: blue-bordered card with a soft shadow, chapter rows
- * separated by thin dividers; an opened chapter lists its articles below it.
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.animation.AnimatedVisibility
@@ -135,7 +126,6 @@ private fun SectionHeaderRow(
     }
 }
 
-/** "§ Muqaddima — “Biz, O‘zbekistonning yagona xalqi…”" row at the top of the contents. */
 @Composable
 internal fun PreambleRow(
     onClick: () -> Unit,

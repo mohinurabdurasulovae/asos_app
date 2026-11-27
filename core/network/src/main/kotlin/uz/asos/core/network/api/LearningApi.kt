@@ -1,9 +1,3 @@
-/*
- * LearningApi.kt
- * Module: :core:network   ·   Work package: WP-07
- *
- * Retrofit interface for the O‘rganish tag of docs/api/openapi.yaml.
- */
 package uz.asos.core.network.api
 
 import retrofit2.http.Body
@@ -18,18 +12,12 @@ import uz.asos.core.network.dto.LearnResponseDto
 
 interface LearningApi {
 
-    /** The whole O‘rganish screen (optional token: adds overview, dailyGoal, points, streak). */
     @GET("v1/learn")
     suspend fun getLearn(): LearnResponseDto
 
-    /**
-     * Opens an attempt (token required). An unfinished attempt is returned instead of a new
-     * one, so "Davom etish" works without extra state. [quizId] = id or slug.
-     */
     @POST("v1/quizzes/{id}/attempts")
     suspend fun startAttempt(@Path("id") quizId: String): AttemptResponseDto
 
-    /** Answers one question. A second answer to the same question is rejected with 409. */
     @POST("v1/attempts/{id}/answers")
     suspend fun answer(
         @Path("id") attemptId: Int,

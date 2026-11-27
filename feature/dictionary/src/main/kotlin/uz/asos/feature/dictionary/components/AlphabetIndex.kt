@@ -1,11 +1,3 @@
-/*
- * AlphabetIndex.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * The rail down the right edge: every Uzbek letter, the selected one in a brand circle.
- * Letters with no terms are dimmed and not clickable.
- */
 package uz.asos.feature.dictionary.components
 
 import androidx.compose.foundation.background

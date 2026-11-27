@@ -1,24 +1,15 @@
-/*
- * CommunityDto.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * Wire shapes of the Hamjamiyat tag in docs/api/openapi.yaml.
- */
 package uz.asos.core.network.dto
 
 import kotlinx.serialization.Serializable
 
-/** GET /v1/posts */
 @Serializable
 data class PostsResponseDto(
     val ok: Boolean = true,
     val items: List<PostBriefDto> = emptyList(),
     val meta: ListMetaDto? = null,
-    /** Echo of the sort actually applied. */
     val sort: String? = null,
 )
 
-/** GET /v1/communities */
 @Serializable
 data class CommunitiesResponseDto(
     val ok: Boolean = true,
@@ -66,19 +57,16 @@ data class PostBriefDto(
     val tags: List<String> = emptyList(),
     val upvotes: Int = 0,
     val commentCount: Int = 0,
-    /** open · awaiting_lawyer · answered */
     val status: String? = null,
     val createdAt: String = "",
     val author: AuthorDto = AuthorDto(),
     val community: CommunityDto? = null,
     val article: ArticleRefDto? = null,
     val bestAnswer: BestAnswerDto? = null,
-    /** +1, 0 or -1. */
     val myVote: Int = 0,
     val isSaved: Boolean = false,
 )
 
-/** GET /v1/posts/{id} */
 @Serializable
 data class PostResponseDto(
     val ok: Boolean = true,
@@ -128,11 +116,9 @@ data class CommentDto(
     val author: AuthorDto = AuthorDto(),
     val article: ArticleRefDto? = null,
     val isMine: Boolean = false,
-    /** One nested level; the API lifts anything deeper to the root. */
     val replies: List<CommentDto> = emptyList(),
 )
 
-/** POST /v1/posts */
 @Serializable
 data class CreatePostRequestDto(
     val title: String,
@@ -143,7 +129,6 @@ data class CreatePostRequestDto(
     val articleNumber: Int? = null,
 )
 
-/** POST /v1/posts/{id}/comments */
 @Serializable
 data class CreateCommentRequestDto(
     val body: String,
@@ -157,10 +142,8 @@ data class CommentResponseDto(
     val comment: CommentDto? = null,
 )
 
-/** POST /v1/posts/{id}/vote and the comment vote. */
 @Serializable
 data class VoteRequestDto(
-    /** +1, 0 or -1. */
     val value: Int,
 )
 
@@ -171,7 +154,6 @@ data class VoteResponseDto(
     val myVote: Int = 0,
 )
 
-/** POST /v1/communities/{slug}/join */
 @Serializable
 data class JoinResponseDto(
     val ok: Boolean = true,

@@ -1,11 +1,3 @@
-/*
- * TopicComponents.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * Topic chips under the "Oxirgi o‘qilgan" card ("Barchasi" + topics from GET /v1/topics),
- * and topic rows for the Mavzular tab.
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.foundation.background
@@ -115,7 +107,6 @@ internal fun TopicListItem(
     }
 }
 
-/** Picks an icon from the topic slug/title (the API's `icon` names are not fixed yet). */
 private fun topicIcon(slug: String, title: String): ImageVector {
     val key = "$slug $title".lowercase()
     return when {

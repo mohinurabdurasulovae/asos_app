@@ -1,9 +1,3 @@
-/*
- * DefaultLearningRepository.kt
- * Module: :core:data   ·   Work package: WP-07
- *
- * LearningRepository backed by LearningApi.
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -62,7 +56,6 @@ internal class DefaultLearningRepository @Inject constructor(
     private suspend fun <T> io(block: suspend () -> T): T = withContext(ioDispatcher) { block() }
 
     private companion object {
-        /** openapi.yaml: seconds is 0..3600. */
         const val MAX_SECONDS = 3600
     }
 }

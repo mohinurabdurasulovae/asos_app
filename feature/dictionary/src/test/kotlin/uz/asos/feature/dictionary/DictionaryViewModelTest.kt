@@ -1,8 +1,3 @@
-/*
- * DictionaryViewModelTest.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- */
 package uz.asos.feature.dictionary
 
 import androidx.lifecycle.SavedStateHandle
@@ -37,7 +32,6 @@ class DictionaryViewModelTest {
 
         assertFalse(state.isLoading)
         assertNull(state.errorMessage)
-        // Sample data holds A, D and E terms, in that API order.
         assertEquals(listOf("D", "E", "A"), state.groups.map { it.letter })
         assertEquals(4, state.groups.first { it.letter == "D" }.terms.size)
     }
@@ -72,7 +66,6 @@ class DictionaryViewModelTest {
         vm.onAction(DictionaryAction.OnQueryChange("Davlat"))
         advanceUntilIdle()
 
-        // Three keystrokes, one reload.
         assertEquals(callsBefore + 1, repository.termsCalls)
         assertEquals("Davlat", repository.queries.last())
         assertTrue(

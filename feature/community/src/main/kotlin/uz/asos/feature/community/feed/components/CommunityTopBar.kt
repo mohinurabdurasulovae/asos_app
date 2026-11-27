@@ -1,10 +1,3 @@
-/*
- * CommunityTopBar.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * "Hamjamiyat" with the search and saved buttons. No back arrow: this is a tab.
- */
 package uz.asos.feature.community.feed.components
 
 import androidx.compose.foundation.layout.Arrangement

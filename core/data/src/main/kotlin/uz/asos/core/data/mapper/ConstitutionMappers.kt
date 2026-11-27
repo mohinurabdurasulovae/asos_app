@@ -1,9 +1,3 @@
-/*
- * ConstitutionMappers.kt
- * Module: :core:data   ·   Work package: WP-02
- *
- * DTO → core:model mappers for the Constitution endpoints.
- */
 package uz.asos.core.data.mapper
 
 import uz.asos.core.model.constitution.Article
@@ -39,14 +33,12 @@ import uz.asos.core.network.dto.SectionDto
 import uz.asos.core.network.dto.TermBriefDto
 import uz.asos.core.network.dto.TopicDto
 
-/** Chapter.status: not_started | in_progress | done. */
 internal fun chapterStatus(value: String): ReadingStatus = when (value) {
     "done" -> ReadingStatus.READ
     "in_progress" -> ReadingStatus.IN_PROGRESS
     else -> ReadingStatus.NOT_STARTED
 }
 
-/** ReadingProgress.status: reading | read. */
 internal fun ReadingProgressDto.asModel() = ReadingProgress(
     status = if (status == "read") ReadingStatus.READ else ReadingStatus.IN_PROGRESS,
     seconds = seconds,
@@ -137,7 +129,6 @@ internal fun ArticleDto.asModel() = Article(
     parts = parts.sortedBy { it.partNo }.map {
         ArticlePart(partNo = it.partNo, body = it.body, highlights = it.highlight, isExtra = it.isExtra)
     }.ifEmpty {
-        // No `parts` (e.g. the preamble): show `text` as a single block.
         text?.takeIf { it.isNotBlank() }
             ?.let { listOf(ArticlePart(partNo = 1, body = it.trim(), highlights = emptyList(), isExtra = false)) }
             .orEmpty()

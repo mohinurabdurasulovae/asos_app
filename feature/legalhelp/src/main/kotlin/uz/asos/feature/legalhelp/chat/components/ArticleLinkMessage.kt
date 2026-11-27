@@ -1,11 +1,3 @@
-/*
- * ArticleLinkMessage.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * Navy article card inside a message bubble: "31-modda · Shaxsiy hayot va uy-joy
- * daxlsizligi" → opens the article reader. Kept here because core:designsystem
- * ArticleLinkCard is still a placeholder. TODO(WP-01): use ArticleLinkCard once it exists.
- */
 package uz.asos.feature.legalhelp.chat.components
 
 import androidx.compose.foundation.background

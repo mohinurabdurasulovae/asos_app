@@ -1,10 +1,3 @@
-/*
- * AsosCard.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. White rounded card. Elevated = soft shadow (most cards);
- * outlined = 1 dp border (lists such as the Konstitutsiya table of contents).
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

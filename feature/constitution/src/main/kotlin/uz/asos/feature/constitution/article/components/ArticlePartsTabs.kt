@@ -1,11 +1,3 @@
-/*
- * ArticlePartsTabs.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * "Modda bo‘limlari" tabs: Rasmiy matn · Sodda tilda · Misollar · Bog‘liq. Tapping a tab
- * scrolls to that part of the page; the active tab follows the scroll position.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.annotation.StringRes
@@ -43,7 +35,6 @@ import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.core.designsystem.theme.AsosTheme
 import uz.asos.feature.constitution.R
 
-/** The parts of the reader the tabs jump to. */
 enum class ReaderSection(@StringRes val labelRes: Int) {
     OFFICIAL(R.string.constitution_tab_official),
     PLAIN(R.string.constitution_tab_plain),

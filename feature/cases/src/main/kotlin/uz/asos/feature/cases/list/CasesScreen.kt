@@ -1,20 +1,3 @@
-/*
- * CasesScreen.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * Layout (top to bottom, 16 dp gutters, 12 dp gaps):
- *   CasesHeader (back · "Kazuslar" · sort button · intro)
- *   CaseCategoryChips
- *   DifficultyFilter
- *   FeaturedCaseCard ("Haftaning kazusi")
- *   CaseListItem per case
- *   CasesFilterSheet behind the sort button
- *
- * CasesRoute collects the ViewModel; CasesScreen(uiState, onAction) is stateless and
- * previewable. Kazuslar is not a tab, so this screen is full width with a back button and no
- * bottom bar (the app module owns the tab bar).
- */
 package uz.asos.feature.cases.list
 
 import androidx.compose.foundation.background

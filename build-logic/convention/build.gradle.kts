@@ -1,5 +1,3 @@
-// :build-logic:convention  ·  WP-00
-// Registers the convention plugins every module applies.
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 

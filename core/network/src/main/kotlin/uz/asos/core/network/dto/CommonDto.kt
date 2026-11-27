@@ -1,11 +1,3 @@
-/*
- * CommonDto.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * Shapes shared by every endpoint (openapi.yaml: Error, ListMeta, ArticleRef).
- * Every response is a flat JSON object with "ok": true plus its fields; errors are
- * { "ok": false, "error": "<code>", "message": "<Uzbek text>" }.
- */
 package uz.asos.core.network.dto
 
 import kotlinx.serialization.Serializable

@@ -1,4 +1,3 @@
-// Root settings  ·  WP-00
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -39,7 +38,3 @@ include(":feature:dictionary")
 include(":feature:learn")
 include(":feature:legalhelp")
 include(":feature:profile")
-
-// Every feature module is in. Still placeholders (their build.gradle.kts files are empty),
-// so they are not included yet:
-//   :core:database   :core:domain

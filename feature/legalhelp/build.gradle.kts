@@ -1,6 +1,3 @@
-// :feature:legalhelp  ·  WP-10
-// Huquqiy yordam (legal help) + Advokat bilan chat.
-// NEVER depend on another :feature:* module. Navigate through core:navigation routes.
 plugins {
     alias(libs.plugins.asos.android.feature)
 }

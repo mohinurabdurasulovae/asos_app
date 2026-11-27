@@ -1,10 +1,3 @@
-/*
- * ArticleNumberBadge.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Serif number tile: article numbers ("50", "31") and chapter roman
- * numerals ("IX"). Dark (Navy), Brand (current chapter) and Light (#F5F8FC) variants.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.background

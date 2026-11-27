@@ -1,10 +1,3 @@
-/*
- * FakeLegalHelpRepository.kt
- * Module: :core:testing   ·   Work package: WP-02 (legal-help slice written with WP-10)
- *
- * In-memory LegalHelpRepository for ViewModel tests. Every result is a var, so a test can
- * swap in an error; calls are recorded for assertions. Sample content: LegalHelpSampleData.
- */
 package uz.asos.core.testing.repository
 
 import uz.asos.core.common.result.AsosErrorCode
@@ -31,7 +24,6 @@ class FakeLegalHelpRepository : LegalHelpRepository {
         AsosResult.Success(CallbackRequestResult(requestId = 7, phone = "+998901234567", status = "new"))
     var bookingResult: AsosResult<BookingResult> =
         AsosResult.Success(BookingResult(bookingId = 3, slotAt = "2026-11-21 15:00", status = "pending"))
-    /** null = echo the sent text back as my message. */
     var sendResult: AsosResult<ChatMessage>? = null
 
     val askedQuestions = mutableListOf<String>()

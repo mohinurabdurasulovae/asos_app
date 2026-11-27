@@ -1,9 +1,3 @@
-/*
- * FakeUserRepository.kt
- * Module: :core:testing   ·   Work package: WP-02 / WP-11
- *
- * In-memory fake of UserRepository. Sample content: ProfileSampleData.
- */
 package uz.asos.core.testing.repository
 
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,3 @@
-/*
- * LearnViewModelTest.kt
- * Module: :feature:learn   ·   Work package: WP-07
- */
 package uz.asos.feature.learn.hub
 
 import org.junit.Assert.assertEquals

@@ -1,14 +1,3 @@
-/*
- * ChatScreen.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- * Screen: Advokat bilan chat (design artboard: Chat.dc.html)
- *
- * ChatRoute connects the ViewModel and handles navigation, file opening and snackbars;
- * ChatScreen(uiState, onAction) is stateless and previewable.
- *
- * Layout: ChatTopBar · day headers ("Bugun") + MessageBubbles ·
- *         QuickReplyChips · ChatComposer (above the keyboard).
- */
 package uz.asos.feature.legalhelp.chat
 
 import android.content.ActivityNotFoundException
@@ -80,7 +69,6 @@ internal fun ChatRoute(
         }
     }
 
-    // Refresh for the lawyer's replies only while the chat is on screen.
     LifecycleResumeEffect(viewModel) {
         viewModel.onAction(ChatAction.OnResume)
         onPauseOrDispose { viewModel.onAction(ChatAction.OnPause) }
@@ -113,7 +101,6 @@ internal fun ChatRoute(
                         }
                     }
                 }
-                // No calls, uploads or voice messages in the API yet.
                 ChatAction.OnCallClick,
                 ChatAction.OnVideoCallClick,
                 ChatAction.OnAttachClick,
@@ -229,7 +216,6 @@ private fun MessageList(
     val listState = rememberLazyListState()
     val todayLabel = stringResource(R.string.legalhelp_chat_today)
 
-    // One header per day, then that day's messages.
     val rows = remember(uiState.messages, uiState.today) {
         buildList {
             var lastDay: String? = null
@@ -243,7 +229,6 @@ private fun MessageList(
         }
     }
 
-    // Keep the newest message in view.
     LaunchedEffect(rows.size) {
         if (rows.isNotEmpty()) listState.animateScrollToItem(rows.lastIndex)
     }
@@ -289,8 +274,6 @@ private fun DayHeader(label: String) {
         )
     }
 }
-
-// ---------------------------------------------------------------------- previews
 
 private val PreviewLawyer = ChatLawyerUi(
     name = "Sardor Rahimov",

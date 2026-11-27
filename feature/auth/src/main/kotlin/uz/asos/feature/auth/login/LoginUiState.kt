@@ -10,6 +10,5 @@ data class LoginUiState(
 sealed interface LoginEvent {
     data object SignedIn : LoginEvent
 
-    /** Google needs its SDK and a client id before the button can do anything. */
     data object GoogleUnavailable : LoginEvent
 }

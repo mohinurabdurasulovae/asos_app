@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:legalhelp. Prefix keys with 'legalhelp_'. -->
-<!-- All user-facing text is Uzbek (Latin script). Texts that the API sends (AI card, hints,
-     error messages) are shown as they come; these are fallbacks and UI labels. -->
 <resources>
-    <!-- Huquqiy yordam -->
     <string name="legalhelp_title">Huquqiy yordam</string>
     <string name="legalhelp_back">Orqaga</string>
     <string name="legalhelp_quote">“Har kimga malakali yuridik yordam olish huquqi kafolatlanadi.”</string>
@@ -13,7 +9,6 @@
     <string name="legalhelp_sign_in_required">Buning uchun tizimga kiring</string>
     <string name="legalhelp_cancel">Bekor qilish</string>
 
-    <!-- AI yordamchi -->
     <string name="legalhelp_ai_title">Asos AI yordamchi</string>
     <string name="legalhelp_ai_subtitle">Tegishli moddalarni topib, sodda tushuntiradi</string>
     <string name="legalhelp_ai_placeholder">Vaziyatingizni yozing, masalan: ish beruvchi ikki oydan beri maoshni kechiktirmoqda…</string>
@@ -25,7 +20,6 @@
     <string name="legalhelp_ai_sign_in">AI yordamchiga savol berish uchun tizimga kiring.</string>
     <string name="legalhelp_article_label">%1$d-modda</string>
 
-    <!-- Ishonch telefoni -->
     <string name="legalhelp_hotline_title">Ishonch telefoni</string>
     <string name="legalhelp_hotline_every_day">Har kuni %1$s</string>
     <string name="legalhelp_hotline_free">bepul</string>
@@ -41,7 +35,6 @@
     <string name="legalhelp_callback_invalid">Raqamni to‘liq kiriting, masalan +998 90 123 45 67</string>
     <string name="legalhelp_callback_send">Yuborish</string>
 
-    <!-- Advokatlar -->
     <string name="legalhelp_lawyers_title">Advokatlar</string>
     <string name="legalhelp_lawyers_online">%1$d nafari onlayn</string>
     <string name="legalhelp_lawyers_empty">Bu yo‘nalishda advokat topilmadi</string>
@@ -63,7 +56,6 @@
     <string name="legalhelp_video_call">Video qo‘ng‘iroq</string>
     <string name="legalhelp_online">Onlayn</string>
 
-    <!-- Chat -->
     <string name="legalhelp_chat_status_online">Onlayn · advokat</string>
     <string name="legalhelp_chat_status_offline">Oflayn · advokat</string>
     <string name="legalhelp_chat_today">Bugun</string>

@@ -1,11 +1,3 @@
-/*
- * PlainSummarySection.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * "Sodda qilib aytganda": light blue card with a lightbulb, bullet list and the reviewer /
- * disclaimer line. Editorial content, not the official text.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

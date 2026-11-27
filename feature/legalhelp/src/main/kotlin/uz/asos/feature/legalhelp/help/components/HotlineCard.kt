@@ -1,10 +1,3 @@
-/*
- * HotlineCard.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- *
- * "Ishonch telefoni": free legal hotline with opening hours, open/closed status, the number,
- * and two buttons (call now, request a call back).
- */
 package uz.asos.feature.legalhelp.help.components
 
 import androidx.compose.foundation.background

@@ -1,10 +1,3 @@
-/*
- * SavedTermsFilter.kt
- * Module: :feature:dictionary   ·   Work package: WP-06
- * Screen: Konstitutsiyaviy lug'at (design artboard: Lugat.dc.html)
- *
- * Two pills: "Barcha atamalar" and "Saqlangan" with the saved count.
- */
 package uz.asos.feature.dictionary.components
 
 import androidx.compose.foundation.BorderStroke

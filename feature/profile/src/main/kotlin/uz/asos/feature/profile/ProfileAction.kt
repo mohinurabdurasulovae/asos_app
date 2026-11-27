@@ -1,9 +1,3 @@
-/*
- * ProfileAction.kt
- * Module: :feature:profile   ·   Work package: WP-11
- *
- * Everything the user can do on the Profil screen.
- */
 package uz.asos.feature.profile
 
 import uz.asos.core.model.user.BookmarkType
@@ -14,7 +8,6 @@ sealed interface ProfileAction {
 
     data object OnAchievementsClick : ProfileAction
 
-    /** A "Saqlanganlar" row: opens that list. */
     data class OnSavedClick(val type: BookmarkType) : ProfileAction
 
     data object OnPersonalDataClick : ProfileAction
@@ -43,6 +36,5 @@ sealed interface ProfileAction {
 
     data object OnRetry : ProfileAction
 
-    /** Screen is visible again: refresh points and streak quietly. */
     data object OnResume : ProfileAction
 }

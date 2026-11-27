@@ -1,10 +1,3 @@
-/*
- * SavedItemsSection.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- *
- * "Saqlanganlar": Moddalar, Muhokamalar, Atamalar, each with its count and a chevron.
- */
 package uz.asos.feature.profile.components
 
 import androidx.compose.foundation.background

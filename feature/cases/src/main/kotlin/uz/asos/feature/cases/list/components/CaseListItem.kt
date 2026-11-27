@@ -1,10 +1,3 @@
-/*
- * CaseListItem.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- *
- * Number, category tag, difficulty bars, status badge, title, summary.
- */
 package uz.asos.feature.cases.list.components
 
 import androidx.compose.foundation.layout.Arrangement

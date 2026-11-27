@@ -1,11 +1,3 @@
-/*
- * ArticleList.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * Article rows used in search results, a topic's articles, Saqlangan, and inside an opened
- * chapter. Same visual language as the chapter rows: serif number tile, title, meta, status.
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.foundation.clickable
@@ -45,7 +37,6 @@ import uz.asos.feature.constitution.browse.ArticleListState
 import uz.asos.feature.constitution.browse.ArticleRowUi
 import uz.asos.feature.constitution.browse.ReadState
 
-/** One article row. [compact] = inside an opened chapter (smaller tile, more indent). */
 @Composable
 internal fun ArticleListItem(
     article: ArticleRowUi,
@@ -87,9 +78,6 @@ internal fun ArticleListItem(
     }
 }
 
-/**
- * A whole list in a card: loading spinner, rows with dividers, empty message or error.
- */
 @Composable
 internal fun ArticleListSection(
     state: ArticleListState,
@@ -135,7 +123,6 @@ internal fun ArticleListSection(
     }
 }
 
-/** Articles shown under an opened chapter, inside the section card. */
 @Composable
 internal fun ChapterArticles(
     state: ArticleListState?,

@@ -1,9 +1,3 @@
-/*
- * AndroidComposeConventionPlugin.kt
- * Module: :build-logic   ·   Work package: WP-00
- *
- * Compose compiler + BOM. Apply after asos.android.application or asos.android.library.
- */
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin

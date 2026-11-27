@@ -1,10 +1,3 @@
-/*
- * AndroidFeatureConventionPlugin.kt
- * Module: :build-logic   ·   Work package: WP-00
- *
- * Library + Compose + Hilt + core:designsystem/ui/navigation/model for every :feature:*
- * module. A feature adds :core:data (and later :core:domain) in its own build file.
- */
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies

@@ -1,10 +1,3 @@
-/*
- * FakeDictionaryRepository.kt
- * Module: :core:testing   ·   Work package: WP-06
- *
- * In-memory DictionaryRepository for ViewModel tests. Every result is a var, so a test can
- * swap in an error; calls are recorded for assertions. Sample content: DictionarySampleData.
- */
 package uz.asos.core.testing.repository
 
 import uz.asos.core.common.result.AsosResult
@@ -16,7 +9,6 @@ import uz.asos.core.testing.data.DictionarySampleData
 
 class FakeDictionaryRepository : DictionaryRepository {
 
-    /** null = filter DictionarySampleData the way the API would. */
     var termsResult: AsosResult<TermsPage>? = null
     var termOfTheDayResult: AsosResult<TermDetail> =
         AsosResult.Success(DictionarySampleData.termOfTheDay)

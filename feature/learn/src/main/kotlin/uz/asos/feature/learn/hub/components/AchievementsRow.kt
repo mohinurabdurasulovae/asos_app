@@ -1,10 +1,3 @@
-/*
- * AchievementsRow.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * "Yutuqlar" header with "Barchasi" and a horizontal row of 104 dp achievement cards.
- * Earned: white card, coloured icon. Locked: grey card, lock icon, "7 / 10".
- */
 package uz.asos.feature.learn.hub.components
 
 import androidx.compose.foundation.background

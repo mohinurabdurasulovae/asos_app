@@ -1,11 +1,3 @@
-/*
- * GlossaryTermChips.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * "Lug‘atda": purple chips with the dictionary terms used in this article. Tapping one opens
- * the term in the dictionary.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

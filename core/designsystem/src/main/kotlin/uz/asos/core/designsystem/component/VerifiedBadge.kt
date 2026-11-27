@@ -1,9 +1,3 @@
-/*
- * VerifiedBadge.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Reusable component. Blue verified seal next to a name or a reviewed note.
- */
 package uz.asos.core.designsystem.component
 
 import androidx.compose.foundation.layout.padding

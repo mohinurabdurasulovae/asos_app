@@ -1,17 +1,3 @@
-/*
- * QuizScreen.kt
- * Module: :feature:learn   ·   Work package: WP-07
- * Screen: Test savoli (design artboard: Test.dc.html)
- *
- * Full-screen quiz (no bottom bar), white background:
- *   QuizTopBar (X · progress strip · 5/10)
- *   QuestionCard (quiz chip · difficulty chip · timer · question)
- *   AnswerOptionList — tapping an option answers it
- *   bottom: PickAnswerBar before answering, ExplanationPanel after
- * Other phases: loading skeleton, sign-in prompt, error, QuizResultContent.
- *
- * QuizRoute collects the ViewModel; QuizScreen(uiState, onAction) is stateless and previewable.
- */
 package uz.asos.feature.learn.quiz
 
 import androidx.compose.foundation.background
@@ -195,7 +181,6 @@ private fun QuestionContent(
     }
 }
 
-/** X button at the top, message in the middle (sign-in and error phases). */
 @Composable
 private fun MessageLayout(
     onClose: () -> Unit,
@@ -211,8 +196,6 @@ private fun MessageLayout(
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) { content() }
     }
 }
-
-// ---------------------------------------------------------------------- previews
 
 private val previewQuestion = QuizUiState(
     phase = QuizPhase.QUESTION,

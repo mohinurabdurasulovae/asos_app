@@ -1,11 +1,3 @@
-/*
- * DiscussionCard.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Navy card: "24 ta muhokama" + the latest question title. Opens Hamjamiyat filtered to
- * this article.
- */
 package uz.asos.feature.constitution.article.components
 
 import androidx.compose.foundation.background

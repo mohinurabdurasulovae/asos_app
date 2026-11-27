@@ -1,11 +1,3 @@
-/*
- * AskQuestionButton.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- *
- * Two entry points to the same sheet: the composer row under the topic chips, and the
- * floating "Savol berish" button.
- */
 package uz.asos.feature.community.feed.components
 
 import androidx.compose.foundation.BorderStroke
@@ -32,7 +24,6 @@ import uz.asos.core.designsystem.theme.AsosSpacing
 import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.feature.community.R
 
-/** The row that looks like an input but opens the sheet. */
 @Composable
 internal fun AskQuestionComposer(
     initials: String?,
@@ -101,7 +92,6 @@ internal fun AskQuestionComposer(
     }
 }
 
-/** Floating "Savol berish". */
 @Composable
 internal fun AskQuestionButton(
     onClick: () -> Unit,

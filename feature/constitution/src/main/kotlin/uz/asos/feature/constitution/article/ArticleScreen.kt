@@ -1,17 +1,3 @@
-/*
- * ArticleScreen.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Modda (50-modda) (design artboard: Modda.dc.html)
- *
- * Article reader. ArticleRoute connects the ViewModel, snackbars, sharing and navigation;
- * ArticleScreen(uiState, onAction) is stateless and previewable.
- *
- * Layout (top to bottom, as on the canvas):
- *   ArticleTopBar
- *   ArticleHeader · ArticlePartsTabs · OfficialTextCard · PlainSummarySection
- *   RealLifeExamplesSection · RelatedArticlesSection + GlossaryTermChips + DiscussionCard
- *   ArticleActionsBar (fixed at the bottom) · TextSizeSheet (from "Aa")
- */
 package uz.asos.feature.constitution.article
 
 import android.content.Context
@@ -70,7 +56,6 @@ import uz.asos.feature.constitution.article.components.RealLifeExamplesSection
 import uz.asos.feature.constitution.article.components.RelatedArticlesSection
 import uz.asos.feature.constitution.article.components.TextSizeSheet
 
-/** Reading at least this long, then reaching the end, marks the article as read. */
 private const val MIN_READ_MILLIS = 5_000L
 
 @Composable
@@ -224,7 +209,6 @@ private fun ArticleContent(
         derivedStateOf { currentSection(listState, sections) }
     }
 
-    // Reaching the end after reading for a few seconds marks the article as read.
     LaunchedEffect(listState, article.key) {
         delay(MIN_READ_MILLIS)
         snapshotFlow { listState.layoutInfo.totalItemsCount > 0 && !listState.canScrollForward }.first { it }
@@ -321,7 +305,6 @@ private fun RelatedBlock(
     }
 }
 
-/** The section whose item is at (or just above) the top of the list. */
 private fun currentSection(listState: LazyListState, sections: List<ReaderSection>): ReaderSection {
     val first = listState.firstVisibleItemIndex
     if (first <= TABS_INDEX) return sections.first()
@@ -336,8 +319,6 @@ private fun shareArticle(context: Context, text: String, chooserTitle: String) {
     }
     context.startActivity(Intent.createChooser(send, chooserTitle))
 }
-
-// ---------------------------------------------------------------------- previews
 
 internal val previewArticle = ArticleUi(
     key = "50",

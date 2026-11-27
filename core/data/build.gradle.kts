@@ -1,6 +1,3 @@
-// :core:data  ·  WP-02
-// Repositories. Depends on :core:network, :core:datastore, :core:model.
-// :core:database (Room, offline copy) will be added when WP-02 builds it.
 plugins {
     alias(libs.plugins.asos.android.library)
     alias(libs.plugins.asos.hilt)

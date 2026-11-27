@@ -1,16 +1,3 @@
-/*
- * ConstitutionNavigation.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- *
- * Public entry point of this feature. Registers its screens in the app NavHost and exposes
- * navigateTo… helpers. The app module calls these and nothing else.
- *
- *  - ConstitutionScreen → ConstitutionRoute (tab "Konstitutsiya")
- *  - ArticleScreen      → ArticleRoute(key), deep link asos://article/{key}
- *
- * The screen composables are also called ConstitutionRoute / ArticleRoute (docs/ARCHITECTURE.md
- * "XRoute" pattern), so the route classes are imported here as …Destination.
- */
 package uz.asos.feature.constitution.navigation
 
 import androidx.navigation.NavController
@@ -38,10 +25,6 @@ fun NavController.navigateToArticle(key: String, navOptions: NavOptions? = null)
     navigate(ArticleDestination(key), navOptions)
 }
 
-/**
- * @param navController used for back and for replacing the reader (previous / next article).
- * @param onNavigate opens screens of other features through AsosRoutes.
- */
 fun NavGraphBuilder.constitutionScreens(
     navController: NavController,
     onNavigate: (AsosRoute) -> Unit,

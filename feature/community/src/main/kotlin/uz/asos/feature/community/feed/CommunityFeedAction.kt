@@ -1,16 +1,9 @@
-/*
- * CommunityFeedAction.kt
- * Module: :feature:community   ·   Work package: WP-09
- *
- * Everything the user can do on the Hamjamiyat screen.
- */
 package uz.asos.feature.community.feed
 
 import uz.asos.core.model.community.PostSort
 import uz.asos.core.model.community.VoteState
 
 sealed interface CommunityFeedAction {
-    /** null = "Barchasi". */
     data class OnTopicSelect(val slug: String?) : CommunityFeedAction
 
     data class OnSortSelect(val sort: PostSort) : CommunityFeedAction
@@ -43,6 +36,5 @@ sealed interface CommunityFeedAction {
 
     data object OnRetry : CommunityFeedAction
 
-    /** Screen is visible again: refresh quietly. */
     data object OnResume : CommunityFeedAction
 }

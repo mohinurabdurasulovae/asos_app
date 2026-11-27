@@ -1,8 +1,3 @@
-/*
- * PostDetailViewModelTest.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Muhokama (design artboard: Post.dc.html)
- */
 package uz.asos.feature.community.post
 
 import androidx.lifecycle.SavedStateHandle
@@ -39,7 +34,6 @@ class PostDetailViewModelTest {
         assertNotNull(state.post)
         assertEquals(1, state.bestAnswer?.id)
         assertTrue(state.bestAnswer?.isLawyer ?: false)
-        // The best answer is shown on its own, so it is not in the list below it.
         assertTrue(state.comments.none { it.isBest })
         assertEquals(1, state.comments.size)
     }
@@ -60,7 +54,6 @@ class PostDetailViewModelTest {
 
         vm.onAction(PostDetailAction.OnPostVote(VoteState.DOWN))
 
-        // The sample post is already upvoted, so a downvote swings the count by two.
         assertEquals(before - 2, vm.uiState.value.post!!.post.upvotes)
         assertEquals(VoteState.DOWN, vm.uiState.value.post!!.post.myVote)
     }

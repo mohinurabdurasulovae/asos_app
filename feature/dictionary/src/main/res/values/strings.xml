@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for :feature:dictionary. Prefix keys with 'dictionary_'. -->
-<!-- All user-facing text is Uzbek (Latin script). -->
 <resources>
     <string name="dictionary_title">Konstitutsiyaviy lug‘at</string>
     <string name="dictionary_back">Orqaga</string>

@@ -1,8 +1,3 @@
-/*
- * CommunityFeedViewModelTest.kt
- * Module: :feature:community   ·   Work package: WP-09
- * Screen: Hamjamiyat (design artboard: Hamjamiyat.dc.html)
- */
 package uz.asos.feature.community.feed
 
 import androidx.lifecycle.SavedStateHandle

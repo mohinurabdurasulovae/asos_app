@@ -1,11 +1,3 @@
-/*
- * ArticleStatusIcon.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * O‘qilgan (filled check), in progress (ring with percent), Boshlanmagan (empty circle).
- * Maps the screen's ReadState onto the shared StatusIcon.
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.runtime.Composable

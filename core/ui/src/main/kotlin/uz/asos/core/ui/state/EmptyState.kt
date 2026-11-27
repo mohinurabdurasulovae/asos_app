@@ -1,9 +1,3 @@
-/*
- * EmptyState.kt
- * Module: :core:ui   ·   Work package: WP-01
- *
- * Empty list message with an icon and an optional action.
- */
 package uz.asos.core.ui.state
 
 import androidx.compose.foundation.background

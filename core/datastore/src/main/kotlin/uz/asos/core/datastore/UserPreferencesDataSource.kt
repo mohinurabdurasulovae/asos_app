@@ -1,12 +1,3 @@
-/*
- * UserPreferencesDataSource.kt
- * Module: :core:datastore   ·   Work package: WP-02
- *
- * Reads/writes user preferences stored on the device.
- *
- * Implemented: reader text size (used by the Modda reader's "Aa" button).
- * Still to add: daily reminders on/off, language, onboarding done.
- */
 package uz.asos.core.datastore
 
 import androidx.datastore.core.DataStore

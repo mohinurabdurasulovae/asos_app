@@ -1,10 +1,3 @@
-/*
- * MainActivity.kt
- * Module: :app   ·   Work package: WP-00
- *
- * Single activity. Edge-to-edge with dark status-bar icons on the light background,
- * sets AsosTheme { AsosApp() }.
- */
 package uz.asos.app
 
 import android.graphics.Color

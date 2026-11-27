@@ -1,18 +1,3 @@
-/*
- * AsosNavHost.kt
- * Module: :app   ·   Work package: WP-00
- *
- * NavHost that calls each feature's <feature>Screens() from its navigation/ file.
- *
- * Implemented features: auth (Kirish, Ro‘yxatdan o‘tish), home (Bosh sahifa),
- * constitution (Konstitutsiya, Modda), learn (O‘rganish, Test), cases (Kazuslar,
- * Kazus — yechim), legalhelp (Huquqiy yordam, Advokat bilan chat).
- * Every other route shows ComingSoonScreen so navigation from the finished screens never
- * crashes. When a feature lands, replace its comingSoon(...) lines with <feature>Screens().
- *
- * Start destination: Bosh sahifa. Kirish opens on demand (each screen calls onSignIn when
- * an action needs a signed-in user).
- */
 package uz.asos.app.navigation
 
 import androidx.annotation.StringRes
@@ -61,13 +46,11 @@ fun AsosNavHost(
         legalHelpScreens(navController = navController, onNavigate = onNavigate)
         profileScreens(onNavigate = onNavigate)
 
-        // Not built yet ------------------------------------------------------------------
         comingSoon<SearchRoute>(R.string.app_screen_search, onBack)
         comingSoon<BookmarksRoute>(R.string.app_screen_bookmarks, onBack)
     }
 }
 
-/** Placeholder destination. [onBack] = null on tab screens (they have no back button). */
 private inline fun <reified T : Any> NavGraphBuilder.comingSoon(
     @StringRes titleRes: Int,
     noinline onBack: (() -> Unit)?,

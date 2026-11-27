@@ -1,9 +1,3 @@
-/*
- * DefaultCommunityRepository.kt
- * Module: :core:data   ·   Work package: WP-02
- *
- * CommunityRepository backed by CommunityApi.
- */
 package uz.asos.core.data.repository.impl
 
 import kotlinx.coroutines.CoroutineDispatcher
@@ -47,8 +41,6 @@ internal class DefaultCommunityRepository @Inject constructor(
         articleNumber: Int?,
         page: Int,
     ): AsosResult<PostsPage> = io {
-        // The feed and its topic chips come from two endpoints; the chips are optional, so a
-        // failure there must not hide the posts.
         val communities = apiCaller.call { communityApi.getCommunities() }
             .mapSuccess { response -> response.items.map { it.asModel() } }
             .getOrNull()

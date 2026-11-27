@@ -1,5 +1,3 @@
-// :app  ·  WP-00
-// The ONLY module that knows all features: it wires them together.
 plugins {
     alias(libs.plugins.asos.android.application)
     alias(libs.plugins.asos.android.compose)
@@ -38,7 +36,6 @@ dependencies {
     implementation(project(":feature:learn"))
     implementation(project(":feature:legalhelp"))
     implementation(project(":feature:profile"))
-    // Add the other features here as they land: :feature:dictionary, :feature:community, ...
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

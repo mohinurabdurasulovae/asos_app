@@ -1,12 +1,3 @@
-/*
- * MainDispatcherRule.kt
- * Module: :core:testing   ·   Work package: WP-02
- *
- * JUnit rule that swaps Dispatchers.Main for a test dispatcher, so ViewModels that use
- * viewModelScope can run in plain JVM tests.
- *
- *     @get:Rule val mainDispatcherRule = MainDispatcherRule()
- */
 package uz.asos.core.testing
 
 import kotlinx.coroutines.Dispatchers

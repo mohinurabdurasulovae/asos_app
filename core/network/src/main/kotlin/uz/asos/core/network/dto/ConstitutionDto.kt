@@ -1,18 +1,7 @@
-/*
- * ConstitutionDto.kt
- * Module: :core:network   ·   Work package: WP-02
- *
- * @Serializable DTOs for the Konstitutsiya endpoints. Field names mirror the OpenAPI
- * schemas exactly (ConstitutionStats, Section, Chapter, Topic, ArticleBrief, ArticlePart,
- * Article, ReadingProgress, ReadingOverview). Every field has a default so a missing or
- * new field never crashes parsing.
- */
 package uz.asos.core.network.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-// ---------------------------------------------------------------- GET /v1/constitution
 
 @Serializable
 data class ConstitutionResponseDto(
@@ -54,11 +43,8 @@ data class ChapterDto(
     val articleCount: Int = 0,
     val readCount: Int = 0,
     val percent: Int = 0,
-    /** not_started | in_progress | done */
     val status: String = "not_started",
 )
-
-// ---------------------------------------------------------------- GET /v1/topics
 
 @Serializable
 data class TopicsResponseDto(
@@ -76,8 +62,6 @@ data class TopicDto(
     val articleCount: Int = 0,
 )
 
-// ---------------------------------------------------------------- GET /v1/chapters/{roman}
-
 @Serializable
 data class ChapterResponseDto(
     val ok: Boolean = true,
@@ -91,8 +75,6 @@ data class SectionRefDto(
     val roman: String = "",
     val title: String = "",
 )
-
-// ---------------------------------------------------------------- GET /v1/articles
 
 @Serializable
 data class ArticleListResponseDto(
@@ -119,13 +101,10 @@ data class ArticleBriefDto(
 
 @Serializable
 data class ReadingProgressDto(
-    /** reading | read */
     val status: String = "reading",
     val seconds: Int = 0,
     val lastReadAt: String? = null,
 )
-
-// ---------------------------------------------------------------- GET /v1/articles/{key}
 
 @Serializable
 data class ArticleResponseDto(
@@ -147,7 +126,6 @@ data class ArticleDto(
     val chapter: ArticleChapterDto? = null,
     val topics: List<ArticleTopicDto> = emptyList(),
     val parts: List<ArticlePartDto> = emptyList(),
-    /** The whole official text as one string. The preamble sends this instead of `parts`. */
     val text: String? = null,
     val plain: PlainSummaryDto? = null,
     val examples: List<ArticleExampleDto> = emptyList(),
@@ -197,7 +175,6 @@ data class ArticleExampleDto(
     val id: Int = 0,
     val situation: String = "",
     val verdict: String = "",
-    /** ok | bad */
     val verdictKind: String = "ok",
 )
 
@@ -209,7 +186,6 @@ data class RelatedArticleDto(
     val note: String? = null,
 )
 
-/** openapi.yaml: TermBrief (also used by the dictionary). */
 @Serializable
 data class TermBriefDto(
     val id: Int = 0,
@@ -235,11 +211,8 @@ data class QuizRefDto(
     val title: String = "",
 )
 
-// ---------------------------------------------------------------- POST /v1/articles/{key}/progress
-
 @Serializable
 data class ArticleProgressRequestDto(
-    /** reading | read */
     val status: String,
     val seconds: Int? = null,
 )
@@ -254,9 +227,6 @@ data class ArticleProgressResponseDto(
     val overview: ReadingOverviewDto? = null,
 )
 
-// ---------------------------------------------------------------- ReadingOverview (GET /v1/me/progress)
-
-/** GET /v1/me/progress returns these fields flat, next to "ok". */
 @Serializable
 data class ReadingOverviewDto(
     val ok: Boolean = true,

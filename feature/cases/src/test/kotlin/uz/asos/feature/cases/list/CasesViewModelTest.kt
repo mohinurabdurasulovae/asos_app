@@ -1,8 +1,3 @@
-/*
- * CasesViewModelTest.kt
- * Module: :feature:cases   ·   Work package: WP-08
- * Screen: Kazuslar (design artboard: Kazuslar.dc.html)
- */
 package uz.asos.feature.cases.list
 
 import org.junit.Assert.assertEquals
@@ -36,7 +31,6 @@ class CasesViewModelTest {
         assertNull(state.errorMessage)
         assertNotNull(state.featured)
         assertEquals(14, state.featured?.id)
-        // Five cases in all, the featured one shown on its own card.
         assertEquals(4, state.cases.size)
         assertTrue(state.cases.none { it.id == 14 })
     }
@@ -59,7 +53,6 @@ class CasesViewModelTest {
 
         val state = vm.uiState.value
         assertTrue(state.cases.all { it.topic == CaseTopic.TALIM })
-        // The featured case is "Shaxsiy hayot", so it drops out.
         assertNull(state.featured)
     }
 

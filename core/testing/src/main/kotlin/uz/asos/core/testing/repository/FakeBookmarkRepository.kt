@@ -1,9 +1,3 @@
-/*
- * FakeBookmarkRepository.kt
- * Module: :core:testing   ·   Work package: WP-02
- *
- * In-memory fake of BookmarkRepository. [result] is returned by every call.
- */
 package uz.asos.core.testing.repository
 
 import uz.asos.core.common.result.AsosResult

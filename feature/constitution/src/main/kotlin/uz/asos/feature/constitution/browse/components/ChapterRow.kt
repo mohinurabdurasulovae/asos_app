@@ -1,11 +1,3 @@
-/*
- * ChapterRow.kt
- * Module: :feature:constitution   ·   Work package: WP-05
- * Screen: Konstitutsiya (design artboard: Konstitutsiya.dc.html)
- *
- * Bob row: roman numeral tile, title, article range, read status. The chapter being read is
- * highlighted (light blue row, blue tile). Tapping opens its articles underneath.
- */
 package uz.asos.feature.constitution.browse.components
 
 import androidx.compose.foundation.background

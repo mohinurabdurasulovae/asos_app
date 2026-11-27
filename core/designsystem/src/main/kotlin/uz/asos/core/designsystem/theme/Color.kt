@@ -1,44 +1,27 @@
-/*
- * Color.kt
- * Module: :core:designsystem   ·   Work package: WP-01
- *
- * Colour tokens from the design (Komponentlar.dc.html). Features use these, never raw hex.
- */
 package uz.asos.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
 object AsosColors {
-    /** Large surfaces, icons, progress. White small text on it is only 4.4:1. */
     val Brand500 = Color(0xFF2478DE)
-    /** Buttons and links (white text passes 4.5:1). */
     val Brand600 = Color(0xFF1C64C0)
-    /** Pressed / hover. */
     val Brand700 = Color(0xFF174F99)
-    /** Selected states, info cards. */
     val Brand50 = Color(0xFFEAF2FD)
     val Brand100 = Color(0xFFDCE9FB)
-    /** Highlighted row (e.g. chapter in progress). */
     val Brand25 = Color(0xFFF3F8FF)
     val Brand200 = Color(0xFFCFE0F7)
     val Brand300 = Color(0xFFBFD7F6)
-    /** Light accent on Navy surfaces. */
     val BrandOnNavy = Color(0xFF7FB2F0)
     val BrandOnNavySoft = Color(0xFFA9CBF5)
 
-    /** Main text, dark surfaces. */
     val Navy = Color(0xFF172B4D)
-    /** Secondary text (5.4:1 on white). */
     val Text2 = Color(0xFF5E6A80)
     val Text3 = Color(0xFF3A4A66)
-    /** Muted text on Navy surfaces. */
     val TextOnNavy = Color(0xFFC9D6EA)
-    /** Decoration and icons only, never text. */
     val SoftGray = Color(0xFF8A94A6)
 
     val Background = Color(0xFFF5F8FC)
     val Surface = Color(0xFFFFFFFF)
-    /** Neutral chip / segmented track. */
     val SurfaceMuted = Color(0xFFF0F3F8)
     val SegmentTrack = Color(0xFFE8EEF6)
     val Border = Color(0xFFE3EAF4)
@@ -61,14 +44,11 @@ object AsosColors {
     val WarningOnLight = Color(0xFF8A4B00)
     val WarningBg = Color(0xFFFDF1E1)
 
-    /** Streak flame (O‘rganish header pill, achievements). */
     val StreakFlame = Color(0xFFF08A12)
     val StreakBorder = Color(0xFFF3DDBD)
 
-    /** "Afsus, noto‘g‘ri" panel in Test savoli. */
     val ErrorPanel = Color(0xFFFDEEEC)
 
-    /** Locked achievement icon circle. */
     val LockedCircle = Color(0xFFE3E8F0)
 
     val Teal = Color(0xFF0F6B5C)
@@ -92,10 +72,6 @@ object AsosColors {
     val SlateBg = Color(0xFFEBEEF3)
 }
 
-/**
- * Colour pair for a `tone` sent by the API (Topic.tone, category tone):
- * brand, teal, orange, purple, pink, navy.
- */
 data class AsosTone(val content: Color, val container: Color)
 
 object AsosTones {

@@ -1,8 +1,3 @@
-/*
- * ProfileViewModelTest.kt
- * Module: :feature:profile   ·   Work package: WP-11
- * Screen: Profil (design artboard: Profil.dc.html)
- */
 package uz.asos.feature.profile
 
 import org.junit.Assert.assertEquals
@@ -54,7 +49,6 @@ class ProfileViewModelTest {
         assertEquals(4, progress?.nextLevel)
         assertEquals("1 240", progress?.pointsLabel)
         assertEquals("1 500", progress?.targetLabel)
-        // 240 of the 500 points between level 3 and level 4.
         assertEquals(0.48f, progress?.fraction ?: 0f, 0.001f)
     }
 

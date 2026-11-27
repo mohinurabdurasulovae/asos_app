@@ -1,9 +1,3 @@
-/*
- * QuestionCard.kt
- * Module: :feature:learn   ·   Work package: WP-07
- *
- * Quiz title chip, difficulty chip, running timer (mm:ss) and the question text (23 / 800).
- */
 package uz.asos.feature.learn.quiz.components
 
 import androidx.compose.foundation.background
@@ -106,7 +100,6 @@ private fun QuizChip(
     )
 }
 
-/** Time spent on the question; counts every second until the answer freezes it. */
 @Composable
 private fun QuizTimer(startedAt: Long, frozenSeconds: Int?) {
     val seconds by produceState(initialValue = frozenSeconds ?: elapsedSeconds(startedAt), startedAt, frozenSeconds) {

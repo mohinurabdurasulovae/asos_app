@@ -1,10 +1,3 @@
-/*
- * LegalHelpViewModelTest.kt
- * Module: :feature:legalhelp   ·   Work package: WP-10
- * Screen: Huquqiy yordam (design artboard: Yordam.dc.html)
- *
- * Unit tests for LegalHelpViewModel using fakes from core:testing (no network).
- */
 package uz.asos.feature.legalhelp.help
 
 import app.cash.turbine.test
@@ -90,8 +83,6 @@ class LegalHelpViewModelTest {
         assertEquals(3, viewModel.state.lawyers.size)
     }
 
-    // ------------------------------------------------------------------ AI
-
     @Test
     fun `assistant sends the question and shows the answer with its articles`() {
         val viewModel = createViewModel()
@@ -141,8 +132,6 @@ class LegalHelpViewModelTest {
         assertNull(viewModel.state.assistant.errorMessage)
     }
 
-    // ------------------------------------------------------------------ chat
-
     @Test
     fun `Yozish opens the conversation and sends its id`() = runTest {
         val viewModel = createViewModel()
@@ -164,8 +153,6 @@ class LegalHelpViewModelTest {
         }
         assertTrue(repository.openedLawyerIds.isEmpty())
     }
-
-    // ------------------------------------------------------------------ callback
 
     @Test
     fun `callback while signed in is sent at once`() = runTest {
@@ -204,8 +191,6 @@ class LegalHelpViewModelTest {
         assertFalse(LegalHelpViewModel.isValidUzPhone("+99890123456"))
         assertFalse(LegalHelpViewModel.isValidUzPhone("901234567"))
     }
-
-    // ------------------------------------------------------------------ booking
 
     @Test
     fun `booking asks to confirm the free slot, then books it`() = runTest {

@@ -1,11 +1,3 @@
-/*
- * CommunityNavigation.kt
- * Module: :feature:community   ·   Work package: WP-09
- *
- * Public entry point of this feature: the only file the app module uses.
- *  - CommunityRoute(articleNumber) → Hamjamiyat (tab); a number narrows the feed to one article
- *  - PostRoute(postId)             → Muhokama
- */
 package uz.asos.feature.community.navigation
 
 import androidx.navigation.NavController
@@ -34,10 +26,6 @@ fun NavController.navigateToPost(postId: Int, navOptions: NavOptions? = null) {
     navigate(PostDestination(postId), navOptions)
 }
 
-/**
- * @param navController used for back.
- * @param onNavigate opens screens of other features through AsosRoutes.
- */
 fun NavGraphBuilder.communityScreens(
     navController: NavController,
     onNavigate: (AsosRoute) -> Unit,
