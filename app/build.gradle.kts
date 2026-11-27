@@ -30,7 +30,7 @@ dependencies {
     implementation(project(":core:data"))
 
     implementation(project(":feature:constitution"))
-    implementation(project(":feature:learn"))
+    implementation(project(":feature:legalhelp"))
     // Add the other features here as they land: :feature:home, :feature:auth, ...
 
     implementation(libs.androidx.core.ktx)

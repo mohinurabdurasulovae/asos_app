@@ -1,6 +1,14 @@
 // :feature:legalhelp  ·  WP-10
-// PLACEHOLDER: build configuration goes here.
-//
-// Apply the convention plugin: asos.android.feature (brings Compose, Hilt, core:designsystem, core:ui, core:navigation).
-// Extra dependencies: project(":core:domain"), project(":core:data").
+// Huquqiy yordam (legal help) + Advokat bilan chat.
 // NEVER depend on another :feature:* module. Navigate through core:navigation routes.
+plugins {
+    alias(libs.plugins.asos.android.feature)
+}
+
+android {
+    namespace = "uz.asos.feature.legalhelp"
+}
+
+dependencies {
+    implementation(project(":core:data"))
+}

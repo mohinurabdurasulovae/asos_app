@@ -31,10 +31,10 @@ include(":core:ui")
 include(":core:testing")
 
 include(":feature:constitution")
-include(":feature:learn")
+include(":feature:legalhelp")
 
 // Still placeholders (their build.gradle.kts files are empty). Add each line when the
 // work package lands, together with the module's dependency in app/build.gradle.kts:
 //   :core:database   :core:domain
-//   :feature:auth    :feature:home       :feature:dictionary
-//   :feature:cases   :feature:community  :feature:legalhelp    :feature:profile
+//   :feature:auth    :feature:home       :feature:dictionary   :feature:learn
+//   :feature:cases   :feature:community  :feature:profile

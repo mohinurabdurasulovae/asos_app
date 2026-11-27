@@ -14,12 +14,12 @@ import dagger.hilt.components.SingletonComponent
 import uz.asos.core.data.repository.AuthRepository
 import uz.asos.core.data.repository.BookmarkRepository
 import uz.asos.core.data.repository.ConstitutionRepository
-import uz.asos.core.data.repository.LearningRepository
+import uz.asos.core.data.repository.LegalHelpRepository
 import uz.asos.core.data.repository.UserRepository
 import uz.asos.core.data.repository.impl.DefaultAuthRepository
 import uz.asos.core.data.repository.impl.DefaultBookmarkRepository
 import uz.asos.core.data.repository.impl.DefaultConstitutionRepository
-import uz.asos.core.data.repository.impl.DefaultLearningRepository
+import uz.asos.core.data.repository.impl.DefaultLegalHelpRepository
 import uz.asos.core.data.repository.impl.DefaultUserRepository
 import javax.inject.Singleton
 
@@ -45,5 +45,5 @@ internal abstract class DataModule {
 
     @Binds
     @Singleton
-    abstract fun bindsLearningRepository(impl: DefaultLearningRepository): LearningRepository
+    abstract fun bindsLegalHelpRepository(impl: DefaultLegalHelpRepository): LegalHelpRepository
 }
