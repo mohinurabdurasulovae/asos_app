@@ -94,7 +94,9 @@ private fun EmailStep(
             modifier = Modifier.fillMaxWidth(),
         )
         LinkPrompt(
-            question = stringResource(R.string.auth_no_account),
+            question = stringResource(
+                if (otp.needsRegistration) R.string.auth_no_account_found else R.string.auth_no_account,
+            ),
             link = stringResource(R.string.auth_sign_up),
             onClick = { onAction(LoginAction.OnSignUpClick) },
             enabled = !otp.isSubmitting,

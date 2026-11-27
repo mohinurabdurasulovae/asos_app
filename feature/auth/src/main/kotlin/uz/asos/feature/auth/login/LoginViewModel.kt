@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import uz.asos.core.data.repository.AuthRepository
 import uz.asos.feature.auth.common.OtpController
 import uz.asos.feature.auth.data.EmailAuthRepository
+import uz.asos.feature.auth.data.model.AuthPurpose
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,7 +34,7 @@ class LoginViewModel @Inject constructor(
         scope = viewModelScope,
         read = { _uiState.value.otp },
         write = { transform -> _uiState.update { it.copy(otp = transform(it.otp)) } },
-        sendCode = emailAuthRepository::requestCode,
+        sendCode = { email -> emailAuthRepository.requestCode(email, AuthPurpose.LOGIN) },
         checkCode = emailAuthRepository::verifyCode,
         onVerified = { _events.send(LoginEvent.SignedIn) },
     )

@@ -29,11 +29,25 @@ info:
     qiladi, lekin ilova uni ko‘rsatmaydi).
 
     1. `POST /v1/auth/request-code` — manzilga 6 xonali kod yuboriladi.
-       Jo‘natuvchi: **support@prteam.uz**. Rivojlanish rejimida (`dev_mode: true`)
+       Jo‘natuvchi: **noreply@asos.api.berdiklichev.uz**. Rivojlanish rejimida (`dev_mode: true`)
        javobda `devCode` ham qaytadi.
     2. `POST /v1/auth/verify` — kod to‘g‘ri bo‘lsa, token va foydalanuvchi qaytadi.
-       Manzil birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi (`isNew: true`).
     3. Keyingi so‘rovlarda `Authorization: Bearer <accessToken>`.
+
+    ### `purpose` — kirish va ro‘yxatdan o‘tish
+
+    Ikkala endpoint ham ixtiyoriy `purpose` maydonini oladi: `login` (standart)
+    yoki `register`. Server shu qiymatga qarab tekshiradi:
+
+    | `purpose` | Shart | Shart buzilsa |
+    |---|---|---|
+    | `login` | manzil bazada bo‘lishi kerak | `404 not_registered` |
+    | `register` | manzil bazada bo‘lmasligi kerak | `409 already_registered` |
+
+    Ya’ni ro‘yxatdan o‘tmagan manzilga kirish kodi **umuman yuborilmaydi** —
+    ilova «Avval ro‘yxatdan o‘ting» deb qaytaradi. Akkaunt `purpose: register`
+    bilan yuborilgan `verify` da yaratiladi (`isNew: true`), ism esa ketidan
+    `PATCH /v1/me` bilan saqlanadi.
 
     Telefon raqam oqimi serverdan olib tashlandi: ikkala endpoint ham faqat
     `email` ni qabul qiladi.
@@ -186,12 +200,16 @@ paths:
       tags: [Kirish]
       summary: Tasdiqlash kodini yuborish
       description: |
-        6 xonali kod **support@prteam.uz** dan jo‘natiladi. Yangi
+        6 xonali kod **noreply@asos.api.berdiklichev.uz** dan jo‘natiladi. Yangi
         jo‘natuvchi ko‘pincha «Spam» yoki «Promotions» papkasiga tushadi, shuning
         uchun ilova kod ekranida shu haqda ogohlantiradi.
 
         Bitta manzilga ketma-ket kod yuborish orasida kamida 60 sekund tanaffus.
         Kod 5 daqiqa amal qiladi.
+
+        `purpose` manzilni tekshirish shartini belgilaydi: `login` da manzil
+        ro‘yxatdan o‘tgan bo‘lishi kerak, `register` da esa aksincha. Shart
+        buzilsa, kod yuborilmaydi va yozuv ham yaratilmaydi.
       security: []
       requestBody:
         required: true
@@ -206,6 +224,13 @@ paths:
                   format: email
                   maxLength: 254
                   example: 'aziza@example.uz'
+                purpose:
+                  type: string
+                  enum: [login, register]
+                  default: login
+                  description: |
+                    `login` — mavjud akkauntga kirish, `register` — yangi akkaunt.
+                  example: login
       responses:
         '200':
           description: Kod yuborildi
@@ -225,6 +250,28 @@ paths:
                         type: string
                         description: "Faqat `dev_mode: true` bo‘lganda. Serverda qaytmaydi."
                         example: '123456'
+        '404':
+          description: '`purpose: login`, lekin bunday manzil ro‘yxatdan o‘tmagan'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      error: { type: string, example: not_registered }
+                      field: { type: string, example: email }
+        '409':
+          description: '`purpose: register`, lekin manzil allaqachon band'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      error: { type: string, example: already_registered }
+                      field: { type: string, example: email }
         '502':
           description: Xatni jo‘natib bo‘lmadi (SMTP xatosi)
           content:
@@ -253,7 +300,9 @@ paths:
       tags: [Kirish]
       summary: Kodni tasdiqlash va token olish
       description: |
-        Manzil birinchi marta ko‘rilsa, akkaunt shu yerda yaratiladi.
+        `purpose: register` bo‘lsa, akkaunt shu yerda yaratiladi (`isNew: true`).
+        `purpose: login` (standart) da esa mavjud akkaunt talab qilinadi —
+        topilmasa `404 not_registered`.
       security: []
       requestBody:
         required: true
@@ -265,6 +314,11 @@ paths:
               properties:
                 email: { type: string, format: email, example: 'aziza@example.uz' }
                 code:  { type: string, minLength: 6, maxLength: 6, example: '123456' }
+                purpose:
+                  type: string
+                  enum: [login, register]
+                  default: login
+                  example: login
       responses:
         '200':
           description: Kirish muvaffaqiyatli
@@ -289,6 +343,26 @@ paths:
                     properties:
                       triesLeft: { type: integer, example: 3 }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: '`purpose: login`, lekin bunday manzil ro‘yxatdan o‘tmagan'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      error: { type: string, example: not_registered }
+        '409':
+          description: '`purpose: register`, lekin manzil allaqachon band'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Error'
+                  - type: object
+                    properties:
+                      error: { type: string, example: already_registered }
         '410':
           description: Kod yuborilmagan yoki muddati tugagan
           content:

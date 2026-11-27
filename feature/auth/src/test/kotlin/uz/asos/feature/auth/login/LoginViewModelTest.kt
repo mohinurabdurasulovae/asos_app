@@ -13,6 +13,8 @@ import uz.asos.core.testing.MainDispatcherRule
 import uz.asos.core.testing.repository.FakeAuthRepository
 import uz.asos.feature.auth.common.OtpStep
 import uz.asos.feature.auth.data.FakeEmailAuthRepository
+import uz.asos.feature.auth.data.model.AuthErrorCode
+import uz.asos.feature.auth.data.model.AuthPurpose
 import uz.asos.feature.auth.data.model.CodeRequest
 
 class LoginViewModelTest {
@@ -109,6 +111,43 @@ class LoginViewModelTest {
 
         assertEquals(OtpStep.EMAIL, viewModel.otp().step)
         assertEquals("Email manzil noto‘g‘ri.", viewModel.otp().errorMessage)
+    }
+
+    @Test
+    fun `the code is asked for as a sign-in, not a sign-up`() {
+        val viewModel = createViewModel()
+
+        viewModel.requestCodeFor()
+
+        assertEquals(listOf(AuthPurpose.LOGIN), auth.requestedPurposes)
+    }
+
+    @Test
+    fun `an unregistered address is turned away and points at sign-up`() {
+        auth.requestCodeResult = AsosResult.Error(
+            message = "Bu email ro‘yxatdan o‘tmagan. Avval ro‘yxatdan o‘ting.",
+            code = AuthErrorCode.NOT_REGISTERED,
+        )
+        val viewModel = createViewModel()
+
+        viewModel.requestCodeFor("yangi@example.uz")
+
+        assertEquals(OtpStep.EMAIL, viewModel.otp().step)
+        assertEquals("Bu email ro‘yxatdan o‘tmagan. Avval ro‘yxatdan o‘ting.", viewModel.otp().errorMessage)
+        assertTrue(viewModel.otp().needsRegistration)
+    }
+
+    @Test
+    fun `editing the address clears the sign-up hint`() {
+        auth.requestCodeResult = AsosResult.Error(message = "...", code = AuthErrorCode.NOT_REGISTERED)
+        val viewModel = createViewModel()
+        viewModel.requestCodeFor("yangi@example.uz")
+        assertTrue(viewModel.otp().needsRegistration)
+
+        viewModel.onAction(LoginAction.OnEmailChange("yangi2@example.uz"))
+
+        assertFalse(viewModel.otp().needsRegistration)
+        assertNull(viewModel.otp().errorMessage)
     }
 
     @Test

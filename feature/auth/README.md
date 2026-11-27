@@ -13,9 +13,26 @@ Phone numbers and OneID were removed. Sign-in is:
 
 1. **Google** — one button at the top.
 2. **Email code** — the user types an address, the server mails a 6-digit code from
-   **support@prteam.uz**, and the code screen warns that it may land in Spam or Promotions.
+   **noreply@asos.api.berdiklichev.uz**, and the code screen warns that it may land in Spam or Promotions.
 
 The artboard still shows the phone field; the screens follow this flow instead.
+
+## Sign-in is not sign-up
+
+Both screens send the same two calls, told apart by `purpose` (`AuthPurpose`):
+
+| Screen | `purpose` | The server refuses with |
+|---|---|---|
+| Kirish | `login` | `404 not_registered` — the address has no account |
+| Ro‘yxatdan o‘tish | `register` | `409 already_registered` — the address is taken |
+
+So an unknown address never gets a sign-in code: the server answers «Avval ro‘yxatdan
+o‘ting», `OtpState.needsRegistration` turns true, and the prompt under the button changes
+to point at Ro‘yxatdan o‘tish (the mirror case, `needsSignIn`, points back at Kirish).
+
+Registration asks for **Ism va familiya** before the address; the name is saved with
+`PATCH /v1/me` right after the code is verified, so a new account is never left nameless
+unless that one call fails.
 
 ## Folder layout
 
@@ -34,8 +51,9 @@ A successful verify saves the token in `core:datastore`'s `TokenStore`, so
 
 ## API endpoints used (through `data/EmailAuthRepository`)
 
-- `POST /v1/auth/request-code` — `{ "email": "…" }`, mails the code
-- `POST /v1/auth/verify` — `{ "email": "…", "code": "123456" }`, creates the account on first sign-in
+- `POST /v1/auth/request-code` — `{ "email": "…", "purpose": "login" | "register" }`, mails the code
+- `POST /v1/auth/verify` — `{ "email": "…", "code": "123456", "purpose": … }`, creates the account when
+  the purpose is `register`
 - `PATCH /v1/me` — saves the name after registration
 - `POST /v1/auth/oauth` — `{ "provider": "google", "subject": "…" }`
 
@@ -46,8 +64,9 @@ See [`docs/api/openapi.yaml`](../../docs/api/openapi.yaml).
 Live since 27-noyabr 2026. `POST /v1/auth/request-code` and `POST /v1/auth/verify` take
 `email` only — the phone flow was removed from the server too, so the two sides match.
 
-Server files: `lib/mail.php` (validation, mail, the code flow) and `routes/auth.php`.
-The code is mailed with PHP `mail()` from **support@prteam.uz**; `auth_codes` is keyed by
+Server files: `lib/mail.php` (validation, mail, the code flow, the `purpose` guard) and
+`routes/auth.php`.
+The code is mailed with PHP `mail()` from **noreply@asos.api.berdiklichev.uz**; `auth_codes` is keyed by
 email, and `lib/mail.php` migrates that table itself on first use.
 
 ## Blocked on Google
@@ -67,4 +86,4 @@ wiring it up is: add the dependency, get the id token, pass its `subject`.
 - [x] Only depends on `core:*` modules
 - [x] The backend accepts `email` on request-code / verify
 - [ ] Google Sign-In SDK and client id
-- [ ] SPF / DKIM / DMARC on prteam.uz so the code does not land in Spam
+- [ ] SPF / DKIM / DMARC on asos.api.berdiklichev.uz so the code does not land in Spam

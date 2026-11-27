@@ -18,6 +18,7 @@
     <string name="auth_or">yoki</string>
     <string name="auth_google_continue">Google orqali davom etish</string>
     <string name="auth_no_account">Akkauntingiz yo‘qmi?</string>
+    <string name="auth_no_account_found">Bu manzil bo‘yicha akkaunt topilmadi.</string>
     <string name="auth_sign_up">Ro‘yxatdan o‘tish</string>
     <string name="auth_terms_prefix">Davom etib, </string>
     <string name="auth_terms_link">Foydalanish shartlari</string>
@@ -48,6 +49,7 @@
     <string name="auth_name_error">Ismingizni kiriting: kamida 2 ta harf.</string>
     <string name="auth_register_terms_suffix">ga roziman.</string>
     <string name="auth_have_account">Akkauntingiz bormi?</string>
+    <string name="auth_account_exists">Bu manzil allaqachon band.</string>
     <string name="auth_sign_in">Kirish</string>
 
     <string name="auth_google_unavailable">Google orqali kirish hali sozlanmagan. Hozircha email manzil orqali kiring.</string>
