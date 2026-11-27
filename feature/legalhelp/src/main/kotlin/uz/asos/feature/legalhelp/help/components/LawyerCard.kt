@@ -38,9 +38,9 @@ import uz.asos.core.designsystem.theme.AsosSpacing
 import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.core.designsystem.theme.AsosTheme
 import uz.asos.feature.legalhelp.R
-import uz.asos.feature.legalhelp.data.temp.AvatarTone
-import uz.asos.feature.legalhelp.data.temp.LawyerCategory
+import uz.asos.feature.legalhelp.help.FreeSlotUi
 import uz.asos.feature.legalhelp.help.LawyerUi
+import uz.asos.feature.legalhelp.ui.AvatarTone
 import uz.asos.feature.legalhelp.ui.LawyerAvatar
 
 private val ActionHeight = 48.dp
@@ -53,6 +53,7 @@ internal fun LawyerCard(
     onVideoCall: () -> Unit,
     onBook: () -> Unit,
     modifier: Modifier = Modifier,
+    isOpeningChat: Boolean = false,
 ) {
     val online = stringResource(R.string.legalhelp_online)
     AsosCard(modifier = modifier.fillMaxWidth()) {
@@ -80,12 +81,20 @@ internal fun LawyerCard(
                         }
                     }
                     Text(
-                        text = stringResource(R.string.legalhelp_lawyer_experience, lawyer.specialty, lawyer.experienceYears),
+                        text = if (lawyer.specialtyLine.isNotEmpty()) {
+                            stringResource(R.string.legalhelp_lawyer_experience, lawyer.specialtyLine, lawyer.experienceYears)
+                        } else {
+                            stringResource(R.string.legalhelp_lawyer_years, lawyer.experienceYears)
+                        },
                         style = AsosTextStyles.Meta.copy(color = AsosColors.Text3),
                     )
                     when {
-                        lawyer.nextFreeTime != null -> Text(
-                            text = stringResource(R.string.legalhelp_lawyer_free_from, lawyer.nextFreeTime),
+                        lawyer.nextFree != null -> Text(
+                            text = if (lawyer.nextFree.isToday) {
+                                stringResource(R.string.legalhelp_lawyer_free_today, lawyer.nextFree.time)
+                            } else {
+                                stringResource(R.string.legalhelp_lawyer_free_on, lawyer.nextFree.dateLabel, lawyer.nextFree.time)
+                            },
                             style = AsosTextStyles.Tag,
                             color = AsosColors.WarningOnLight,
                         )
@@ -111,6 +120,7 @@ internal fun LawyerCard(
                     AsosButton(
                         text = stringResource(R.string.legalhelp_lawyer_write),
                         onClick = onWrite,
+                        enabled = !isOpeningChat,
                         modifier = Modifier.weight(1f),
                         height = ActionHeight,
                         leadingIcon = AsosIcons.Comment,
@@ -156,20 +166,21 @@ private fun SquareIconButton(icon: ImageVector, contentDescription: String, onCl
 
 internal val PreviewLawyers = listOf(
     LawyerUi(
-        id = 1, name = "Sardor Rahimov", initials = "SR", specialty = "Uy-joy va fuqarolik ishlari",
-        experienceYears = 9, ratingLabel = "4,9", reviewCount = 210, isOnline = true, isVerified = true,
-        nextFreeTime = null, categories = setOf(LawyerCategory.HOUSING), avatarTone = AvatarTone.NAVY,
+        id = 1, name = "Sardor Rahimov", initials = "SR", specialties = listOf("Uy-joy", "Fuqarolik ishlari"),
+        specialtyLine = "Uy-joy va fuqarolik ishlari", experienceYears = 9, ratingLabel = "4,9", reviewCount = 210,
+        isOnline = true, isVerified = true, nextFree = null, avatarTone = AvatarTone.NAVY,
     ),
     LawyerUi(
-        id = 2, name = "Malika Yusupova", initials = "MY", specialty = "Oila va ta’lim huquqi",
-        experienceYears = 12, ratingLabel = "4,8", reviewCount = 164, isOnline = true, isVerified = true,
-        nextFreeTime = null, categories = setOf(LawyerCategory.FAMILY, LawyerCategory.EDUCATION),
-        avatarTone = AvatarTone.BRAND,
+        id = 2, name = "Malika Yusupova", initials = "MY", specialties = listOf("Oila", "Ta’lim"),
+        specialtyLine = "Oila va ta’lim", experienceYears = 12, ratingLabel = "4,8", reviewCount = 164,
+        isOnline = true, isVerified = true, nextFree = null, avatarTone = AvatarTone.BRAND,
     ),
     LawyerUi(
-        id = 3, name = "Bekzod Karimov", initials = "BK", specialty = "Mehnat huquqi",
-        experienceYears = 6, ratingLabel = null, reviewCount = 0, isOnline = false, isVerified = true,
-        nextFreeTime = "15:00", categories = setOf(LawyerCategory.LABOR), avatarTone = AvatarTone.ORANGE,
+        id = 3, name = "Bekzod Karimov", initials = "BK", specialties = listOf("Mehnat"),
+        specialtyLine = "Mehnat", experienceYears = 6, ratingLabel = null, reviewCount = 0,
+        isOnline = false, isVerified = true,
+        nextFree = FreeSlotUi(raw = "2026-11-21 15:00", isToday = true, dateLabel = "21.11", time = "15:00"),
+        avatarTone = AvatarTone.ORANGE,
     ),
 )
 

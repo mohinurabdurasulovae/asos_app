@@ -33,20 +33,7 @@ import uz.asos.core.designsystem.theme.AsosSpacing
 import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.core.designsystem.theme.AsosTheme
 import uz.asos.feature.legalhelp.R
-import uz.asos.feature.legalhelp.data.temp.LawyerCategory
 import uz.asos.feature.legalhelp.help.LawyerUi
-
-/** Chip label for each category; null = "Barchasi". */
-@Composable
-internal fun LawyerCategory?.label(): String = stringResource(
-    when (this) {
-        null -> R.string.legalhelp_filter_all
-        LawyerCategory.HOUSING -> R.string.legalhelp_filter_housing
-        LawyerCategory.FAMILY -> R.string.legalhelp_filter_family
-        LawyerCategory.LABOR -> R.string.legalhelp_filter_labor
-        LawyerCategory.EDUCATION -> R.string.legalhelp_filter_education
-    },
-)
 
 @Composable
 internal fun LawyersHeader(
@@ -80,12 +67,13 @@ internal fun LawyersHeader(
 
 @Composable
 internal fun LawyerFilterChips(
-    selected: LawyerCategory?,
-    onSelect: (LawyerCategory?) -> Unit,
+    specialties: List<String>,
+    selected: String?,
+    onSelect: (String?) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    val options: List<LawyerCategory?> = listOf(null) + LawyerCategory.entries
+    val options: List<String?> = listOf<String?>(null) + specialties
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -95,7 +83,7 @@ internal fun LawyerFilterChips(
     ) {
         options.forEach { category ->
             AsosChip(
-                label = category.label(),
+                label = category ?: stringResource(R.string.legalhelp_filter_all),
                 selected = category == selected,
                 onClick = { onSelect(category) },
             )
@@ -112,6 +100,7 @@ internal fun LawyerList(
     onVideoCall: (Int) -> Unit,
     onBook: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    openingChatForLawyerId: Int? = null,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AsosSpacing.m)) {
         if (lawyers.isEmpty()) {
@@ -131,6 +120,7 @@ internal fun LawyerList(
                 onCall = { onCall(lawyer.id) },
                 onVideoCall = { onVideoCall(lawyer.id) },
                 onBook = { onBook(lawyer.id) },
+                isOpeningChat = openingChatForLawyerId == lawyer.id,
             )
         }
     }
@@ -142,7 +132,12 @@ private fun LawyerListPreview() {
     AsosTheme {
         Column(Modifier.padding(vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             LawyersHeader(onlineCount = 2, modifier = Modifier.padding(horizontal = 20.dp))
-            LawyerFilterChips(selected = null, onSelect = {}, contentPadding = PaddingValues(horizontal = 20.dp))
+            LawyerFilterChips(
+                specialties = listOf("Uy-joy", "Oila", "Mehnat", "Ta’lim"),
+                selected = null,
+                onSelect = {},
+                contentPadding = PaddingValues(horizontal = 20.dp),
+            )
             LawyerList(
                 lawyers = PreviewLawyers,
                 onWrite = {},

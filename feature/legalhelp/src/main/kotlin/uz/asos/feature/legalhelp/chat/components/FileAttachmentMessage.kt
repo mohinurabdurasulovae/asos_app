@@ -73,7 +73,7 @@ internal fun FileAttachmentMessage(
 private fun FileAttachmentMessagePreview() {
     AsosTheme {
         FileAttachmentMessage(
-            file = ChatFileUi(name = "Ogohlantirish_xati.docx", meta = "24 KB · Word"),
+            file = ChatFileUi(name = "Ogohlantirish_xati.docx", meta = "24 KB · Word", url = null),
             onClick = {},
             modifier = Modifier.padding(16.dp),
         )

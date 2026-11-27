@@ -41,7 +41,7 @@ import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.core.designsystem.theme.AsosTheme
 import uz.asos.feature.legalhelp.R
 import uz.asos.feature.legalhelp.chat.ChatLawyerUi
-import uz.asos.feature.legalhelp.data.temp.AvatarTone
+import uz.asos.feature.legalhelp.ui.AvatarTone
 import uz.asos.feature.legalhelp.ui.LawyerAvatar
 
 @Composable
@@ -149,7 +149,6 @@ private fun ChatTopBarPreview() {
         ChatTopBar(
             lawyer = ChatLawyerUi(
                 name = "Sardor Rahimov",
-                firstName = "Sardor",
                 initials = "SR",
                 isOnline = true,
                 isVerified = true,

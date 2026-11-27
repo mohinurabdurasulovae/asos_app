@@ -10,6 +10,5 @@ android {
 }
 
 dependencies {
-    // TODO(WP-02): uncomment when core:data has LegalHelpRepository, then delete data/temp/.
-    // implementation(project(":core:data"))
+    implementation(project(":core:data"))
 }

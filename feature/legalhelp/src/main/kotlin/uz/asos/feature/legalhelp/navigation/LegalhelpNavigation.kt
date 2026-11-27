@@ -6,7 +6,7 @@
  * navigateTo… helpers. The app module calls these and nothing else.
  *
  *  - LegalHelpScreen → LegalHelpRoute
- *  - ChatScreen      → ChatRoute(chatId)
+ *  - ChatScreen      → ChatRoute(chatId), chatId = conversation id from the API
  *
  * The screen composables are also called LegalHelpRoute / ChatRoute (docs/ARCHITECTURE.md
  * "XRoute" pattern), so the route classes are imported here as …Destination.
@@ -19,6 +19,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import uz.asos.core.navigation.ArticleRoute
 import uz.asos.core.navigation.AsosRoute
+import uz.asos.core.navigation.LoginRoute
 import uz.asos.feature.legalhelp.chat.ChatRoute
 import uz.asos.feature.legalhelp.help.LegalHelpRoute
 import uz.asos.core.navigation.ChatRoute as ChatDestination
@@ -28,8 +29,8 @@ fun NavController.navigateToLegalHelp(navOptions: NavOptions? = null) {
     navigate(LegalHelpDestination, navOptions)
 }
 
-fun NavController.navigateToChat(chatId: Int, navOptions: NavOptions? = null) {
-    navigate(ChatDestination(chatId), navOptions)
+fun NavController.navigateToChat(conversationId: Int, navOptions: NavOptions? = null) {
+    navigate(ChatDestination(conversationId), navOptions)
 }
 
 /**
@@ -43,8 +44,9 @@ fun NavGraphBuilder.legalHelpScreens(
     composable<LegalHelpDestination> {
         LegalHelpRoute(
             onBack = { navController.navigateUp() },
-            onOpenChat = { chatId -> onNavigate(ChatDestination(chatId)) },
+            onOpenChat = { conversationId -> onNavigate(ChatDestination(conversationId)) },
             onOpenArticle = { number -> onNavigate(ArticleRoute(number)) },
+            onSignIn = { onNavigate(LoginRoute) },
         )
     }
 
@@ -52,6 +54,7 @@ fun NavGraphBuilder.legalHelpScreens(
         ChatRoute(
             onBack = { navController.navigateUp() },
             onOpenArticle = { number -> onNavigate(ArticleRoute(number)) },
+            onSignIn = { onNavigate(LoginRoute) },
         )
     }
 }

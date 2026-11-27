@@ -42,8 +42,10 @@ internal fun HotlineCard(
     onCallback: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val hours = stringResource(R.string.legalhelp_hotline_hours, hotline.opensAt, hotline.closesAt)
-    val subtitle = if (hotline.isFree) "$hours · ${stringResource(R.string.legalhelp_hotline_free)}" else hours
+    val hours = if (hotline.everyDay) stringResource(R.string.legalhelp_hotline_every_day, hotline.hours) else hotline.hours
+    val subtitle = listOf(hours, if (hotline.isFree) stringResource(R.string.legalhelp_hotline_free) else "")
+        .filter { it.isNotBlank() }
+        .joinToString(" · ")
 
     AsosCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -65,7 +67,7 @@ internal fun HotlineCard(
                         .padding(horizontal = AsosSpacing.m),
                 ) {
                     Text(text = stringResource(R.string.legalhelp_hotline_title), style = AsosTextStyles.RowTitle)
-                    Text(text = subtitle, style = AsosTextStyles.Meta)
+                    if (subtitle.isNotEmpty()) Text(text = subtitle, style = AsosTextStyles.Meta)
                 }
                 OpenStatus(isOpen = hotline.isOpenNow)
             }
@@ -74,6 +76,7 @@ internal fun HotlineCard(
                 text = hotline.displayNumber,
                 style = AsosTextStyles.SerifNumber.copy(fontSize = AsosTextStyles.SerifNumber.fontSize * 1.1f),
             )
+            hotline.note?.let { note -> Text(text = note, style = AsosTextStyles.Meta) }
 
             Row(horizontalArrangement = Arrangement.spacedBy(AsosSpacing.s)) {
                 AsosButton(
@@ -121,10 +124,11 @@ private fun HotlineCardPreview() {
             hotline = HotlineUi(
                 displayNumber = "+998 (71) 000-00-00",
                 dialNumber = "+998710000000",
-                opensAt = "09:00",
-                closesAt = "21:00",
+                hours = "09:00–21:00",
+                everyDay = true,
                 isFree = true,
                 isOpenNow = true,
+                note = null,
             ),
             onCall = {},
             onCallback = {},

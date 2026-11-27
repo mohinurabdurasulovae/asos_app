@@ -45,6 +45,7 @@ import uz.asos.core.designsystem.theme.AsosSpacing
 import uz.asos.core.designsystem.theme.AsosTextStyles
 import uz.asos.core.designsystem.theme.AsosTheme
 import uz.asos.feature.legalhelp.R
+import uz.asos.feature.legalhelp.help.AnswerArticleUi
 import uz.asos.feature.legalhelp.help.AssistantAnswerUi
 import uz.asos.feature.legalhelp.help.AssistantUi
 
@@ -61,13 +62,9 @@ internal fun AiAssistantCard(
     onSend: () -> Unit,
     onVoiceClick: () -> Unit,
     onArticleClick: (Int) -> Unit,
+    onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val suggestions = listOf(
-        stringResource(R.string.legalhelp_ai_chip_salary),
-        stringResource(R.string.legalhelp_ai_chip_rent),
-        stringResource(R.string.legalhelp_ai_chip_student),
-    )
 
     Column(
         modifier = modifier
@@ -88,12 +85,12 @@ internal fun AiAssistantCard(
             }
             Column(Modifier.padding(start = AsosSpacing.m)) {
                 Text(
-                    text = stringResource(R.string.legalhelp_ai_title),
+                    text = state.title.ifBlank { stringResource(R.string.legalhelp_ai_title) },
                     style = AsosTextStyles.CardTitle,
                     color = AsosColors.Surface,
                 )
                 Text(
-                    text = stringResource(R.string.legalhelp_ai_subtitle),
+                    text = state.subtitle.ifBlank { stringResource(R.string.legalhelp_ai_subtitle) },
                     style = AsosTextStyles.Meta,
                     color = AsosColors.TextOnNavy,
                 )
@@ -157,13 +154,15 @@ internal fun AiAssistantCard(
             }
         }
 
-        // Suggestions
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(AsosSpacing.s),
-            verticalArrangement = Arrangement.spacedBy(AsosSpacing.s),
-        ) {
-            suggestions.forEach { label ->
-                OnNavyChip(label = label, onClick = { onSuggestionClick(label) })
+        // Suggestions (sent by the API)
+        if (state.suggestions.isNotEmpty()) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(AsosSpacing.s),
+                verticalArrangement = Arrangement.spacedBy(AsosSpacing.s),
+            ) {
+                state.suggestions.forEach { label ->
+                    OnNavyChip(label = label, onClick = { onSuggestionClick(label) })
+                }
             }
         }
 
@@ -174,15 +173,25 @@ internal fun AiAssistantCard(
                 color = AsosColors.TextOnNavy,
             )
         }
+        if (state.isTooShort) {
+            Text(
+                text = stringResource(R.string.legalhelp_ai_too_short, AssistantUi.MIN_QUESTION_LENGTH),
+                style = AsosTextStyles.Meta,
+                color = AsosColors.WarningBg,
+            )
+        }
         state.errorMessage?.let { message ->
             Text(text = message, style = AsosTextStyles.Meta, color = AsosColors.ErrorBg)
+        }
+        if (state.needsSignIn) {
+            SignInRow(onSignIn = onSignIn)
         }
         state.answer?.let { answer ->
             AssistantAnswer(answer = answer, onArticleClick = onArticleClick)
         }
 
         Text(
-            text = stringResource(R.string.legalhelp_ai_disclaimer),
+            text = state.disclaimer.ifBlank { stringResource(R.string.legalhelp_ai_disclaimer) },
             style = AsosTextStyles.Meta.copy(fontSize = AsosTextStyles.Tag.fontSize),
             color = AsosColors.TextOnNavy.copy(alpha = 0.8f),
         )
@@ -232,6 +241,35 @@ private fun OnNavyChip(label: String, onClick: () -> Unit) {
 }
 
 @Composable
+private fun SignInRow(onSignIn: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(OnNavyField, AsosShapes.R14)
+            .padding(start = AsosSpacing.m, end = AsosSpacing.xxs, top = AsosSpacing.xxs, bottom = AsosSpacing.xxs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.legalhelp_ai_sign_in),
+            style = AsosTextStyles.Meta,
+            color = AsosColors.Surface,
+            modifier = Modifier.weight(1f),
+        )
+        Box(
+            modifier = Modifier
+                .heightIn(min = AsosSpacing.minTouch)
+                .clip(AsosShapes.R12)
+                .background(AsosColors.Surface)
+                .clickable(role = Role.Button, onClick = onSignIn)
+                .padding(horizontal = AsosSpacing.l),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = stringResource(R.string.legalhelp_sign_in), style = AsosTextStyles.Tag, color = AsosColors.Brand600)
+        }
+    }
+}
+
+@Composable
 private fun AssistantAnswer(answer: AssistantAnswerUi, onArticleClick: (Int) -> Unit) {
     Column(
         modifier = Modifier
@@ -240,38 +278,49 @@ private fun AssistantAnswer(answer: AssistantAnswerUi, onArticleClick: (Int) -> 
             .padding(AsosSpacing.l),
         verticalArrangement = Arrangement.spacedBy(AsosSpacing.m),
     ) {
-        Text(text = answer.text, style = AsosTextStyles.BodySmall, color = AsosColors.Navy)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(AsosShapes.R14)
-                .background(AsosColors.Brand50)
-                .clickable(
-                    role = Role.Button,
-                    onClickLabel = stringResource(R.string.legalhelp_chat_open_article),
-                    onClick = { onArticleClick(answer.articleNumber) },
-                )
-                .padding(AsosSpacing.m),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            ArticleNumberBadge(
-                text = answer.articleNumber.toString(),
-                variant = ArticleNumberBadgeVariant.Brand,
-                size = 36.dp,
-                cornerRadius = 10.dp,
-            )
-            Column(
-                Modifier
-                    .weight(1f)
-                    .padding(horizontal = AsosSpacing.m),
+        if (answer.text.isNotBlank()) {
+            Text(text = answer.text, style = AsosTextStyles.BodySmall, color = AsosColors.Navy)
+        }
+        answer.articles.forEach { article ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(AsosShapes.R14)
+                    .background(AsosColors.Brand50)
+                    .clickable(
+                        role = Role.Button,
+                        onClickLabel = stringResource(R.string.legalhelp_chat_open_article),
+                        onClick = { onArticleClick(article.number) },
+                    )
+                    .padding(AsosSpacing.m),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = stringResource(R.string.legalhelp_article_label, answer.articleNumber),
-                    style = AsosTextStyles.RowTitle,
+                ArticleNumberBadge(
+                    text = article.number.toString(),
+                    variant = ArticleNumberBadgeVariant.Brand,
+                    size = 36.dp,
+                    cornerRadius = 10.dp,
                 )
-                Text(text = answer.articleTitle, style = AsosTextStyles.Meta)
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .padding(horizontal = AsosSpacing.m),
+                ) {
+                    Text(
+                        text = stringResource(R.string.legalhelp_article_label, article.number),
+                        style = AsosTextStyles.RowTitle,
+                    )
+                    Text(text = article.title, style = AsosTextStyles.Meta)
+                    article.hint?.let { hint ->
+                        Text(
+                            text = hint,
+                            style = AsosTextStyles.Meta.copy(color = AsosColors.Text3),
+                            modifier = Modifier.padding(top = AsosSpacing.xxs),
+                        )
+                    }
+                }
+                Icon(AsosIcons.ChevronRight, contentDescription = null, tint = AsosColors.Brand600, modifier = Modifier.size(18.dp))
             }
-            Icon(AsosIcons.ChevronRight, contentDescription = null, tint = AsosColors.Brand600, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -281,12 +330,15 @@ private fun AssistantAnswer(answer: AssistantAnswerUi, onArticleClick: (Int) -> 
 private fun AiAssistantCardPreview() {
     AsosTheme {
         AiAssistantCard(
-            state = AssistantUi(),
+            state = AssistantUi(
+                suggestions = listOf("Ish haqi kechikdi", "Ijara muammosi", "Talaba huquqlari"),
+            ),
             onInputChange = {},
             onSuggestionClick = {},
             onSend = {},
             onVoiceClick = {},
             onArticleClick = {},
+            onSignIn = {},
             modifier = Modifier.padding(16.dp),
         )
     }
@@ -299,10 +351,12 @@ private fun AiAssistantCardAnswerPreview() {
         AiAssistantCard(
             state = AssistantUi(
                 input = "Ijara muammosi",
+                suggestions = listOf("Ish haqi kechikdi", "Ijara muammosi", "Talaba huquqlari"),
                 answer = AssistantAnswerUi(
                     text = "Uy-joy daxlsiz. Avval uy egasiga yozma ogohlantirish yuboring.",
-                    articleNumber = 31,
-                    articleTitle = "Shaxsiy hayot va uy-joy daxlsizligi",
+                    articles = listOf(
+                        AnswerArticleUi(31, "Shaxsiy hayot va uy-joy daxlsizligi", "Har kim uy-joy daxlsizligi huquqiga ega."),
+                    ),
                 ),
             ),
             onInputChange = {},
@@ -310,6 +364,7 @@ private fun AiAssistantCardAnswerPreview() {
             onSend = {},
             onVoiceClick = {},
             onArticleClick = {},
+            onSignIn = {},
             modifier = Modifier.padding(16.dp),
         )
     }
