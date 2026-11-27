@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Asos" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#F5F8FC</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:colorAccent">#1C64C0</item>
+    </style>
+    <string name="app_name">Asos · Huquqiy yordam</string>
+</resources>
